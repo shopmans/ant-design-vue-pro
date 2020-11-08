@@ -10,7 +10,9 @@ const user = {
     welcome: '',
     avatar: '',
     roles: [],
-    info: {}
+    info: {},
+    workOrderType: '',
+    detailData: {}
   },
 
   mutations: {
@@ -29,17 +31,25 @@ const user = {
     },
     SET_INFO: (state, info) => {
       state.info = info
+    },
+    SET_WORK_ORDER_TYPE: (state, type) => {
+      state.workOrderType = type
+    },
+    SET_DETAIL_DATA: (state, data) => {
+      state.detailData = data
     }
   },
 
   actions: {
     // 登录
     Login ({ commit }, userInfo) {
+      console.log(userInfo)
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
           const result = response.result
           storage.set(ACCESS_TOKEN, result.token, 7 * 24 * 60 * 60 * 1000)
           commit('SET_TOKEN', result.token)
+          commit('SET_WORK_ORDER_TYPE', userInfo.workOrderType)
           resolve()
         }).catch(error => {
           reject(error)
@@ -52,7 +62,6 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
           const result = response.result
-
           if (result.role && result.role.permissions.length > 0) {
             const role = result.role
             role.permissions = result.role.permissions
@@ -89,6 +98,7 @@ const user = {
         }).finally(() => {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
+          commit('SET_WORK_ORDER_TYPE', '')
           storage.remove(ACCESS_TOKEN)
         })
       })

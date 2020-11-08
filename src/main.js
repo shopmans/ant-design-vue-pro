@@ -13,13 +13,21 @@ import themePluginConfig from '../config/themePluginConfig'
 
 // mock
 // WARNING: `mockjs` NOT SUPPORT `IE` PLEASE DO NOT USE IN `production` ENV.
-import './mock'
+// import './mock'
 
 import bootstrap from './core/bootstrap'
 import './core/lazy_use'
 import './permission' // permission control
 import './utils/filter' // global filter
 import './global.less'
+// import print from './api/print'
+import Print from 'vue-print-nb'
+import 'viewerjs/dist/viewer.css'
+import Viewer from 'v-viewer'
+import VueCookies from 'vue-cookies'
+
+Vue.use(VueCookies)
+Vue.use(Viewer)
 
 Vue.config.productionTip = false
 
@@ -27,6 +35,7 @@ Vue.config.productionTip = false
 Vue.use(VueAxios)
 Vue.component('pro-layout', ProLayout)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
+Vue.use(Print)
 
 window.umi_plugin_ant_themeVar = themePluginConfig.theme
 

@@ -48,11 +48,9 @@ export default {
     }
   },
   mounted () {
-    setTimeout(() => {
-      this.currentUser = {
-        name: 'Serati Ma'
-      }
-    }, 1500)
+    this.currentUser = {
+      name: this.$store.state.user.name
+    }
   }
 }
 </script>

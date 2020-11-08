@@ -12,9 +12,28 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['login', 'register', 'registerResult'] // no redirect whitelist
 const loginRoutePath = '/user/login'
-const defaultRoutePath = '/dashboard/workplace'
+const defaultRoutePath = 'project/project-list'
 
 router.beforeEach((to, from, next) => {
+  console.log('router to: ' + to.fullPath)
+  console.log('router from: ' + from.fullPath)
+
+  const userAgent = navigator.userAgent
+  if (userAgent.indexOf('Android') > -1) {
+    // 移动端不跳转到登录界面，在移动端会将cookie设置给页面
+    if (!storage.get(ACCESS_TOKEN)) {
+      storage.set(ACCESS_TOKEN, 'Android_client', 7 * 24 * 60 * 60 * 1000)
+    }
+    // 移动端路由是/step/steplist 则视为返回
+    if (to.fullPath.indexOf('step/steplist') > -1) {
+      // eslint-disable-next-line no-undef
+      callFlutterBacktoList.postMessage('call from vue backtolist')
+      return
+    }
+  }
+
+  //  || to.fullPath.indexOf('/step/steplist') > -1
+
   NProgress.start() // start progress bar
   to.meta && (typeof to.meta.title !== 'undefined' && setDocumentTitle(`${i18nRender(to.meta.title)} - ${domTitle}`))
   /* has token */

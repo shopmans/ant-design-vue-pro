@@ -1,6 +1,6 @@
 <template>
   <pro-layout
-    :title="title"
+    :title="$t('app.title')"
     :menus="menus"
     :collapsed="collapsed"
     :mediaQuery="query"
@@ -11,7 +11,7 @@
     :i18nRender="i18nRender"
     v-bind="settings"
   >
-    <setting-drawer :settings="settings" @change="handleSettingChange" />
+    <!-- <setting-drawer :settings="settings" @change="handleSettingChange" /> -->
     <template v-slot:rightContentRender>
       <right-content :top-menu="settings.layout === 'topmenu'" :is-mobile="isMobile" :theme="settings.theme" />
     </template>
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { SettingDrawer, updateTheme } from '@ant-design-vue/pro-layout'
+// import { SettingDrawer, updateTheme } from '@ant-design-vue/pro-layout'
 import { i18nRender } from '@/locales'
 import { mapState } from 'vuex'
 import { SIDEBAR_TYPE, TOGGLE_MOBILE_TYPE } from '@/store/mutation-types'
@@ -36,7 +36,7 @@ import LogoSvg from '../assets/logo.svg?inline'
 export default {
   name: 'BasicLayout',
   components: {
-    SettingDrawer,
+    // SettingDrawer,
     RightContent,
     GlobalFooter
   },
@@ -46,7 +46,6 @@ export default {
       menus: [],
       // 侧栏收起状态
       collapsed: false,
-      title: defaultSettings.title,
       settings: {
         // 布局类型
         layout: defaultSettings.layout, // 'sidemenu', 'topmenu'
@@ -59,6 +58,7 @@ export default {
         fixedHeader: defaultSettings.fixedHeader,
         fixSiderbar: defaultSettings.fixSiderbar,
         colorWeak: defaultSettings.colorWeak,
+        collapsedWidth: 0,
 
         hideHintAlert: false,
         hideCopyButton: false
@@ -99,7 +99,7 @@ export default {
     }
 
     // first update color
-    updateTheme(this.settings.primaryColor)
+    // updateTheme(this.settings.primaryColor)
   },
   methods: {
     i18nRender,

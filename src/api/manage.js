@@ -11,6 +11,14 @@ const api = {
 
 export default api
 
+export function getProjectList (parameter) {
+  return request({
+    url: api.service,
+    method: 'get',
+    params: parameter
+  })
+}
+
 export function getUserList (parameter) {
   return request({
     url: api.user,

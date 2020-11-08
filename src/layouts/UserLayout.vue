@@ -5,24 +5,19 @@
         <div class="header">
           <a href="/">
             <img src="~@/assets/logo.svg" class="logo" alt="logo">
-            <span class="title">Ant Design</span>
+            <span class="title">赛来科技</span>
           </a>
         </div>
         <div class="desc">
-          Ant Design 是西湖区最具影响力的 Web 设计规范
+          售后-维修服务管理系统
         </div>
       </div>
 
       <router-view />
 
       <div class="footer">
-        <div class="links">
-          <a href="_self">帮助</a>
-          <a href="_self">隐私</a>
-          <a href="_self">条款</a>
-        </div>
         <div class="copyright">
-          Copyright &copy; 2018 vueComponent
+          Copyright &copy; 2020 SinoControls
         </div>
       </div>
     </div>
@@ -31,12 +26,16 @@
 
 <script>
 import { deviceMixin } from '@/store/device-mixin'
+// import { getStepParameter } from '@/api/mGetParam'
 
 export default {
   name: 'UserLayout',
   mixins: [deviceMixin],
   mounted () {
+    // this.$cookies.set('sino_sr_server_mobile_session', 'MTYwNDI0MTE4NHxEdi1CQkFFQ180SUFBUkFCRUFBQV80WF9nZ0FCQm5OMGNtbHVad3dqQUNGemFXNXZYM055WDI5aGRYUm9NbDl6WlhKMlpYSmZiVzlpYVd4bFgzVnpaWElhS25ObGMzTnBiMjR1VFc5aWFXeGxWWE5sY2xObGMzTnBiMjdfaFFNQkFSRk5iMkpwYkdWVmMyVnlVMlZ6YzJsdmJnSF9oZ0FCQWdFR1JteHZkMGxFQVF3QUFRdERkWEp5Wlc1MFUzUmxjQUVNQUFBQU1fLUdNQUVrTXpNeU1XVTRaVFV0T1RVMk5TMDBOelEzTFdKaVpUa3ROemhsT0Rrd09XRTBPR1E0QVFkU1pXTmxhWEIwQUE9PXyPg_IDm6Si7DmGDo92L-34oXKaF3xc03YDqmBT7ZLTZg==', 'Sun, 08 Nov 2020 14:33:04 GMT')
+    // document.cookie = 'sino_sr_server_mobile_session=MTYwNDI0MTE4NHxEdi1CQkFFQ180SUFBUkFCRUFBQV80WF9nZ0FCQm5OMGNtbHVad3dqQUNGemFXNXZYM055WDI5aGRYUm9NbDl6WlhKMlpYSmZiVzlpYVd4bFgzVnpaWElhS25ObGMzTnBiMjR1VFc5aWFXeGxWWE5sY2xObGMzTnBiMjdfaFFNQkFSRk5iMkpwYkdWVmMyVnlVMlZ6YzJsdmJnSF9oZ0FCQWdFR1JteHZkMGxFQVF3QUFRdERkWEp5Wlc1MFUzUmxjQUVNQUFBQU1fLUdNQUVrTXpNeU1XVTRaVFV0T1RVMk5TMDBOelEzTFdKaVpUa3ROemhsT0Rrd09XRTBPR1E0QVFkU1pXTmxhWEIwQUE9PXyPg_IDm6Si7DmGDo92L-34oXKaF3xc03YDqmBT7ZLTZg==; Expires=Sun, 08 Nov 2020 14:33:04 GMT; Max-Age=604800; Path=/; HttpOnly'
     document.body.classList.add('userLayout')
+    // getStepParameter()
   },
   beforeDestroy () {
     document.body.classList.remove('userLayout')

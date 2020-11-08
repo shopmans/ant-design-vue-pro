@@ -4,16 +4,15 @@
       <a-form layout="inline">
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
-            <a-form-item label="角色ID">
+            <a-form-item label="工号">
               <a-input placeholder="请输入"/>
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
             <a-form-item label="状态">
               <a-select placeholder="请选择" default-value="0">
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
+                <a-select-option value="1">全部</a-select-option>
+                <a-select-option value="2">禁用</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -32,48 +31,17 @@
       size="default"
       :columns="columns"
       :data="loadData"
-      :expandedRowKeys="expandedRowKeys"
-      @expand="handleExpand"
     >
-      <div
-        slot="expandedRowRender"
-        slot-scope="record"
-        style="margin: 0">
-        <a-row
-          :gutter="24"
-          :style="{ marginBottom: '12px' }">
-          <a-col :span="12" v-for="(role, index) in record.permissions" :key="index" :style="{ marginBottom: '12px', height: '23px' }">
-            <a-col :lg="4" :md="24">
-              <span>{{ role.permissionName }}：</span>
-            </a-col>
-            <a-col :lg="20" :md="24" v-if="role.actionList && role.actionList.length > 0">
-              <a-tag color="cyan" v-for="action in role.actionList" :key="action">{{ action | permissionFilter }}</a-tag>
-            </a-col>
-            <a-col :span="20" v-else>-</a-col>
-          </a-col>
-        </a-row>
-      </div>
       <a-tag color="blue" slot="status" slot-scope="text">{{ text | statusFilter }}</a-tag>
-      <span slot="createTime" slot-scope="text">{{ text | moment }}</span>
+      <span slot="date" slot-scope="text">{{ text | moment }}</span>
       <span slot="action" slot-scope="text, record">
         <a @click="handleEdit(record)">编辑</a>
         <a-divider type="vertical" />
-        <a-dropdown>
-          <a class="ant-dropdown-link">
-            更多 <a-icon type="down" />
-          </a>
-          <a-menu slot="overlay">
-            <a-menu-item>
-              <a href="javascript:;">详情</a>
-            </a-menu-item>
-            <a-menu-item>
-              <a href="javascript:;">禁用</a>
-            </a-menu-item>
-            <a-menu-item>
-              <a href="javascript:;">删除</a>
-            </a-menu-item>
-          </a-menu>
-        </a-dropdown>
+        <a @click="handleEdit(record)">禁用</a>
+        <a-divider type="vertical" />
+        <a @click="handleEdit(record)">密码</a>
+        <a-divider type="vertical" />
+        <a @click="handleEdit(record)">删除</a>
       </span>
     </s-table>
 
@@ -164,7 +132,7 @@
 <script>
 import pick from 'lodash.pick'
 import { STable } from '@/components'
-import { getRoleList, getServiceList } from '@/api/manage'
+import { getUserList } from '@/api/user'
 import { PERMISSION_ENUM } from '@/utils/helper/permission'
 
 const STATUS = {
@@ -174,26 +142,32 @@ const STATUS = {
 
 const columns = [
   {
-    title: '唯一识别码',
-    dataIndex: 'id'
+    title: '日期',
+    dataIndex: 'date'
   },
   {
-    title: '角色名称',
-    dataIndex: 'name'
+    title: '用户名',
+    dataIndex: 'user_name'
+  },
+  {
+    title: '工号',
+    dataIndex: 'job_number',
+    scopedSlots: { customRender: 'createTime' },
+    sorter: true
+  },
+  {
+    title: '职位',
+    dataIndex: 'position',
+    scopedSlots: { customRender: 'createTime' },
+    sorter: true
   },
   {
     title: '状态',
-    dataIndex: 'status',
-    scopedSlots: { customRender: 'status' }
+    dataIndex: 'state',
+    scopedSlots: { customRender: 'state' }
   },
   {
-    title: '创建时间',
-    dataIndex: 'createTime',
-    scopedSlots: { customRender: 'createTime' },
-    sorter: true
-  }, {
     title: '操作',
-    width: '150px',
     dataIndex: 'action',
     scopedSlots: { customRender: 'action' }
   }
@@ -228,18 +202,11 @@ export default {
       columns,
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        return getRoleList(parameter)
+        return getUserList(parameter)
           .then(res => {
-            console.log('getRoleList', res)
-            // 展开全部行
-            this.expandedRowKeys = res.result.data.map(item => item.id)
             return res.result
           })
-      },
-
-      expandedRowKeys: [],
-      selectedRowKeys: [],
-      selectedRows: []
+      }
     }
   },
   filters: {
@@ -250,15 +217,6 @@ export default {
       const permission = PERMISSION_ENUM[key]
       return permission && permission.label
     }
-  },
-  created () {
-    getServiceList().then(res => {
-      console.log('getServiceList.call()', res)
-    })
-
-    getRoleList().then(res => {
-      console.log('getRoleList.call()', res)
-    })
   },
   methods: {
     handleEdit (record) {

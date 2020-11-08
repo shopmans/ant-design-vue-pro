@@ -28,7 +28,6 @@ import {
   Steps,
   Spin,
   Menu,
-  Drawer,
   Tooltip,
   Alert,
   Tag,
@@ -82,7 +81,6 @@ Vue.use(Breadcrumb)
 Vue.use(Steps)
 Vue.use(Spin)
 Vue.use(Menu)
-Vue.use(Drawer)
 Vue.use(Tooltip)
 Vue.use(Alert)
 Vue.use(Tag)

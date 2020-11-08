@@ -21,7 +21,7 @@
 
         <standard-form-row title="其它选项" grid last>
           <a-row>
-            <a-col :lg="8" :md="10" :sm="10" :xs="24">
+            <a-col :lg="6" :md="10" :sm="10" :xs="24">
               <a-form-item :wrapper-col="{ sm: { span: 16 }, xs: { span: 24 } }" label="作者">
                 <a-select
                   style="max-width: 200px; width: 100%;"
@@ -34,7 +34,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :lg="8" :md="10" :sm="10" :xs="24">
+            <a-col :lg="6" :md="10" :sm="10" :xs="24">
               <a-form-item :wrapper-col="{ sm: { span: 16 }, xs: { span: 24 } }" label="好评度">
                 <a-select
                   style="max-width: 200px; width: 100%;"

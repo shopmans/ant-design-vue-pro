@@ -26,7 +26,7 @@
         hasFeedback
         validateStatus="success"
       >
-        <a-input-number :min="1" style="width: 100%" v-decorator="['callNo', {rules: [{ required: true }]}]" />
+        <a-input-number :min="0" style="width: 100%" v-decorator="['callNo', {rules: [{ required: true }]}]" />
       </a-form-item>
 
       <a-form-item

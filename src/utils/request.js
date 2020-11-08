@@ -18,17 +18,15 @@ const errorHandler = (error) => {
     const data = error.response.data
     // 从 localstorage 获取 token
     const token = storage.get(ACCESS_TOKEN)
-    if (error.response.status === 403) {
-      notification.error({
-        message: 'Forbidden',
-        description: data.message
-      })
-    }
     if (error.response.status === 401 && !(data.result && data.result.isLogin)) {
       notification.error({
-        message: 'Unauthorized',
-        description: 'Authorization verification failed'
+        message: '认证失败',
+        description: '用户身份认证失败'
       })
+      const userAgent = navigator.userAgent
+      if (userAgent.indexOf('Android') > -1) {
+        return Promise.reject(error)
+      }
       if (token) {
         store.dispatch('Logout').then(() => {
           setTimeout(() => {
@@ -36,6 +34,11 @@ const errorHandler = (error) => {
           }, 1500)
         })
       }
+    } else {
+      notification.error({
+        message: data.message,
+        description: data.description
+      })
     }
   }
   return Promise.reject(error)
@@ -43,6 +46,12 @@ const errorHandler = (error) => {
 
 // request interceptor
 request.interceptors.request.use(config => {
+  if (config.url.indexOf('?') > -1) {
+    config.url = config.url + '&timestamp=' + Date.parse(new Date())
+  } else {
+    config.url = config.url + '?timestamp=' + Date.parse(new Date())
+  }
+
   const token = storage.get(ACCESS_TOKEN)
   // 如果 token 存在
   // 让每个请求携带自定义 token 请根据实际情况自行修改
