@@ -1,9 +1,18 @@
 <template>
   <div>
+    <a-card :bordered="false" title="执行信息">
+      <a-descriptions title="">
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <a-card title="测漏试压" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-row :gutter="16">
         <a-col :span="9">
           <a-descriptions title="阀痤测试" :column="1">
+            <a-descriptions-item label="阀座泄漏测试标准">{{ getValveSeatLeakTestUnit(baseValveData.valve_seat_leak_test) }}</a-descriptions-item>
             <a-descriptions-item label="泄漏测试介质">{{ getValveTestMediumUnit(baseValveData.valve_leak_test_medium) }}</a-descriptions-item>
             <a-descriptions-item label="泄漏标准测试压力">{{ getValveHydrostaticTestValueUnitText(baseValveData.valve_leak_test_std_pressed, baseValveData.valve_leak_test_std_pressed_unit) }}</a-descriptions-item>
             <a-descriptions-item label="泄漏等级">
@@ -15,9 +24,6 @@
             <a-descriptions-item label="泄漏测试时间">
               {{ baseValveData.valve_leak_test_time ? baseValveData.valve_leak_test_time + " " + getValveHydrostaticTestTimeUnit(baseValveData.valve_leak_test_time_unit) : "" }}
             </a-descriptions-item>
-            <a-descriptions-item label="">
-              {{ }}
-            </a-descriptions-item>
             <a-descriptions-item label="泄漏实际测试压力">
               {{ getValveHydrostaticTestValueUnitText(leakPressureData.leak_test_real_test_pressed, leakPressureData.leak_test_real_test_pressed_unit) }}
             </a-descriptions-item>
@@ -26,6 +32,9 @@
             </a-descriptions-item>
             <a-descriptions-item label="泄漏测试实际值">
               {{ getValveSeatLeakTestUnitText(leakPressureData.leak_test_real_valve, leakPressureData.leak_test_real_valve_unit) }}
+            </a-descriptions-item>
+            <a-descriptions-item label="实际测试介质">
+              {{ getValveTestMediumUnit(leakPressureData.leak_test_real_test_medium) }}
             </a-descriptions-item>
           </a-descriptions>
           备注
@@ -46,17 +55,20 @@
             <a-descriptions-item label="水压测试时间">
               {{ baseValveData.valve_hydrostatic_test_time ? baseValveData.valve_hydrostatic_test_time + " " + getValveHydrostaticTestTimeUnit(baseValveData.valve_hydrostatic_test_time_unit) : "" }}
             </a-descriptions-item>
-            <a-descriptions-item label="">
-              {{ }}
-            </a-descriptions-item>
             <a-descriptions-item label="水压实际测试压力">
               {{ getValveHydrostaticTestValueUnitText(leakPressureData.leak_water_test_real_pressed, leakPressureData.leak_water_test_real_pressed_unit) }}
             </a-descriptions-item>
             <a-descriptions-item label="实际测试时间(分钟)">
               {{ leakPressureData.leak_pressure_water_test_real_time }}
             </a-descriptions-item>
-            <a-descriptions-item label="水压测试结论">
-              {{ getYesNoSwitchUnit(leakPressureData.leak_pressure_water_test_content) }}
+            <a-descriptions-item label="实际测试介质">
+              {{ getValveTestMediumUnit(leakPressureData.leak_pressure_water_real_test_medium) }}
+            </a-descriptions-item>
+            <a-descriptions-item label="">
+              {{ }}
+            </a-descriptions-item>
+            <a-descriptions-item label="">
+              {{ }}
             </a-descriptions-item>
           </a-descriptions>
           备注
@@ -65,20 +77,28 @@
       </a-row>
       <br>
       <a-row :gutter="16">
-        <a-col :span="18">
+        <a-descriptions title="结论">
+          <a-descriptions-item>
+            <template v-if="leakPressureData.leak_pressure_test_content && leakPressureData.leak_pressure_test_content === 1">
+              <a-badge>合格</a-badge>
+            </template>
+            <template v-else>
+              <a-badge>不合格</a-badge>
+            </template>
+          </a-descriptions-item>
+        </a-descriptions>
+        <!-- <a-col :span="18">
           结论
           <a-textarea :rows="6" :value="leakPressureData.leak_pressure_test_content" :disabled="true"></a-textarea>
-        </a-col>
+        </a-col> -->
       </a-row>
       <br>
       <a-row :gutter="16">
-        <a-col :span="8">
-          <a-descriptions title="工时(分钟)">
-            <a-descriptions-item>
-              {{ leakPressureData.leak_pressure_test_total_minute }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
+        <a-descriptions title="工时(分钟)">
+          <a-descriptions-item>
+            {{ leakPressureData.leak_pressure_test_total_minute }}
+          </a-descriptions-item>
+        </a-descriptions>
       </a-row>
     </a-card>
 
@@ -94,7 +114,8 @@
 import UploadImgRead from '../modules/UploadImgRead'
 import { queryStepDataOnlyread, getValveLeakLevel, getValveWaterPressureLevelUnit, getValveHydrostaticTestValueUnitText,
 getValveLeakTestValueUnit, getValveHydrostaticTestTimeUnit, getValveTestMediumUnit,
-getValveSeatLeakTestUnitText, getValveTestStdUnit, getYesNoSwitchUnit } from '@/api/step'
+getValveSeatLeakTestUnitText, getValveTestStdUnit, getYesNoSwitchUnit, getValveSeatLeakTestUnit,
+getStepUser, formatDateYMD } from '@/api/step'
 
 export default {
   components: {
@@ -107,6 +128,8 @@ export default {
     }
     this.leakPressureData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
     this.$refs.uploadImgRead.imgFileList = this.leakPressureData.uploads
+    this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
+    this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
 
     queryStepDataOnlyread({ id: this.leakPressureData.flow_id, current_step: '(start)' }).then(res => {
         res.result.step_data.forEach(stepItem => {
@@ -127,12 +150,15 @@ export default {
     getValveTestMediumUnit,
     getValveSeatLeakTestUnitText,
     getValveTestStdUnit,
-    getYesNoSwitchUnit
+    getYesNoSwitchUnit,
+    getValveSeatLeakTestUnit
   },
   data () {
       return {
         baseValveData: {},
-        leakPressureData: {}
+        leakPressureData: {},
+        stepUser: '',
+        stepDoneDate: ''
       }
     }
 }

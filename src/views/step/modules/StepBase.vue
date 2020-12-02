@@ -138,6 +138,12 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
+            label="序号">
+            <a-input v-decorator="[ 'serial_number', {rules: [{ message: '请输入序号', whitespace: true}]} ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
             label="控制方式">
             <a-select
               v-decorator="[

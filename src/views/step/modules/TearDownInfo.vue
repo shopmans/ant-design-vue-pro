@@ -1,5 +1,13 @@
 <template>
   <div>
+    <a-card :bordered="false" title="执行信息">
+      <a-descriptions title="">
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <a-card :bordered="false" title="阀门拆解" :headStyle="{fontWeight:'bold'}" v-if="ValveTD">
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
@@ -60,6 +68,7 @@
 <script>
 import { getSelectRepairData } from '@/api/preRepairTest'
 import UploadImgRead from '../modules/UploadImgRead'
+import { getStepUser, formatDateYMD } from '@/api/step'
 
 export default {
     components: {
@@ -71,7 +80,9 @@ export default {
         ActuatorTD: false,
         ValveTD: false,
         TearDownData: {},
-        SeatLeakTestStdValue: ''
+        SeatLeakTestStdValue: '',
+        stepUser: '',
+        stepDoneDate: ''
       }
     },
     mounted () {
@@ -82,6 +93,8 @@ export default {
       // 修改数据
       this.TearDownData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
       getSelectRepairData({ FlowID: this.$store.state.editStepData.stepEditData.flow_id }).then(res => {
+      this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
+      this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
         // 阀门 "1"
         // 执行机构 "2"
         // 阀门+执行机构 "3"

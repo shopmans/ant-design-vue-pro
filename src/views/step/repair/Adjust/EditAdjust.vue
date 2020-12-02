@@ -1,363 +1,395 @@
 <template>
   <page-header-wrapper>
     <a-form @submit="handleSubmit" :form="form" class="form">
-      <a-card title="调校" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <a-divider>开关型</a-divider>
-        <a-row>
-          <a-col>
-            <a-form-item label="">
-              <a-checkbox-group v-decorator="['adjust_on_off_open_close', {rules: []}]" :options="ocOpt" />
-            </a-form-item>
-          </a-col>
-        </a-row>
+      <template v-if="valveControlModel === 2">
+        <a-card title="调校" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-divider>开关型</a-divider>
+          <a-form-item label="">
+            <a-checkbox-group v-decorator="['adjust_on_off_open_close', {rules: []}]">
+              <a-checkbox value="1">
+                开位正常
+              </a-checkbox>
+              <a-checkbox value="2" style="margin-left:50px;">
+                关位正常
+              </a-checkbox>
+            </a-checkbox-group>
+          </a-form-item>
+          <br>
+        </a-card>
+      </template>
 
-        <br>
-        <a-divider>调节型</a-divider>
+      <template v-if="valveControlModel === 1">
+        <a-card>
+          <a-divider>定位器</a-divider>
+          <!-- 输入信号 -->
+          <a-table :columns="inputSignalColumns" :dataSource="inputSignalData" :pagination="false" bordered>
+            <template
+              v-for="col in ['ma4', 'ma8', 'ma12', 'ma16', 'ma20', 'ma201', 'ma161', 'ma121', 'ma81', 'ma41']"
+              :slot="col"
+              slot-scope="text, record"
+            >
+              <div :key="col">
+                <a-input
+                  v-if="record.editable"
+                  style="margin: -5px 0"
+                  :value="text"
+                  @change="e => handleChangeInputSignal(e.target.value, record.key, col)"
+                />
+                <template v-else>
+                  {{ text }}
+                </template>
+              </div>
+            </template>
+            <template slot="operation" slot-scope="text, record">
+              <div class="editable-row-operations">
+                <span v-if="record.editable">
+                  <a @click="() => saveInputSignal(record.key)">保存</a>
+                </span>
+                <span v-else>
+                  <a @click="() => editInputSignal(record.key)">编辑</a>
+                </span>
+              </div>
+            </template>
+          </a-table>
 
-        <!-- 输入信号 -->
-        <a-table :columns="inputSignalColumns" :dataSource="inputSignalData" :pagination="false" bordered>
-          <template
-            v-for="col in ['ma4', 'ma8', 'ma12', 'ma16', 'ma20', 'ma201', 'ma161', 'ma121', 'ma81', 'ma41']"
-            :slot="col"
-            slot-scope="text, record"
-          >
-            <div :key="col">
-              <a-input
-                v-if="record.editable"
-                style="margin: -5px 0"
-                :value="text"
-                @change="e => handleChangeInputSignal(e.target.value, record.key, col)"
-              />
-              <template v-else>
-                {{ text }}
-              </template>
-            </div>
-          </template>
-          <template slot="operation" slot-scope="text, record">
-            <div class="editable-row-operations">
-              <span v-if="record.editable">
-                <a @click="() => saveInputSignal(record.key)">保存</a>
-              </span>
-              <span v-else>
-                <a @click="() => editInputSignal(record.key)">编辑</a>
-              </span>
-            </div>
-          </template>
-        </a-table>
+          <br>
+          <a-divider>死区</a-divider>
 
-        <!-- 结论 -->
-        <a-form-item label="结论">
-          <a-textarea :rows="5" v-decorator="['adjust_control_valve_conclustion',{rules: []}]" />
-        </a-form-item>
+          <!-- 死区 -->
+          <a-table :columns="deadBandColumns" :dataSource="deadBandData" :pagination="false" bordered>
+            <template
+              v-for="col in ['p0', 'p25', 'p50', 'p75', 'p100']"
+              :slot="col"
+              slot-scope="text, record"
+            >
+              <div :key="col">
+                <a-input
+                  v-if="record.editable"
+                  style="margin: -5px 0"
+                  :value="text"
+                  @change="e => handleChangeDeadBand(e.target.value, record.key, col)"
+                />
+                <template v-else>
+                  {{ text }}
+                </template>
+              </div>
+            </template>
+            <template slot="operation" slot-scope="text, record">
+              <div class="editable-row-operations">
+                <span v-if="record.editable">
+                  <a @click="() => saveDeadBand(record.key)">保存</a>
+                </span>
+                <span v-else>
+                  <a @click="() => editDeadBand(record.key)">编辑</a>
+                </span>
+              </div>
+            </template>
+          </a-table>
+          <a-row>
+            <a-col :span="6">
+              <a-form-item label="全开到全关(s)">
+                <a-input
+                  style="width:200px;"
+                  :min="0"
+                  v-decorator="[
+                    'adjust_deadband_open_to_close',
+                    {rules: []}
+                  ]">
+                  <a-select v-decorator="[ 'adjust_deadband_open_to_close_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+                    <a-select-option value="1">
+                      Min
+                    </a-select-option>
+                    <a-select-option value="2">
+                      Sec
+                    </a-select-option>
+                  </a-select>
+                </a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item label="全关到全开(s)">
+                <a-input
+                  style="width:200px;"
+                  :min="0"
+                  v-decorator="[
+                    'adjust_deadband_close_to_open',
+                    {rules: []}
+                  ]">
+                  <a-select v-decorator="[ 'adjust_deadband_close_to_open_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+                    <a-select-option value="1">
+                      Min
+                    </a-select-option>
+                    <a-select-option value="2">
+                      Sec
+                    </a-select-option>
+                  </a-select>
+                </a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item label="线性">
+                <a-input
+                  style="width:200px;"
+                  v-decorator="[
+                    'adjust_deadband_linearity',
+                    {rules: []}
+                  ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item label="回差">
+                <a-input
+                  style="width:200px;"
+                  v-decorator="[
+                    'adjust_deadband_hysteresis',
+                    {rules: []}
+                  ]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <br>
+          <!-- 结论 -->
+          <a-form-item label="结论">
+            <a-radio-group v-decorator="['adjust_control_valve_conclustion', {rules: []}]">
+              <a-radio :value="1">
+                合格
+              </a-radio>
+              <a-radio :value="2" style="margin-left:50px;">
+                不合格
+              </a-radio>
+            </a-radio-group>
+          </a-form-item>
 
-        <br>
-        <a-divider>死区</a-divider>
+          <!-- 见证人 -->
+          <a-form-item label="见证人">
+            <a-input v-decorator="['adjust_control_valve_witness', {rules: []}]" style="width:200px;" />
+          </a-form-item>
 
-        <!-- 死区 -->
-        <a-table :columns="deadBandColumns" :dataSource="deadBandData" :pagination="false" bordered>
-          <template
-            v-for="col in ['p0', 'p25', 'p50', 'p75', 'p100']"
-            :slot="col"
-            slot-scope="text, record"
-          >
-            <div :key="col">
-              <a-input
-                v-if="record.editable"
-                style="margin: -5px 0"
-                :value="text"
-                @change="e => handleChangeDeadBand(e.target.value, record.key, col)"
-              />
-              <template v-else>
-                {{ text }}
-              </template>
-            </div>
-          </template>
-          <template slot="operation" slot-scope="text, record">
-            <div class="editable-row-operations">
-              <span v-if="record.editable">
-                <a @click="() => saveDeadBand(record.key)">保存</a>
-              </span>
-              <span v-else>
-                <a @click="() => editDeadBand(record.key)">编辑</a>
-              </span>
-            </div>
-          </template>
-        </a-table>
-        <a-row>
-          <a-col :span="6">
-            <a-form-item label="全开到全关(s)">
-              <a-input
-                style="width:200px;"
-                :min="0"
-                v-decorator="[
-                  'adjust_deadband_open_to_close',
-                  {rules: []}
-                ]">
-                <a-select v-decorator="[ 'adjust_deadband_open_to_close_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
-                  <a-select-option value="1">
-                    Min
-                  </a-select-option>
-                  <a-select-option value="2">
-                    Sec
-                  </a-select-option>
-                </a-select>
-              </a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="全关到全开(s)">
-              <a-input
-                style="width:200px;"
-                :min="0"
-                v-decorator="[
-                  'adjust_deadband_close_to_open',
-                  {rules: []}
-                ]">
-                <a-select v-decorator="[ 'adjust_deadband_close_to_open_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
-                  <a-select-option value="1">
-                    Min
-                  </a-select-option>
-                  <a-select-option value="2">
-                    Sec
-                  </a-select-option>
-                </a-select>
-              </a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="线性">
-              <a-input
-                style="width:200px;"
-                v-decorator="[
-                  'adjust_deadband_linearity',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="回差">
-              <a-input
-                style="width:200px;"
-                v-decorator="[
-                  'adjust_deadband_hysteresis',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
+          <br>
+          <a-divider>电磁阀</a-divider>
 
-        <br>
-        <a-divider>电磁阀</a-divider>
+          <!-- 电磁阀 -->
+          <a-row>
+            <a-col :span="6">
+              <a-form-item label="动作">
+                <a-input
+                  style="width:200px;"
+                  v-decorator="[
+                    'adjust_solenoid_valve_active',
+                    {rules: []}
+                  ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item label="时间(秒)">
+                <a-input-number
+                  style="width:200px;"
+                  :min="0"
+                  v-decorator="[
+                    'adjust_solenoid_valve_time',
+                    {rules: []}
+                  ]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
 
-        <!-- 电磁阀 -->
-        <a-row>
-          <a-col :span="6">
-            <a-form-item label="动作">
-              <a-input
-                style="width:200px;"
-                v-decorator="[
-                  'adjust_solenoid_valve_active',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="时间">
-              <a-input-number
-                style="width:200px;"
-                :min="0"
-                v-decorator="[
-                  'adjust_solenoid_valve_time',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
+          <br>
+          <a-divider>保位/切换阀</a-divider>
 
-        <br>
-        <a-divider>保位/切换阀</a-divider>
+          <!-- 保位/切换阀 -->
+          <a-row>
+            <a-col :span="6">
+              <a-form-item label="动作">
+                <a-input
+                  style="width:200px;"
+                  v-decorator="[
+                    'adjust_lockup_active',
+                    {rules: []}
+                  ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item label="设定点">
+                <a-input
+                  style="width:200px;"
+                  v-decorator="[
+                    'adjust_lockup_time',
+                    {rules: []}
+                  ]">
+                  <a-select v-decorator="[ 'adjust_lockup_time_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+                    <a-select-option value="1">
+                      PSI
+                    </a-select-option>
+                    <a-select-option value="2">
+                      BAR
+                    </a-select-option>
+                    <a-select-option value="3">
+                      MPa
+                    </a-select-option>
+                  </a-select>
+                </a-input>
+              </a-form-item>
+            </a-col>
+          </a-row>
 
-        <!-- 保位/切换阀 -->
-        <a-row>
-          <a-col :span="6">
-            <a-form-item label="动作">
-              <a-input
-                style="width:200px;"
-                v-decorator="[
-                  'adjust_lockup_active',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="设定点">
-              <a-input
-                style="width:200px;"
-                v-decorator="[
-                  'adjust_lockup_time',
-                  {rules: []}
-                ]">
-                <a-select v-decorator="[ 'adjust_lockup_time_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
-                  <a-select-option value="1">
-                    PSI
-                  </a-select-option>
-                  <a-select-option value="2">
-                    BAR
-                  </a-select-option>
-                  <a-select-option value="3">
-                    MPa
-                  </a-select-option>
-                </a-select>
-              </a-input>
-            </a-form-item>
-          </a-col>
-        </a-row>
+          <!-- 位置开关 -->
+          <a-divider>位置开关</a-divider>
+          <a-row>
+            <a-col :span="12">
+              <a-row>
+                <a-divider >开位</a-divider>
+                <a-col :span="12">
+                  <a-row>
+                    <a-col>
+                      <a-form-item label="闭合-输入信号mA">
+                        <a-input-number
+                          :min="0"
+                          style="width:200px;"
+                          v-decorator="[
+                            'adjust_openposition_close_inputsig',
+                            {rules: []}
+                          ]" />
+                      </a-form-item>
+                    </a-col>
+                    <a-col>
+                      <a-form-item label="闭合-百分比%">
+                        <a-input-number
+                          :min="0"
+                          style="width:200px;"
+                          v-decorator="[
+                            'adjust_openposition_close_percentage',
+                            {rules: []}
+                          ]" />
+                      </a-form-item>
+                    </a-col>
+                  </a-row>
+                </a-col>
+                <a-col :span="12">
+                  <a-row>
+                    <a-col>
+                      <a-form-item label="断开-输入信号mA">
+                        <a-input-number
+                          :min="0"
+                          style="width:200px;"
+                          v-decorator="[
+                            'adjust_openposition_break_inputsig',
+                            {rules: []}
+                          ]" />
+                      </a-form-item>
+                    </a-col>
+                    <a-col>
+                      <a-form-item label="断开-百分比%">
+                        <a-input-number
+                          :min="0"
+                          style="width:200px;"
+                          v-decorator="[
+                            'adjust_openposition_break_percentage',
+                            {rules: []}
+                          ]" />
+                      </a-form-item>
+                    </a-col>
+                  </a-row>
+                </a-col>
+              </a-row>
+            </a-col>
+            <!-- 关位 -->
+            <a-col :span="12">
+              <a-row>
+                <a-divider>关位</a-divider>
+                <a-col :span="12">
+                  <a-row>
+                    <a-col>
+                      <a-form-item label="闭合-输入信号mA">
+                        <a-input-number
+                          :min="0"
+                          style="width:200px;"
+                          v-decorator="[
+                            'adjust_closeposition_close_inputsig',
+                            {rules: []}
+                          ]" />
+                      </a-form-item>
+                    </a-col>
+                    <a-col>
+                      <a-form-item label="闭合-百分比%">
+                        <a-input-number
+                          :min="0"
+                          style="width:200px;"
+                          v-decorator="[
+                            'adjust_closeposition_close_percentage',
+                            {rules: []}
+                          ]" />
+                      </a-form-item>
+                    </a-col>
+                  </a-row>
+                </a-col>
+                <a-col :span="12">
+                  <a-row>
+                    <a-col>
+                      <a-form-item label="断开-输入信号mA">
+                        <a-input-number
+                          :min="0"
+                          style="width:200px;"
+                          v-decorator="[
+                            'adjust_closeposition_break_inputsig',
+                            {rules: []}
+                          ]" />
+                      </a-form-item>
+                    </a-col>
+                    <a-col>
+                      <a-form-item label="断开-百分比%">
+                        <a-input-number
+                          :min="0"
+                          style="width:200px;"
+                          v-decorator="[
+                            'adjust_closeposition_break_percentage',
+                            {rules: []}
+                          ]" />
+                      </a-form-item>
+                    </a-col>
+                  </a-row>
+                </a-col>
+              </a-row>
+            </a-col>
+          </a-row>
 
-        <!-- 位置开关 -->
-        <a-divider>位置开关</a-divider>
-        <a-row>
-          <a-col :span="12">
-            <a-row>
-              <a-divider >开位</a-divider>
-              <a-col :span="12">
-                <a-row>
-                  <a-col>
-                    <a-form-item label="闭合-输入信号mA">
-                      <a-input-number
-                        :min="0"
-                        style="width:200px;"
-                        v-decorator="[
-                          'adjust_openposition_close_inputsig',
-                          {rules: []}
-                        ]" />
-                    </a-form-item>
-                  </a-col>
-                  <a-col>
-                    <a-form-item label="闭合-百分比%">
-                      <a-input-number
-                        :min="0"
-                        style="width:200px;"
-                        v-decorator="[
-                          'adjust_openposition_close_percentage',
-                          {rules: []}
-                        ]" />
-                    </a-form-item>
-                  </a-col>
-                </a-row>
-              </a-col>
-              <a-col :span="12">
-                <a-row>
-                  <a-col>
-                    <a-form-item label="断开-输入信号mA">
-                      <a-input-number
-                        :min="0"
-                        style="width:200px;"
-                        v-decorator="[
-                          'adjust_openposition_break_inputsig',
-                          {rules: []}
-                        ]" />
-                    </a-form-item>
-                  </a-col>
-                  <a-col>
-                    <a-form-item label="断开-百分比%">
-                      <a-input-number
-                        :min="0"
-                        style="width:200px;"
-                        v-decorator="[
-                          'adjust_openposition_break_percentage',
-                          {rules: []}
-                        ]" />
-                    </a-form-item>
-                  </a-col>
-                </a-row>
-              </a-col>
-            </a-row>
-          </a-col>
-          <!-- 关位 -->
-          <a-col :span="12">
-            <a-row>
-              <a-divider>关位</a-divider>
-              <a-col :span="12">
-                <a-row>
-                  <a-col>
-                    <a-form-item label="闭合-输入信号mA">
-                      <a-input-number
-                        :min="0"
-                        style="width:200px;"
-                        v-decorator="[
-                          'adjust_closeposition_close_inputsig',
-                          {rules: []}
-                        ]" />
-                    </a-form-item>
-                  </a-col>
-                  <a-col>
-                    <a-form-item label="闭合-百分比%">
-                      <a-input-number
-                        :min="0"
-                        style="width:200px;"
-                        v-decorator="[
-                          'adjust_closeposition_close_percentage',
-                          {rules: []}
-                        ]" />
-                    </a-form-item>
-                  </a-col>
-                </a-row>
-              </a-col>
-              <a-col :span="12">
-                <a-row>
-                  <a-col>
-                    <a-form-item label="断开-输入信号mA">
-                      <a-input-number
-                        :min="0"
-                        style="width:200px;"
-                        v-decorator="[
-                          'adjust_closeposition_break_inputsig',
-                          {rules: []}
-                        ]" />
-                    </a-form-item>
-                  </a-col>
-                  <a-col>
-                    <a-form-item label="断开-百分比%">
-                      <a-input-number
-                        :min="0"
-                        style="width:200px;"
-                        v-decorator="[
-                          'adjust_closeposition_break_percentage',
-                          {rules: []}
-                        ]" />
-                    </a-form-item>
-                  </a-col>
-                </a-row>
-              </a-col>
-            </a-row>
-          </a-col>
-        </a-row>
+          <!-- 结论 -->
+          <br>
+          <a-divider>结论</a-divider>
+          <a-form-item label="结论">
+            <a-radio-group v-decorator="['adjust_conclustion', {rules: []}]">
+              <a-radio :value="1">
+                合格
+              </a-radio>
+              <a-radio :value="2" style="margin-left:50px;">
+                不合格
+              </a-radio>
+            </a-radio-group>
+          </a-form-item>
+          <!-- 见证人 -->
+          <a-form-item label="见证人">
+            <a-input v-decorator="['adjust_witness', {rules: []}]" style="width:200px;" />
+          </a-form-item>
+          <a-divider>备注</a-divider>
+          <a-form-item label="备注">
+            <a-textarea :rows="5" v-decorator="['adjust_memo',{rules: []}]" />
+          </a-form-item>
+          <br><br>
 
-        <!-- 结论 -->
-        <br>
-        <a-divider>结论</a-divider>
-        <a-form-item label="结论">
-          <a-textarea :rows="5" v-decorator="['adjust_conclustion',{rules: []}]" />
-        </a-form-item>
-        <a-form-item label="备注">
-          <a-textarea :rows="5" v-decorator="['adjust_memo',{rules: []}]" />
-        </a-form-item>
-        <br><br>
-
-        <a-row :gutter="16">
-          <a-col :span="8">
-            <a-form-item label="工时(min)">
-              <a-input-number
-                style="width:100%;"
-                :min="0"
-                v-decorator="[
-                  'adjust_total_minute',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-card>
+          <a-row :gutter="16">
+            <a-col :span="8">
+              <a-form-item label="工时(min)">
+                <a-input-number
+                  style="width:100%;"
+                  :min="0"
+                  v-decorator="[
+                    'adjust_total_minute',
+                    {rules: []}
+                  ]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </a-card>
+      </template>
 
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
@@ -385,7 +417,7 @@
   import FooterToolBar from '@/components/FooterToolbar'
   import { baseMixin } from '@/store/app-mixin'
   import pick from 'lodash.pick'
-  import { stepDone } from '@/api/step'
+  import { stepDone, queryStepData } from '@/api/step'
   import { saveAdjustData, getInputSignalColumns, getInputSignalData, getDeadBandColumns, getDeadBandData } from '@/api/adjust'
   import UploadImg from '../../modules/UploadImg'
   import stepDetail from '../../modules/StepBaseInfo'
@@ -397,194 +429,8 @@
   'adjust_conclustion', 'adjust_memo', 'adjust_deadband_open_to_close_unit', 'adjust_deadband_close_to_open_unit',
   'adjust_lockup_time_unit',
   'adjust_openposition_close_inputsig', 'adjust_openposition_close_percentage', 'adjust_openposition_break_inputsig', 'adjust_openposition_break_percentage',
-  'adjust_closeposition_close_inputsig', 'adjust_closeposition_close_percentage', 'adjust_closeposition_break_inputsig', 'adjust_closeposition_break_percentage']
-
-  // const inputSignalColumns = [
-  //   {
-  //     title: '',
-  //     dataIndex: 'leftTitle',
-  //     width: '8%'
-  //   },
-  //   {
-  //     title: 'mA',
-  //     dataIndex: 'ma',
-  //     width: '5%'
-  //   },
-  //   {
-  //     title: '4 mA',
-  //     dataIndex: 'ma4',
-  //     scopedSlots: { customRender: 'ma4' }
-  //   },
-  //   {
-  //     title: '8 mA',
-  //     dataIndex: 'ma8',
-  //     scopedSlots: { customRender: 'ma8' }
-  //   },
-  //   {
-  //     title: '12 mA',
-  //     dataIndex: 'ma12',
-  //     scopedSlots: { customRender: 'ma12' }
-  //   },
-  //   {
-  //     title: '16 mA',
-  //     dataIndex: 'ma16',
-  //     scopedSlots: { customRender: 'ma16' }
-  //   },
-  //   {
-  //     title: '20 mA',
-  //     dataIndex: 'ma20',
-  //     scopedSlots: { customRender: 'ma20' }
-  //   },
-  //   {
-  //     title: '16 mA',
-  //     dataIndex: 'ma161',
-  //     scopedSlots: { customRender: 'ma161' }
-  //   },
-  //   {
-  //     title: '12 mA',
-  //     dataIndex: 'ma121',
-  //     scopedSlots: { customRender: 'ma121' }
-  //   },
-  //   {
-  //     title: '8 mA',
-  //     dataIndex: 'ma81',
-  //     scopedSlots: { customRender: 'ma81' }
-  //   },
-  //   {
-  //     title: '4 mA',
-  //     dataIndex: 'ma41',
-  //     scopedSlots: { customRender: 'ma41' }
-  //   },
-  //   {
-  //     title: '操作',
-  //     dataIndex: 'operation',
-  //     scopedSlots: { customRender: 'operation' },
-  //     width: '5%'
-  //   }
-  // ]
-
-  // const deadBandColumns = [
-  //   {
-  //     title: '测试位置',
-  //     dataIndex: 'deadLeftTitle',
-  //     width: '8%',
-  //     customRender: (value, row, index) => {
-  //       const obj = {
-  //         children: value,
-  //         attrs: {}
-  //       }
-  //       if (index === 0) {
-  //         obj.attrs.rowSpan = 2
-  //       } else {
-  //         obj.attrs.rowSpan = 0
-  //       }
-  //       return obj
-  //     }
-  //   },
-  //   {
-  //     title: '%',
-  //     dataIndex: 'testPostion',
-  //     width: '5%'
-  //   },
-  //   {
-  //     title: '0%',
-  //     dataIndex: 'p0',
-  //     scopedSlots: { customRender: 'p0' }
-  //   },
-  //   {
-  //     title: '25%',
-  //     dataIndex: 'p25',
-  //     scopedSlots: { customRender: 'p25' }
-  //   },
-  //   {
-  //     title: '50%',
-  //     dataIndex: 'p50',
-  //     scopedSlots: { customRender: 'p50' }
-  //   },
-  //   {
-  //     title: '75%',
-  //     dataIndex: 'p75',
-  //     scopedSlots: { customRender: 'p75' }
-  //   },
-  //   {
-  //     title: '100%',
-  //     dataIndex: 'p100',
-  //     scopedSlots: { customRender: 'p100' }
-  //   },
-  //   {
-  //     title: '操作',
-  //     width: '10%',
-  //     dataIndex: 'operation',
-  //     scopedSlots: { customRender: 'operation' }
-  //   }
-  // ]
-
-  // const inputSignalData = [
-  //   {
-  //     leftTitle: '输入信号',
-  //     key: '1',
-  //     ma: '%',
-  //     ma4: '',
-  //     ma8: '',
-  //     ma12: '',
-  //     ma16: '',
-  //     ma20: '',
-  //     ma161: '',
-  //     ma121: '',
-  //     ma81: '',
-  //     ma41: ''
-  //   },
-  //   {
-  //     leftTitle: '反馈信号',
-  //     key: '2',
-  //     ma: 'mA',
-  //     ma4: '',
-  //     ma8: '',
-  //     ma12: '',
-  //     ma16: '',
-  //     ma20: '',
-  //     ma161: '',
-  //     ma121: '',
-  //     ma81: '',
-  //     ma41: ''
-  //   },
-  //   {
-  //     leftTitle: '反馈位置',
-  //     key: '3',
-  //     ma: '%',
-  //     ma4: '',
-  //     ma8: '',
-  //     ma12: '',
-  //     ma16: '',
-  //     ma20: '',
-  //     ma161: '',
-  //     ma121: '',
-  //     ma81: '',
-  //     ma41: ''
-  //   }
-  // ]
-
-  // const deadBandData = [
-  //   {
-  //     key: '1',
-  //     deadLeftTitle: '输入信号',
-  //     testPostion: 'mA',
-  //     p0: '',
-  //     p100: '',
-  //     p25: '',
-  //     p50: '',
-  //     p75: ''
-  //   },
-  //   {
-  //     key: '2',
-  //     testPostion: '%',
-  //     p0: '',
-  //     p100: '',
-  //     p25: '',
-  //     p50: '',
-  //     p75: ''
-  //   }
-  // ]
+  'adjust_closeposition_close_inputsig', 'adjust_closeposition_close_percentage', 'adjust_closeposition_break_inputsig', 'adjust_closeposition_break_percentage',
+  'adjust_control_valve_witness', 'adjust_witness']
 
   export default {
     name: 'TearDown',
@@ -610,6 +456,26 @@
           if (installIAData.deadBandData) { this.deadBandData = installIAData.deadBandData }
         })
       }
+
+      queryStepData({ id: this.flowID, current_step: '(start)' }).then(res => {
+      res.result.step_data.forEach(stepItem => {
+        switch (stepItem.DataNum) {
+          case 1: // baseInfo
+            const baseData = JSON.parse(stepItem.JSON)
+            // 开关阀、调节阀数据
+            if (baseData.control_model === '1') { // 调节阀
+              this.valveControlModel = 1
+              return
+            }
+            if (baseData.control_model === '2') { // 开关阀
+              this.valveControlModel = 2
+              return
+            }
+
+            this.$message.info('不能识别的阀类型(开关阀、调节阀)')
+        }
+      })
+    })
     },
     methods: {
       handleSubmit (e) {
@@ -751,10 +617,7 @@
         flowID: '',
         currentStep: '',
         baseInfoData: null,
-        ocOpt: [
-          { label: '开', value: '1' },
-          { label: '关', value: '2' }
-        ]
+        valveControlModel: 0
       }
     }
   }

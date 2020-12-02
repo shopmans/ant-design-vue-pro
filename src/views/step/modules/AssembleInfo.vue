@@ -1,5 +1,13 @@
 <template>
   <div>
+    <a-card :bordered="false" title="执行信息">
+      <a-descriptions title="">
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <a-card v-if="valveAB" title="阀门组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-row :gutter="16">
         <a-col :span="8">
@@ -68,14 +76,14 @@
         <a-col :span="8">
           <a-descriptions>
             <a-descriptions-item>
-              气密性测试: {{ getYesNoSwitchUnit(assembleData.valve_assemble_air_tightness_is_success) }}
+              气密性测试是否合格: {{ getYesNoSwitchUnit(assembleData.valve_assemble_air_tightness_is_success) }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
         <a-col :span="8">
           <a-descriptions>
             <a-descriptions-item>
-              Bench Set测试: {{ getYesNoSwitchUnit(assembleData.valve_assemble_benchset_is_success) }}
+              Bench Set测试是否合格: {{ getYesNoSwitchUnit(assembleData.valve_assemble_benchset_is_success) }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
@@ -109,7 +117,8 @@
 import UploadImgRead from '../modules/UploadImgRead'
 import { queryStepDataOnlyread, getValveCoverBoltTorqueUnit, getValveCoverBoltMaterialUnit, getValveSizeUnit,
 getValveSeatLeakTestUnit, getActuSpringSetPressureUnit, getActuCoverBoltToolItemUnit, getValveHydrostaticTestValueUnitText,
-getYesNoSwitchUnit, getActuCoverBoltToolItemUnitTextNA, getValveCoverBoltTorqueUnitText, getValveSizeUnitTextNA } from '@/api/step'
+getYesNoSwitchUnit, getActuCoverBoltToolItemUnitTextNA, getValveCoverBoltTorqueUnitText, getValveSizeUnitTextNA,
+getStepUser, formatDateYMD } from '@/api/step'
 
 export default {
   components: {
@@ -122,6 +131,8 @@ export default {
     }
     this.assembleData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
     this.$refs.uploadImgRead.imgFileList = this.assembleData.uploads
+    this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
+    this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
 
     // 根据拆解的工时》0的结果决定组装显示内容
     queryStepDataOnlyread({ id: this.assembleData.flow_id, current_step: 'TearDown' }).then(res => {
@@ -175,7 +186,9 @@ export default {
       accessorData: {},
       assembleValveContent: '',
       assembleActuatorContent: '',
-      assembleAccessoryContent: ''
+      assembleAccessoryContent: '',
+      stepUser: '',
+      stepDoneDate: ''
     }
   },
   methods: {

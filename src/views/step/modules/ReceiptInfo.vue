@@ -1,39 +1,48 @@
 <template>
-  <a-card :bordered="false">
-    <a-descriptions title="收货">
-      <a-descriptions-item label="收货日期">{{ receiptData.receipt_date | moment }}</a-descriptions-item>
-      <a-descriptions-item label="序列号">{{ receiptData.receipt_valve_factory_no }}</a-descriptions-item>
-      <a-descriptions-item label="出入厂单据号码">{{ receiptData.receipt_valve_factory_no }}</a-descriptions-item>
-    </a-descriptions>
-    <a-divider style="margin-bottom: 32px"/>
-    <a-descriptions title="已购买备件清单">
-      <a-descriptions-item label="工单号">{{ baseInfoData.work_order_serial }}</a-descriptions-item>
-      <a-descriptions-item label="合同号">{{ projectData.contract_serial }}</a-descriptions-item>
-      <a-descriptions-item label="客户名称">{{ projectData.customer_name }}</a-descriptions-item>
-      <a-descriptions-item label="执行机构型号">{{ refActuData.actu_model }}</a-descriptions-item>
-      <a-descriptions-item label="阀门位号">{{ baseInfoData.tag }}</a-descriptions-item>
-      <a-descriptions-item label="序列号">{{ refVaveData.valve_serial }}</a-descriptions-item>
-      <a-descriptions-item label="阀门型号">{{ refVaveData.valve_model }}</a-descriptions-item>
-    </a-descriptions>
-    <a-divider style="margin-bottom: 32px">备件清单</a-divider>
-    <a-table
-      :columns="columnsPurchased"
-      :dataSource="dataPurchased"
-      :pagination="false"
-    >
-      <template v-for="(col, i) in ['purchased_part_no', 'purchased_part_key_number', 'purchased_part_number', 'purchased_part_name', 'purchased_part_qty', 'purchased_part_memo']" :slot="col" slot-scope="text">
-        <template>{{ text }}</template>
-      </template>
-      <template slot="purchased_confirm" slot-scope="text">
-        <a-icon v-if="text === 'OK'" type="check" />
-        <a-icon v-else type="close" />
-      </template>
-    </a-table>
-  </a-card>
+  <div>
+    <a-card :bordered="false" title="执行信息">
+      <a-descriptions title="">
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
+    <a-card :bordered="false">
+      <a-descriptions title="收货">
+        <a-descriptions-item label="收货日期">{{ receiptData.receipt_date | moment }}</a-descriptions-item>
+        <a-descriptions-item label="序号">{{ receiptData.receipt_valve_factory_no }}</a-descriptions-item>
+        <a-descriptions-item label="出入厂单据号码">{{ receiptData.receipt_valve_factory_no }}</a-descriptions-item>
+        <a-descriptions-item label="工单号">{{ baseInfoData.work_order_serial }}</a-descriptions-item>
+        <a-descriptions-item label="合同号">{{ projectData.contract_serial }}</a-descriptions-item>
+        <a-descriptions-item label="客户名称">{{ projectData.customer_name }}</a-descriptions-item>
+        <a-descriptions-item label="执行机构型号">{{ refActuData.actu_model }}</a-descriptions-item>
+        <a-descriptions-item label="阀门位号">{{ baseInfoData.tag }}</a-descriptions-item>
+        <a-descriptions-item label="序列号">{{ refVaveData.valve_serial }}</a-descriptions-item>
+        <a-descriptions-item label="阀门型号">{{ refVaveData.valve_model }}</a-descriptions-item>
+      </a-descriptions>
+      <a-divider style="margin-bottom: 32px"/>
+      <a-descriptions title="已购买备件清单">
+        <a-divider style="margin-bottom: 32px">已购买备件清单</a-divider>
+        <a-table
+          :columns="columnsPurchased"
+          :dataSource="dataPurchased"
+          :pagination="false"
+        >
+          <template v-for="col in ['purchased_part_no', 'purchased_part_key_number', 'purchased_part_number', 'purchased_part_name', 'purchased_part_qty', 'purchased_part_memo']" :slot="col" slot-scope="text">
+            <template>{{ text }}</template>
+          </template>
+          <template slot="purchased_confirm" slot-scope="text">
+            <a-icon v-if="text === 'OK'" type="check" />
+            <a-icon v-else type="close" />
+          </template>
+        </a-table>
+      </a-descriptions>
+    </a-card>
+  </div>
 </template>
 
 <script>
-import { queryStepDataOnlyread, getReceiptPurchasedConfirm } from '@/api/step'
+import { queryStepDataOnlyread, getReceiptPurchasedConfirm, getStepUser, formatDateYMD } from '@/api/step'
 
 export default {
   data () {
@@ -45,7 +54,9 @@ export default {
       refVaveData: {},
       refActuData: {},
       projectData: {},
-      baseInfoData: {}
+      baseInfoData: {},
+      stepUser: '',
+      stepDoneDate: ''
     }
   },
   mounted () {
@@ -56,6 +67,8 @@ export default {
     const stepData = this.$store.state.editStepData.stepEditData
     this.projectData = this.$store.state.editStepData.stepEditData.project
     this.receiptData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
+    this.stepUser = getStepUser(stepData.users)
+    this.stepDoneDate = formatDateYMD(stepData.step_done_date)
 
     queryStepDataOnlyread({ id: stepData.flow_id, current_step: '(start)' }).then(res => {
       res.result.step_data.forEach(e => {

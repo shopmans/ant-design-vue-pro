@@ -50,7 +50,7 @@
             :dataSource="dataPurchased"
             :pagination="false"
           >
-            <template v-for="(col, i) in ['purchased_part_no', 'purchased_part_key_number', 'purchased_part_number', 'purchased_part_name', 'purchased_part_qty', 'purchased_part_memo']" :slot="col" slot-scope="text, record">
+            <template v-for="(col, i) in ['purchased_part_no', 'purchased_part_name', 'purchased_part_number', 'purchased_part_qty', 'purchased_part_key_number', 'purchased_part_memo']" :slot="col" slot-scope="text, record">
               <a-input
                 :key="col"
                 v-if="record.editable"
@@ -95,7 +95,8 @@
           </a-table>
           <a-row>
             <template v-if="selectTest">
-              <a-col :span="24"><a-button style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus" @click="newPartMember">新增部件</a-button></a-col>
+              <a-col :span="12"><a-button style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus" @click="newPartMember">新增部件</a-button></a-col>
+              <a-col :span="12"><div class="upload-no-inline-block"><a-upload accept=".xls,.xlsx" :before-upload="importExcel" :show-upload-list="false" className=".ant-upload.ant-upload-select"><a-button style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus">Excel导入</a-button></a-upload></div></a-col>
             </template>
             <template v-else>
               <a-col :span="24"><a-button disabled style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus" @click="newPartMember">新增部件</a-button></a-col>
@@ -146,6 +147,8 @@
   import pick from 'lodash.pick'
   import stepDetail from '../../modules/StepBaseInfo'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
+  import XLSX from 'xlsx'
+  import { randomNum } from '@/api/utils'
 
   const assessmentFields = ['valve_body_state', 'valve_body_repair', 'valve_body_memo',
   'valve_flanges_state', 'valve_flanges_repair', 'valve_flanges_memo',
@@ -310,6 +313,114 @@ export default {
           editable: true,
           isNew: true
         })
+      },
+      importExcel (file) {
+        // console.log(file)
+        this.readExcel(file)
+        return false
+      },
+      readExcel (file) { // 表格导入
+          var that = this
+
+          if (file.length <= 0) { // 如果没有文件名
+            return false
+          }
+
+          const fileReader = new FileReader()
+          fileReader.onload = (ev) => {
+            try {
+              const data = ev.target.result
+              const workbook = XLSX.read(data, {
+                  type: 'binary'
+              })
+              const wsname = workbook.SheetNames[0] // 取第一张表
+              const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]) // 生成json表格内容
+              // console.log(ws)
+
+              // 查找件号单元格并取得件号属性名称
+              var keyNumberPropName = '' // 件号属性名称
+              ws.forEach(wsItem => {
+                for (var wsItemProp of Object.keys(wsItem)) {
+                  if (wsItem[wsItemProp] === '零件号码') {
+                    keyNumberPropName = wsItemProp
+                    break
+                  }
+                }
+              })
+              if (keyNumberPropName.length !== 9) {
+                this.$message.error('导入Excel文件没有找到“零件号码”单元格')
+                return
+              }
+
+              var tmpDataItemArray = []
+              for (let i = 9; i < ws.length; i++) {
+                var tmpDataItem = []
+                var tmpDataObject = ws[i]
+                // 件号属性是否存在
+                if (!tmpDataObject[keyNumberPropName]) {
+                  continue
+                }
+
+                for (var key of Object.keys(tmpDataObject)) {
+                  const tmpValue = tmpDataObject[key]
+                  tmpDataItem.push(tmpValue === 'undefined' ? '' : tmpValue)
+                }
+                tmpDataItemArray.push(tmpDataItem)
+              }
+              console.log(tmpDataItemArray)
+
+              // 合并导入数据，以件号为key
+              var keyIndex = 2 // 件号index
+              tmpDataItemArray.forEach(item => {
+                // 在已有备件数据中查找相同件号
+                var isFind = false
+                var findIndex = 0
+                for (var i = 0; i < that.dataPurchased.length; i++) {
+                  if (item[keyIndex] === that.dataPurchased[i].purchased_part_key_number) {
+                    isFind = true
+                    findIndex = i
+                    break
+                  }
+                }
+
+                const memo = typeof item[5] === 'undefined' ? '' : item[5] + ''
+                console.log(memo)
+                if (isFind) {
+                  that.dataPurchased[findIndex].purchased_part_key_number = item[4] + ''
+                  that.dataPurchased[findIndex].purchased_part_number = item[2] + ''
+                  that.dataPurchased[findIndex].purchased_part_name = item[1] + ''
+                  that.dataPurchased[findIndex].purchased_part_qty = item[3] + ''
+                  that.dataPurchased[findIndex].purchased_part_memo = memo
+                } else {
+                  that.dataPurchased.push({
+                    key: randomNum(1000, 9999999) + '',
+                    purchased_part_no: item[0] + '',
+                    purchased_part_key_number: item[4] + '',
+                    purchased_part_number: item[2] + '',
+                    purchased_part_name: item[1] + '',
+                    purchased_part_qty: item[3] + '',
+                    purchased_part_memo: memo
+                  })
+                }
+              })
+
+              // console.log(that.dataPurchased)
+
+              // that.peopleArr = [];//清空接收数据
+              // if(that.peopleArr.length == 1 && that.peopleArr[0].roleName == "" && that.peopleArr[0].enLine == ""){
+              //     that.peopleArr = [];
+              // }
+              // 重写数据
+              // try {
+
+              // } catch (err) {
+              //     console.log(err)
+              // }
+            } catch (e) {
+                return false
+            }
+          }
+          fileReader.readAsBinaryString(file)
       }
     },
     mounted () {

@@ -35,10 +35,17 @@ const errorHandler = (error) => {
         })
       }
     } else {
-      notification.error({
-        message: data.message,
-        description: data.description
-      })
+      if (error.response.headers['reporterror']) {
+        notification.error({
+          message: '错误',
+          description: decodeURIComponent(error.response.headers['reporterror'])
+        })
+      } else {
+        notification.error({
+          message: data.message,
+          description: data.description
+        })
+      }
     }
   }
   return Promise.reject(error)

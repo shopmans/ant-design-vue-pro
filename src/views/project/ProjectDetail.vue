@@ -16,6 +16,7 @@
       <a-divider style="margin-bottom: 32px"/>
       <a-descriptions :title="$t('menu.project.detail.contractInfo')">
         <a-descriptions-item :label="$t('menu.project.view.query.customerName')">{{ detailData.customer_name }}</a-descriptions-item>
+        <a-descriptions-item :label="$t('menu.customer.new.finallyUser')">{{ detailData.finally_user }}</a-descriptions-item>
         <a-descriptions-item :label="$t('menu.project.view.table.column.sales')">{{ detailData.sales_name }}</a-descriptions-item>
         <a-descriptions-item :label="$t('menu.project.detail.contractNumber')">{{ detailData.contract_serial }}</a-descriptions-item>
         <a-descriptions-item :label="$t('menu.project.view.table.column.total')">{{ formatContractTotal(detailData.total) }}</a-descriptions-item>

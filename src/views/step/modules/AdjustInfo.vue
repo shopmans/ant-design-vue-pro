@@ -1,121 +1,141 @@
 <template>
   <div>
-    <a-card title="开关型" :headStyle="{fontWeight:'bold'}">
-      <!-- 开关型 -->
+    <a-card :bordered="false" title="执行信息">
       <a-descriptions title="">
-        <a-descriptions-item label="">
-          <template v-if="adjustData.adjust_on_off_open_close && adjustData.adjust_on_off_open_close[0] === '1'">
-            <a-badge status="success" :offset="[-1,5]" text="开"></a-badge>
-          </template>
-          <template v-else>
-            <a-badge>开</a-badge>
-          </template>
-        </a-descriptions-item>
-        <a-descriptions-item label="">
-          <template v-if="adjustData.adjust_on_off_open_close && adjustData.adjust_on_off_open_close[0] === '2'">
-            <a-badge status="success" :offset="[-1,5]" text="关"></a-badge>
-          </template>
-          <template v-else>
-            <a-badge>关</a-badge>
-          </template>
-        </a-descriptions-item>
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
       </a-descriptions>
     </a-card>
-    <br><br>
-
-    <!-- 调节性 -->
-    <a-card title="调节性" :headStyle="{fontWeight:'bold'}">
-      <!-- 调节性 -->
-      <a-table :columns="inputSignalColumns" :dataSource="inputSignalData" :pagination="false" bordered>
-        <template slot="title">
-          输入信号
+    <br>
+    <template v-if="valveControlModel === 2">
+      <a-card title="开关型" :headStyle="{fontWeight:'bold'}">
+        <!-- 开关型 -->
+        <a-descriptions title="">
+          <a-descriptions-item label="">
+            <template v-if="adjustData.adjust_on_off_open_close && adjustData.adjust_on_off_open_close[0] === '1'">
+              <a-badge status="success" :offset="[-1,5]" text="开位正常"></a-badge>
+            </template>
+            <template v-else>
+              <a-badge>开位正常</a-badge>
+            </template>
+          </a-descriptions-item>
+          <a-descriptions-item label="">
+            <template v-if="adjustData.adjust_on_off_open_close && adjustData.adjust_on_off_open_close[0] === '2'">
+              <a-badge status="success" :offset="[-1,5]" text="关位正常"></a-badge>
+            </template>
+            <template v-else>
+              <a-badge>关位正常</a-badge>
+            </template>
+          </a-descriptions-item>
+        </a-descriptions>
+        <!-- 结论 -->
+        结论:
+        <template v-if="adjustData.adjust_control_valve_conclustion && adjustData.adjust_control_valve_conclustion === 1">
+          <a-badge>合格</a-badge>
         </template>
-      </a-table>
-
-      <br>
-      <!-- 结论 -->
-      结论:
-      <a-textarea disabled :rows="5" v-model="adjustControlValveConclustion" />
-    </a-card>
-
-    <br><br>
-
-    <!-- 死区 -->
-    <a-card title="死区" :headStyle="{fontWeight:'bold'}">
-      <a-table :columns="deadBandColumns" :dataSource="deadBandData" :pagination="false" bordered>
-        <template slot="title">
-          死区
+        <template v-else>
+          <a-badge>不合格</a-badge>
         </template>
-      </a-table>
-      <br>
-      <a-descriptions :column="4">
-        <a-descriptions-item label="全开到全关(s)">
-          {{ adjustData.adjust_deadband_open_to_close }}
-        </a-descriptions-item>
-        <a-descriptions-item label="全关到全开(s)">
-          {{ adjustData.adjust_deadband_close_to_open }}
-        </a-descriptions-item>
-        <a-descriptions-item label="线性">
-          {{ adjustData.adjust_deadband_linearity }}
-        </a-descriptions-item>
-        <a-descriptions-item label="回差">
-          {{ adjustData.adjust_deadband_hysteresis }}
-        </a-descriptions-item>
-      </a-descriptions>
-    </a-card>
-
-    <br><br>
-
-    <!-- 电磁阀 -->
-    <a-card title="电磁阀" :headStyle="{fontWeight:'bold'}">
-      <a-descriptions :column="4">
-        <a-descriptions-item label="动作">
-          {{ adjustData.adjust_solenoid_valve_active }}
-        </a-descriptions-item>
-        <a-descriptions-item label="时间">
-          {{ adjustData.adjust_solenoid_valve_time }}
-        </a-descriptions-item>
-      </a-descriptions>
-    </a-card>
-
-    <br><br>
-
-    <!-- 保位/切换阀 -->
-    <a-card title="保位/切换阀" :headStyle="{fontWeight:'bold'}">
-      <a-descriptions :column="4">
-        <a-descriptions-item label="动作">
-          {{ adjustData.adjust_lockup_active }}
-        </a-descriptions-item>
-        <a-descriptions-item label="设定点">
-          {{ getValveHydrostaticTestValueUnitText(adjustData.adjust_lockup_time, adjustData.adjust_lockup_time_unit) }}
-        </a-descriptions-item>
-      </a-descriptions>
-    </a-card>
-
-    <br><br>
-
-    <!-- 结论 -->
-    <a-card title="结论" :headStyle="{fontWeight:'bold'}">
-      结论:
-      <a-textarea disabled :rows="5" v-model="adjustConclustion" />
+      </a-card>
       <br><br>
-      备注:
-      <a-textarea disabled :rows="5" v-model="adjustMemo" />
-    </a-card>
+    </template>
 
-    <br><br>
+    <template v-if="valveControlModel === 1">
+      <!-- 调节性 -->
+      <a-card title="定位器" :headStyle="{fontWeight:'bold'}">
+        <!-- 调节性 -->
+        <a-table :columns="inputSignalColumns" :dataSource="inputSignalData" :pagination="false" bordered>
+        </a-table>
+      </a-card>
 
-    <a-card title="工时" :headStyle="{fontWeight:'bold'}">
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-descriptions title="工时(min)">
-            <a-descriptions-item>
-              {{ adjustData.adjust_total_minute }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-    </a-card>
+      <br><br>
+
+      <!-- 死区 -->
+      <a-card title="死区" :headStyle="{fontWeight:'bold'}">
+        <a-table :columns="deadBandColumns" :dataSource="deadBandData" :pagination="false" bordered>
+          <template slot="title">
+            死区
+          </template>
+        </a-table>
+        <br>
+        <a-descriptions :column="4">
+          <a-descriptions-item label="全开到全关(s)">
+            {{ adjustData.adjust_deadband_open_to_close }}
+          </a-descriptions-item>
+          <a-descriptions-item label="全关到全开(s)">
+            {{ adjustData.adjust_deadband_close_to_open }}
+          </a-descriptions-item>
+          <a-descriptions-item label="线性">
+            {{ adjustData.adjust_deadband_linearity }}
+          </a-descriptions-item>
+          <a-descriptions-item label="回差">
+            {{ adjustData.adjust_deadband_hysteresis }}
+          </a-descriptions-item>
+        </a-descriptions>
+      </a-card>
+
+      <br><br>
+
+      <!-- 电磁阀 -->
+      <a-card title="电磁阀" :headStyle="{fontWeight:'bold'}">
+        <a-descriptions :column="4">
+          <a-descriptions-item label="动作">
+            {{ adjustData.adjust_solenoid_valve_active }}
+          </a-descriptions-item>
+          <a-descriptions-item label="时间(秒)">
+            {{ adjustData.adjust_solenoid_valve_time }}
+          </a-descriptions-item>
+        </a-descriptions>
+      </a-card>
+
+      <br><br>
+
+      <!-- 保位/切换阀 -->
+      <a-card title="保位/切换阀" :headStyle="{fontWeight:'bold'}">
+        <a-descriptions :column="4">
+          <a-descriptions-item label="动作">
+            {{ adjustData.adjust_lockup_active }}
+          </a-descriptions-item>
+          <a-descriptions-item label="设定点">
+            {{ getValveHydrostaticTestValueUnitText(adjustData.adjust_lockup_time, adjustData.adjust_lockup_time_unit) }}
+          </a-descriptions-item>
+        </a-descriptions>
+      </a-card>
+
+      <br><br>
+
+      <!-- 结论 -->
+      <a-card title="结论" :headStyle="{fontWeight:'bold'}">
+        <template v-if="adjustData.adjust_conclustion && adjustData.adjust_conclustion === 1">
+          <a-badge>成功</a-badge>
+        </template>
+        <template v-else>
+          <a-badge>失败</a-badge>
+        </template>
+      </a-card>
+
+      <br><br>
+
+      <!-- 备注 -->
+      <a-card title="备注" :headStyle="{fontWeight:'bold'}">
+        <a-textarea disabled :rows="5" v-model="adjustMemo" />
+      </a-card>
+
+      <br><br>
+
+      <a-card title="工时(min)" :headStyle="{fontWeight:'bold'}">
+        <a-row :gutter="16">
+          <a-col :span="8">
+            <a-descriptions title="">
+              <a-descriptions-item>
+                {{ adjustData.adjust_total_minute }}
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-col>
+        </a-row>
+      </a-card>
+    </template>
 
     <br><br>
 
@@ -127,11 +147,11 @@
 
 <script>
 import UploadImgRead from '../modules/UploadImgRead'
-  import { getValveHydrostaticTestValueUnitText } from '@/api/step'
+  import { getValveHydrostaticTestValueUnitText, queryStepData, getStepUser, formatDateYMD } from '@/api/step'
 
   const inputSignalColumns = [
     {
-      title: '',
+      title: '输入电流',
       dataIndex: 'leftTitle',
       width: '8%'
     },
@@ -239,7 +259,7 @@ import UploadImgRead from '../modules/UploadImgRead'
 
   const inputSignalData = [
     {
-      leftTitle: '输入信号',
+      leftTitle: '输入阀位',
       key: '1',
       ma: '%',
       ma4: '',
@@ -253,7 +273,7 @@ import UploadImgRead from '../modules/UploadImgRead'
       ma41: ''
     },
     {
-      leftTitle: '反馈信号',
+      leftTitle: '反馈电流',
       key: '2',
       ma: 'mA',
       ma4: '',
@@ -267,7 +287,7 @@ import UploadImgRead from '../modules/UploadImgRead'
       ma41: ''
     },
     {
-      leftTitle: '反馈位置',
+      leftTitle: '反馈阀位',
       key: '3',
       ma: '%',
       ma4: '',
@@ -316,6 +336,7 @@ export default {
       this.$message.warning('当前流程没有保存数据')
       return
     }
+    const flowId = this.$store.state.editStepData.stepEditData.flow_id
     this.adjustData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
     this.$refs.uploadImgRead.imgFileList = this.adjustData.uploads
     this.inputSignalData = this.adjustData.inputSignalData
@@ -324,6 +345,28 @@ export default {
     this.adjustControlValveConclustion = this.adjustData.adjust_control_valve_conclustion
     this.adjustConclustion = this.adjustData.adjust_conclustion
     this.adjustMemo = this.adjustData.adjust_memo
+    this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
+    this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
+
+    queryStepData({ id: flowId, current_step: '(start)' }).then(res => {
+      res.result.step_data.forEach(stepItem => {
+        switch (stepItem.DataNum) {
+          case 1: // baseInfo
+            const baseData = JSON.parse(stepItem.JSON)
+            // 开关阀、调节阀数据
+            if (baseData.control_model === '1') { // 调节阀
+              this.valveControlModel = 1
+              return
+            }
+            if (baseData.control_model === '2') { // 开关阀
+              this.valveControlModel = 2
+              return
+            }
+
+            this.$message.info('不能识别的阀类型(开关阀、调节阀)')
+        }
+      })
+    })
   },
   data () {
       return {
@@ -334,8 +377,10 @@ export default {
         deadBandData: deadBandData,
         adjustControlValveConclustion: '',
         adjustConclustion: '',
-        adjustMemo: ''
-
+        adjustMemo: '',
+        valveControlModel: 0,
+        stepUser: '',
+        stepDoneDate: ''
       }
     }
 }

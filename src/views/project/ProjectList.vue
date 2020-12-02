@@ -266,6 +266,7 @@ export default {
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
+        console.log(values)
         if (!errors) {
           if (values.id) {
             // 修改 e.g.

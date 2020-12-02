@@ -96,7 +96,7 @@
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item>
-              <div class="linehight">气密性测试</div>
+              <div class="linehight">气密性测试是否合格</div>
               <a-radio-group v-decorator="['valve_assemble_air_tightness_is_success', { } ]">
                 <a-radio :value="1">
                   是
@@ -109,7 +109,7 @@
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item>
-              <div class="linehight">Bench Set测试</div>
+              <div class="linehight">Bench Set测试是否合格</div>
               <a-radio-group v-decorator="['valve_assemble_benchset_is_success', { } ]">
                 <a-radio :value="1">
                   是

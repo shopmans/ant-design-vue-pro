@@ -5,11 +5,11 @@
       <a-descriptions-item label="合同号">{{ projectData.contract_serial }}</a-descriptions-item>
       <a-descriptions-item label="客户名称">{{ projectData.customer_name }}</a-descriptions-item>
       <a-descriptions-item label="位号">{{ refData1.tag }}</a-descriptions-item>
-      <a-descriptions-item label="阀门序列号">{{ valveRefData.valve_serial }}</a-descriptions-item>
+      <!-- <a-descriptions-item label="阀门序列号">{{ valveRefData.valve_serial }}</a-descriptions-item>
       <a-descriptions-item label="阀门型号">{{ valveRefData.valve_model }}</a-descriptions-item>
       <a-descriptions-item label="阀门尺寸">{{ getValveSizeUnitText(valveRefData.valve_size, valveRefData.valve_size_unit) }}</a-descriptions-item>
       <a-descriptions-item label="执行机构型号">{{ actuRefData.actu_model }}</a-descriptions-item>
-      <a-descriptions-item label="执行机构尺寸">{{ actuRefData.actu_size }}</a-descriptions-item>
+      <a-descriptions-item label="执行机构尺寸">{{ actuRefData.actu_size }}</a-descriptions-item> -->
     </a-descriptions>
     <a-divider><div class="linehight">定位器<br>Other Accessories</div></a-divider>
     <a-row :gutter="16">

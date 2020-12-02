@@ -12,7 +12,9 @@ const user = {
     roles: [],
     info: {},
     workOrderType: '',
-    detailData: {}
+    detailData: {},
+    curPageNo: '',
+    curPageSize: ''
   },
 
   mutations: {
@@ -37,6 +39,12 @@ const user = {
     },
     SET_DETAIL_DATA: (state, data) => {
       state.detailData = data
+    },
+    SET_CUR_PAGE_NO: (state, data) => {
+      state.curPageNo = data
+    },
+    SET_CUR_PAGE_SIZE: (state, data) => {
+      state.curPageSize = data
     }
   },
 

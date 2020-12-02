@@ -1,54 +1,65 @@
 <template>
   <div>
+    <a-card v-if="!showBaseInfo" :bordered="false" title="执行信息">
+      <a-descriptions title="">
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <a-tabs default-active-key="1" >
-      <a-tab-pane key="1" tab="工单基本信息" :forceRender="true">
-        <a-card :bordered="false">
-          <a-descriptions title="基本信息">
-            <a-descriptions-item label="工程编号">{{ project.serial }}</a-descriptions-item>
-            <a-descriptions-item label="合同编号">{{ project.contract_serial }}</a-descriptions-item>
-            <a-descriptions-item label="工单编号">{{ baseInfo.work_order_serial }}</a-descriptions-item>
-            <a-descriptions-item label="位号">{{ baseInfo.tag }}</a-descriptions-item>
-            <a-descriptions-item label="预估检测费用">{{ formatContractTotal(baseInfo.estimate) }}</a-descriptions-item>
-            <a-descriptions-item label="返厂部件">{{ repairPartComboboxText(baseInfo.return_part) }}</a-descriptions-item>
-            <a-descriptions-item label="维修部件">{{ repairPartComboboxText(baseInfo.repair_part) }}</a-descriptions-item>
-            <a-descriptions-item label="现场拆装">{{ disassemblyComboboxText(baseInfo.disassembly) }}</a-descriptions-item>
-            <a-descriptions-item label="出入厂单据号码">{{ baseInfo.receipt_number }}</a-descriptions-item>
-            <a-descriptions-item label="收货日期">{{ baseInfo.receipt_date ? moment(baseInfo.receipt_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
-            <a-descriptions-item label="要求完工日期">{{ baseInfo.requirst_done_date ? moment(baseInfo.requirst_done_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
-            <a-descriptions-item label="序列号">{{ baseInfo.serial }}</a-descriptions-item>
-            <a-descriptions-item label="控制方式">{{ getControlModelUnit(baseInfo.control_model) }}</a-descriptions-item>
-            <a-descriptions-item label="工艺介质">{{ getProcessMediumUnit(baseInfo.process_medium) }}</a-descriptions-item>
-          </a-descriptions>
-          <a-row>
-            <a-col :span="24">
-              故障现象及工作内容
-              <a-textarea :rows="5" :value="baseInfo.content" :disabled="true"></a-textarea>
-            </a-col>
-          </a-row>
-          <a-divider style="margin-bottom: 32px">已购买备件清单</a-divider>
-          <a-table
-            :columns="getColumnsPurchasedArray()"
-            :dataSource="getPurchasedData()"
-            :pagination="false"
-          ></a-table>
-          <a-divider style="margin-bottom: 32px"/>
-          <a-descriptions title="上传附件">
-            <a-descriptions-item label="">
-              规格表<br>
-              <a-upload :file-list="specificationTableFileList" ></a-upload>
-            </a-descriptions-item>
-            <a-descriptions-item label="">
-              序列卡<br>
-              <a-upload :file-list="serialCardFileList" ></a-upload>
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-card>
-      </a-tab-pane>
+      <template v-if="showBaseInfo">
+        <a-tab-pane key="1" tab="工单基本信息" :forceRender="true">
+          <a-card :bordered="false">
+            <a-descriptions title="基本信息">
+              <a-descriptions-item label="工程编号">{{ project.serial }}</a-descriptions-item>
+              <a-descriptions-item label="合同编号">{{ project.contract_serial }}</a-descriptions-item>
+              <a-descriptions-item label="工单编号">{{ baseInfo.work_order_serial }}</a-descriptions-item>
+              <a-descriptions-item label="位号">{{ baseInfo.tag }}</a-descriptions-item>
+              <a-descriptions-item label="预估检测费用">{{ formatContractTotal(baseInfo.estimate) }}</a-descriptions-item>
+              <a-descriptions-item label="返厂部件">{{ repairPartComboboxText(baseInfo.return_part) }}</a-descriptions-item>
+              <a-descriptions-item label="维修部件">{{ repairPartComboboxText(baseInfo.repair_part) }}</a-descriptions-item>
+              <a-descriptions-item label="现场拆装">{{ disassemblyComboboxText(baseInfo.disassembly) }}</a-descriptions-item>
+              <a-descriptions-item label="出入厂单据号码">{{ baseInfo.receipt_number }}</a-descriptions-item>
+              <a-descriptions-item label="收货日期">{{ baseInfo.receipt_date ? moment(baseInfo.receipt_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
+              <a-descriptions-item label="要求完工日期">{{ baseInfo.requirst_done_date ? moment(baseInfo.requirst_done_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
+              <a-descriptions-item label="序列号">{{ baseInfo.serial }}</a-descriptions-item>
+              <a-descriptions-item label="序号">{{ baseInfo.serial_number }}</a-descriptions-item>
+              <a-descriptions-item label="控制方式">{{ getControlModelUnit(baseInfo.control_model) }}</a-descriptions-item>
+              <a-descriptions-item label="工艺介质">{{ getProcessMediumUnit(baseInfo.process_medium) }}</a-descriptions-item>
+            </a-descriptions>
+            <a-row>
+              <a-col :span="24">
+                故障现象及工作内容
+                <a-textarea :rows="5" :value="baseInfo.content" :disabled="true"></a-textarea>
+              </a-col>
+            </a-row>
+            <a-divider style="margin-bottom: 32px">已购买备件清单</a-divider>
+            <a-table
+              :columns="getColumnsPurchasedArray()"
+              :dataSource="getPurchasedData()"
+              :pagination="false"
+            ></a-table>
+            <a-divider style="margin-bottom: 32px"/>
+            <a-descriptions title="上传附件">
+              <a-descriptions-item label="">
+                规格表<br>
+                <a-upload :file-list="specificationTableFileList" ></a-upload>
+              </a-descriptions-item>
+              <a-descriptions-item label="">
+                序列卡<br>
+                <a-upload :file-list="serialCardFileList" ></a-upload>
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-card>
+        </a-tab-pane>
+      </template>
+
       <a-tab-pane key="2" tab="阀门信息" v-if="showValveForm" :forceRender="true">
         <a-card :bordered="false">
           <a-descriptions title="阀门信息">
             <a-descriptions-item label="阀类型">{{ getValveTypeUnit(valveInfo.valve_type) }}</a-descriptions-item>
-            <a-descriptions-item label="阀门品牌">{{ getValveManufacturerUnit(valveInfo.valve_manufacturer) }}</a-descriptions-item>
+            <a-descriptions-item label="阀门品牌">{{ valveInfo.valve_manufacturer }}</a-descriptions-item>
             <a-descriptions-item label="阀门序列号">{{ valveInfo.valve_serial }}</a-descriptions-item>
             <a-descriptions-item label="阀门型号">{{ valveInfo.valve_model }}</a-descriptions-item>
             <a-descriptions-item label="阀门尺寸">{{ valveInfo.valve_size + " " + getValveSizeUnit(valveInfo.valve_size_unit) }}</a-descriptions-item>
@@ -61,15 +72,23 @@
             <a-descriptions-item label="阀内件特性">{{ getValveFlowChar(valveInfo.valve_flow_char) }}</a-descriptions-item>
             <a-descriptions-item label="阀杆直径">{{ valveInfo.valve_rod_diameter + " " + getValveSizeUnit(valveInfo.valve_rod_diameter_unit) }}</a-descriptions-item>
             <a-descriptions-item label="口径">{{ valveInfo.valve_caliber + " " + getValveSizeUnit(valveInfo.valve_caliber_unit) }}</a-descriptions-item>
+            <a-descriptions-item label="连接方式">{{ getValveConnectModelUnit(valveInfo.valve_connect_model) }}</a-descriptions-item>
             <a-descriptions-item label="法兰螺栓工具">{{ valveInfo.valve_flange_bolt_tool + " " + getValveSizeUnit(valveInfo.valve_flange_bolt_tool_unit) }}</a-descriptions-item>
             <a-descriptions-item label="连接夹块螺栓工具">{{ valveInfo.valve_connect_bolt_tool + " " + getValveSizeUnit(valveInfo.valve_connect_bolt_tool_unit) }}</a-descriptions-item>
+            <a-descriptions-item label="阀芯/阀球/蝶板材质">{{ getValveCoreBallBettleflyUnit(valveInfo.valve_core_ball_bettlefly) }}</a-descriptions-item>
+            <a-descriptions-item label="阀杆/阀轴材质">{{ getValveStemAxisUnit(valveInfo.valve_stem_axis) }}</a-descriptions-item>
+            <a-descriptions-item label="阀笼/保持环材质">{{ getValveCageRetainingRingUnit(valveInfo.valve_cage_retaining_ring) }}</a-descriptions-item>
+            <a-descriptions-item label="阀座环材质">{{ getValveSetRingUnit(valveInfo.valve_set_ring) }}</a-descriptions-item>
+            <a-descriptions-item label="村套/轴承材质">{{ getValveVillageBearingUnit(valveInfo.valve_village_bearing) }}</a-descriptions-item>
+            <a-descriptions-item label="垫片材质">{{ getValveSpacer(valveInfo.valve_spacer) }}</a-descriptions-item>
+
           </a-descriptions>
           <a-divider style="margin-bottom: 32px"/>
           <a-descriptions title="阀盖" :column="4">
-            <a-descriptions-item label="阀盖螺栓扭矩标准值">{{ valveInfo.valve_cover_bolt_torque + " " + getValveCoverBoltTorqueUnit(valveInfo.valve_cover_bolt_torque_unit) }}</a-descriptions-item>
-            <a-descriptions-item label="阀盖螺栓材质">{{ getValveCoverBoltMaterialUnit(valveInfo.valve_cover_bolt_material) }}</a-descriptions-item>
-            <a-descriptions-item label="阀盖螺栓尺寸">{{ valveInfo.valve_cover_bolt_size + " " + getValveSizeUnit(valveInfo.valve_cover_bolt_size_unit) }}</a-descriptions-item>
-            <a-descriptions-item label="阀盖螺栓工具">{{ valveInfo.valve_cover_bolt_tool + " " + getValveSizeUnit(valveInfo.valve_cover_bolt_tool_unit) }}</a-descriptions-item>
+            <a-descriptions-item label="阀盖螺栓扭矩标准值">{{ getValveCoverBoltTorqueUnitText(valveInfo.valve_cover_bolt_torque, valveInfo.valve_cover_bolt_torque_unit) }}</a-descriptions-item>
+            <a-descriptions-item label="阀盖螺栓材质">{{ getValveCoverBoltMaterialUnitNA(valveInfo.valve_cover_bolt_material) }}</a-descriptions-item>
+            <a-descriptions-item label="阀盖螺栓尺寸">{{ getValveSizeUnitTextNA(valveInfo.valve_cover_bolt_size, valveInfo.valve_cover_bolt_size_unit) }}</a-descriptions-item>
+            <a-descriptions-item label="阀盖螺栓工具">{{ getValveSizeUnitTextNA(valveInfo.valve_cover_bolt_tool, valveInfo.valve_cover_bolt_tool_unit) }}</a-descriptions-item>
           </a-descriptions>
           <a-divider style="margin-bottom: 32px"/>
           <a-descriptions title="阀座" :column="4">
@@ -108,18 +127,21 @@
             <a-descriptions-item label="作用方式">{{ getActuUseModeUnit(ActuatorInfo.actu_use_mode) }}</a-descriptions-item>
             <a-descriptions-item label="序列号">{{ ActuatorInfo.actuator_serial }}</a-descriptions-item>
             <a-descriptions-item label="型号">{{ ActuatorInfo.actu_model }}</a-descriptions-item>
-            <a-descriptions-item label="尺寸">{{ ActuatorInfo.actu_size }}</a-descriptions-item>
+            <a-descriptions-item label="尺寸">{{ getValveSizeUnitText(ActuatorInfo.actu_size, ActuatorInfo.actu_size_unit) }}</a-descriptions-item>
             <a-descriptions-item label="动作方式">{{ getActuActionModeUnit(ActuatorInfo.actu_action_mode) }}</a-descriptions-item>
             <a-descriptions-item label="弹簧设置压力">{{ ActuatorInfo.actu_spring_set_pressure + " " +getActuSpringSetPressureUnit(ActuatorInfo.actu_spring_set_pressure_unit) }}</a-descriptions-item>
             <a-descriptions-item label="故障失效">{{ getActuFailureUnit(ActuatorInfo.actu_failure) }}</a-descriptions-item>
             <a-descriptions-item label="安装位置">{{ getActuInstallPointUnit(ActuatorInfo.actu_install_point) }}</a-descriptions-item>
             <a-descriptions-item label="气源压力">{{ getValveHydrostaticTestValueUnitText(ActuatorInfo.actu_air_pressed, ActuatorInfo.actu_air_pressed_unit) }}</a-descriptions-item>
+            <a-descriptions-item label="是否集成附件安装支架">{{ getYesNoSwitchUnit(ActuatorInfo.actu_install_bracket) }}</a-descriptions-item>
+            <a-descriptions-item label="附件安装支架方向">{{ getActuInstallDirectoreUnit(ActuatorInfo.actu_install_directore) }}</a-descriptions-item>
+            <a-descriptions-item label="手轮">{{ getActuHandwheel(ActuatorInfo.actu_handwheel) }}</a-descriptions-item>
           </a-descriptions>
           <a-divider style="margin-bottom: 32px"/>
-          <a-descriptions title="阀盖">
+          <a-descriptions title="">
             <a-descriptions-item label="膜盖/缸盖螺栓工具">{{ ActuatorInfo.actu_cover_bolt_tool + " " + getValveSizeUnit(ActuatorInfo.actu_cover_bolt_tool_unit) + " " + getActuCoverBoltToolItemUnit(ActuatorInfo.actu_cover_bolt_tool_item) }}</a-descriptions-item>
             <a-descriptions-item label="膜盖/缸盖螺栓扭矩标准值">{{ ActuatorInfo.actu_cover_bolt_torque + " " + getValveCoverBoltTorqueUnit(ActuatorInfo.actu_cover_bolt_torque_unit) }}</a-descriptions-item>
-            <a-descriptions-item label="膜盖/缸盖螺栓材质">{{ getValveCoverBoltMaterialUnit(ActuatorInfo.actu_cover_bolt_material) }}</a-descriptions-item>
+            <a-descriptions-item label="膜盖/缸盖螺栓材质">{{ getValveCoverBoltMaterialUnitNA(ActuatorInfo.actu_cover_bolt_material) }}</a-descriptions-item>
             <a-descriptions-item label="膜盖/缸盖螺栓尺寸">{{ ActuatorInfo.actu_cover_bolt_size + " " + getValveSizeUnit(ActuatorInfo.actu_cover_bolt_size_unit) }}</a-descriptions-item>
           </a-descriptions>
         </a-card>
@@ -132,7 +154,7 @@
             <a-descriptions-item label="定位器型号">{{ SlaveInfo.slave_locator_model }}</a-descriptions-item>
             <a-descriptions-item label="定位器作用方式">{{ getSlaveLocatorActionmodeUnit(SlaveInfo.slave_locator_actionmode) }}</a-descriptions-item>
             <a-descriptions-item label="输入信号范围">{{ getSlaveInputSignalScopeUnit(SlaveInfo.slave_input_signal_scope) }}</a-descriptions-item>
-            <a-descriptions-item label="标准输出">{{ getSlaveStandardOutputText(SlaveInfo.slave_standard_output) }}</a-descriptions-item>
+            <a-descriptions-item label="标准输出">{{ getSlaveStandardOutputUnit(SlaveInfo.slave_standard_output) }}</a-descriptions-item>
           </a-descriptions>
           <a-divider style="margin-bottom: 32px"/>
           <a-descriptions title="过滤减压阀">
@@ -141,17 +163,17 @@
           </a-descriptions>
           <a-divider style="margin-bottom: 32px"/>
           <a-descriptions title="电磁阀" :column="4">
-            <a-descriptions-item label="电磁阀品牌1">{{ SlaveInfo.slave_elect_valve_brand }}</a-descriptions-item>
-            <a-descriptions-item label="电磁阀型号1">{{ SlaveInfo.slave_elect_valve_model }}</a-descriptions-item>
-            <a-descriptions-item label="电磁阀电压1">{{ SlaveInfo.slave_elect_valve_vol }}</a-descriptions-item>
+            <a-descriptions-item label="电磁阀品牌1">{{ SlaveInfo.slave_elect_valve_brand1 }}</a-descriptions-item>
+            <a-descriptions-item label="电磁阀型号1">{{ SlaveInfo.slave_elect_valve_model1 }}</a-descriptions-item>
+            <a-descriptions-item label="电磁阀电压1">{{ SlaveInfo.slave_elect_valve_vol1 }}</a-descriptions-item>
             <a-descriptions-item label="电磁阀作用方式1">{{ getSlaveElectValveActiveUnit(SlaveInfo.slave_elect_valve_active1) }}</a-descriptions-item>
-            <a-descriptions-item label="电磁阀品牌2">{{ SlaveInfo.slave_elect_valve_brand }}</a-descriptions-item>
-            <a-descriptions-item label="电磁阀型号2">{{ SlaveInfo.slave_elect_valve_model }}</a-descriptions-item>
-            <a-descriptions-item label="电磁阀电压2">{{ SlaveInfo.slave_elect_valve_vol }}</a-descriptions-item>
+            <a-descriptions-item label="电磁阀品牌2">{{ SlaveInfo.slave_elect_valve_brand2 }}</a-descriptions-item>
+            <a-descriptions-item label="电磁阀型号2">{{ SlaveInfo.slave_elect_valve_model2 }}</a-descriptions-item>
+            <a-descriptions-item label="电磁阀电压2">{{ SlaveInfo.slave_elect_valve_vol2 }}</a-descriptions-item>
             <a-descriptions-item label="电磁阀作用方式2">{{ getSlaveElectValveActiveUnit(SlaveInfo.slave_elect_valve_active2) }}</a-descriptions-item>
-            <a-descriptions-item label="电磁阀品牌3">{{ SlaveInfo.slave_elect_valve_brand }}</a-descriptions-item>
-            <a-descriptions-item label="电磁阀型号3">{{ SlaveInfo.slave_elect_valve_model }}</a-descriptions-item>
-            <a-descriptions-item label="电磁阀电压3">{{ SlaveInfo.slave_elect_valve_vol }}</a-descriptions-item>
+            <a-descriptions-item label="电磁阀品牌3">{{ SlaveInfo.slave_elect_valve_brand3 }}</a-descriptions-item>
+            <a-descriptions-item label="电磁阀型号3">{{ SlaveInfo.slave_elect_valve_model3 }}</a-descriptions-item>
+            <a-descriptions-item label="电磁阀电压3">{{ SlaveInfo.slave_elect_valve_vol3 }}</a-descriptions-item>
             <a-descriptions-item label="电磁阀作用方式3">{{ getSlaveElectValveActiveUnit(SlaveInfo.slave_elect_valve_active3) }}</a-descriptions-item>
           </a-descriptions>
           <a-divider style="margin-bottom: 32px"/>
@@ -189,14 +211,16 @@ import { formatTotal } from '@/api/project'
 import { getRepairPartComboboxText, getDisassemblyComboboxText } from '@/api/comboxText'
 import { getColumnsPurchased, getValveSizeUnit, getValveMaterialUnit, getValvePressureLevelUnit,
 getValveFlowUnit, getValvePushDoneUnit, getValveHydrostaticTestValueUnit, getValveHydrostaticTestTimeUnit,
-getValveCoverBoltTorqueUnit, getValveCoverBoltMaterialUnit, getValveSeatLeakTestUnit, getValveFillConfig,
+getValveCoverBoltTorqueUnit, getValveCoverBoltMaterialUnitNA, getValveSeatLeakTestUnit, getValveFillConfig,
 getValveLeakLevel, getValveFlowChar, getValveManufacturerUnit,
 getActuTypeUnit, getActuUseModeUnit, getActuActionModeUnit, getActuSpringSetPressureUnit,
 getActuFailureUnit, getActuInstallPointUnit, getActuCoverBoltToolItemUnit, getSlaveLocatorBrandUnit,
 getSlaveInputSignalScopeUnit, getValveLeakTestValueUnit, getValveTypeUnit, getValveHydrostaticTestTimeUnitText,
-getValveSizeUnitText, getSlaveStandardOutputText, getValveTestMediumUnit, getControlModelUnit,
+getValveSizeUnitText, getSlaveStandardOutputUnit, getValveTestMediumUnit, getControlModelUnit,
 getProcessMediumUnit, getSlaveLocatorActionmodeUnit, getSlaveElectValveActiveUnit, getValveHydrostaticTestValueUnitText,
-getValveTestStdUnit } from '@/api/step'
+getValveTestStdUnit, getValveCoreBallBettleflyUnit, getValveCageRetainingRingUnit, getValveSetRingUnit, getValveVillageBearingUnit,
+getValveSpacer, getYesNoSwitchUnit, getActuInstallDirectoreUnit, getValveConnectModelUnit, getValveStemAxisUnit, getActuHandwheel,
+getValveSizeUnitTextNA, getValveCoverBoltTorqueUnitText, getStepUser, formatDateYMD } from '@/api/step'
 
 export default {
   props: {
@@ -205,6 +229,10 @@ export default {
       default: null
     },
     cancelButton: {
+      type: Boolean,
+      default: true
+    },
+    showBaseInfo: {
       type: Boolean,
       default: true
     }
@@ -225,7 +253,9 @@ export default {
       specificationTableFileList: [], // 规格表
       serialCardFileList: [], // 序列卡
       current: 0,
-      valueFlowValue: ''
+      valueFlowValue: '',
+      stepUser: '',
+      stepDoneDate: ''
     }
   },
   mounted () {
@@ -240,6 +270,8 @@ export default {
     if (detailData === undefined) {
       return
     }
+    this.stepUser = getStepUser(detailData.users)
+    this.stepDoneDate = formatDateYMD(detailData.step_done_date)
 
     this.project = detailData.project
     const dataList = detailData.step_data
@@ -348,7 +380,7 @@ export default {
     getValveHydrostaticTestValueUnit,
     getValveHydrostaticTestTimeUnit,
     getValveCoverBoltTorqueUnit,
-    getValveCoverBoltMaterialUnit,
+    getValveCoverBoltMaterialUnitNA,
     getValveSeatLeakTestUnit,
     getValveFillConfig,
     getValveLeakLevel,
@@ -367,7 +399,7 @@ export default {
     getValveTypeUnit,
     getValveHydrostaticTestTimeUnitText,
     getValveSizeUnitText,
-    getSlaveStandardOutputText,
+    getSlaveStandardOutputUnit,
     getValveTestMediumUnit,
     getControlModelUnit,
     getProcessMediumUnit,
@@ -375,6 +407,18 @@ export default {
     getSlaveElectValveActiveUnit,
     getValveHydrostaticTestValueUnitText,
     getValveTestStdUnit,
+    getValveCoreBallBettleflyUnit,
+    getValveCageRetainingRingUnit,
+    getValveSetRingUnit,
+    getValveVillageBearingUnit,
+    getValveSpacer,
+    getYesNoSwitchUnit,
+    getActuInstallDirectoreUnit,
+    getValveConnectModelUnit,
+    getValveStemAxisUnit,
+    getActuHandwheel,
+    getValveSizeUnitTextNA,
+    getValveCoverBoltTorqueUnitText,
     cancelDetail () {
         this.$router.push({ path: '/step/steplist' })
     },

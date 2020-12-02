@@ -5,6 +5,7 @@
         <a-row :gutter="16">
           <a-col :span="8">
             <a-descriptions title="阀痤测试" :column="1">
+              <a-descriptions-item label="阀座泄漏测试标准">{{ getValveSeatLeakTestUnit(baseValveData.valve_seat_leak_test) }}</a-descriptions-item>
               <a-descriptions-item label="泄漏测试介质">{{ getValveTestMediumUnit(baseValveData.valve_leak_test_medium) }}</a-descriptions-item>
               <a-descriptions-item label="泄漏等级">
                 {{ getValveLeakLevel(baseValveData.valve_leak_level) }}
@@ -72,11 +73,34 @@
               </a-input>
             </a-form-item>
             <a-form-item>
+              <div class="linehight">实际测试介质</div>
+              <a-select v-decorator="[ 'leak_test_real_test_medium', {rules: [{}]}]" style="width: 200px">
+                <a-select-option value="1">
+                  水
+                </a-select-option>
+                <a-select-option value="2">
+                  压缩空气
+                </a-select-option>
+                <a-select-option value="3">
+                  氮气
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item>
               <div class="linehight">备注</div>
               <a-textarea
                 rows="6"
                 v-decorator="[
                   'leak_test_memo',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+            <a-form-item>
+              <div class="linehight">见证人</div>
+              <a-input
+                style="width:200px;"
+                v-decorator="[
+                  'leak_test_real_test_witness',
                   {rules: []}
                 ]" />
             </a-form-item>
@@ -95,6 +119,9 @@
               </a-descriptions-item>
               <a-descriptions-item label="水压测试时间">
                 {{ baseValveData.valve_hydrostatic_test_time ? baseValveData.valve_hydrostatic_test_time + " " + getValveHydrostaticTestTimeUnit(baseValveData.valve_hydrostatic_test_time_unit) : "" }}
+              </a-descriptions-item>
+              <a-descriptions-item label="">
+                {{ }}
               </a-descriptions-item>
             </a-descriptions>
             <a-form-item>
@@ -130,22 +157,38 @@
                 ]" />
             </a-form-item>
             <a-form-item>
-              <div class="linehight">水压测试结论</div>
-              <a-select v-decorator="[ 'leak_pressure_water_test_content', {rules: [{ message: '请选择单位'}]}]" style="width: 200px">
+              <div class="linehight">实际测试介质</div>
+              <a-select v-decorator="[ 'leak_pressure_water_real_test_medium', {rules: [{}]}]" style="width: 200px">
                 <a-select-option value="1">
-                  是
+                  水
                 </a-select-option>
                 <a-select-option value="2">
-                  否
+                  压缩空气
+                </a-select-option>
+                <a-select-option value="3">
+                  氮气
                 </a-select-option>
               </a-select>
             </a-form-item>
+            <br>
+            <br>
+            <br>
+            <br>
             <a-form-item>
-              <div class="linehight">备注</div>
+              <div class="linehight" style="margin-top:20px;">备注</div>
               <a-textarea
                 rows="6"
                 v-decorator="[
                   'leak_pressure_water_test_memo',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+            <a-form-item>
+              <div class="linehight">见证人</div>
+              <a-input
+                style="width:200px;"
+                v-decorator="[
+                  'leak_pressure_water_test_witness',
                   {rules: []}
                 ]" />
             </a-form-item>
@@ -156,12 +199,14 @@
           <a-col :span="24">
             <a-form-item>
               <div class="linehight">结论</div>
-              <a-textarea
-                rows="6"
-                v-decorator="[
-                  'leak_pressure_test_content',
-                  {rules: []}
-                ]" />
+              <a-radio-group v-decorator="['leak_pressure_test_content', {rules: []}]">
+                <a-radio :value="1">
+                  合格
+                </a-radio>
+                <a-radio :value="2" style="margin-left:50px;">
+                  不合格
+                </a-radio>
+              </a-radio-group>
             </a-form-item>
           </a-col>
         </a-row>
@@ -210,7 +255,7 @@
   import pick from 'lodash.pick'
   import { stepDone, queryStepData, getValveLeakLevel, getValveLeakTestValueUnit, getValveHydrostaticTestTimeUnit,
   getValveWaterPressureLevelUnit, getValveHydrostaticTestValueUnitText, getValveSeatLeakTestUnitText,
-  getValveTestMediumUnit, getValveTestStdUnit } from '@/api/step'
+  getValveTestMediumUnit, getValveTestStdUnit, getValveSeatLeakTestUnit } from '@/api/step'
   import UploadImg from '../../modules/UploadImg'
   import stepDetail from '../../modules/StepBaseInfo'
   import { saveLeakPressureData } from '@/api/leakPressureTest'
@@ -220,7 +265,8 @@
   'leak_pressure_test_real_time', 'leak_test_real_valve', 'leak_test_real_valve_unit', 'leak_pressure_water_test_real_value',
   'leak_pressure_water_test_real_value_unit', 'leak_test_real_test_pressed', 'leak_test_real_test_pressed_unit',
   'leak_water_test_real_pressed', 'leak_water_test_real_pressed_unit', 'leak_pressure_test_content',
-  'leak_pressure_water_test_content', 'leak_pressure_water_test_memo', 'leak_test_memo']
+  'leak_pressure_water_test_content', 'leak_pressure_water_test_memo', 'leak_test_memo', 'leak_test_real_test_medium',
+  'leak_pressure_water_real_test_medium', 'leak_pressure_water_test_witness', 'leak_test_real_test_witness']
 
   export default {
     name: 'LeakPressureTest',
@@ -240,6 +286,7 @@
       getValveSeatLeakTestUnitText,
       getValveTestMediumUnit,
       getValveTestStdUnit,
+      getValveSeatLeakTestUnit,
       handleSubmit (e) {
         e.preventDefault()
         this.form.validateFields((err, values) => {

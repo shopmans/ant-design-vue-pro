@@ -486,7 +486,7 @@ const fields = ['hardware_check_locator_nameplate', 'hardware_check_locator_grad
 'hardware_check_locator_gain_setting', 'hardware_check_locator_terminal_resistance', 'hardware_check_locator_terminal_resistance_water',
 'hardware_check_locator_ip_active', 'hardware_check_locator_ip_active_water', 'hardware_check_locator_relay_active', 'hardware_check_locator_relay_active_water',
 'hardware_check_locator_pwb_active', 'hardware_check_locator_pwb_active_water', 'hardware_check_locator_base_shell_seal', 'hardware_check_locator_base_shell_seal_water',
-'hardware_check_locator_air_connection', 'localtor_intofactorycheck_total_minute']
+'hardware_check_locator_air_connection', 'localtor_intofactorycheck_total_minute', 'hardware_check_locator_valve_type']
 
 export default {
   name: 'TearDown',

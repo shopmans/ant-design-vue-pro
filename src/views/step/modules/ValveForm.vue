@@ -32,10 +32,35 @@
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="阀门序列号">
-            <a-input v-decorator="[ 'valve_serial', {rules: [{ message: '请输入阀门序列号', whitespace: true}]} ]" />
-          </a-form-item>
+          <a-row>
+            <a-col :span="18">
+              <a-form-item
+                label="阀门序列号">
+                <a-select
+                  ref="valveSelect"
+                  show-search
+                  :default-active-first-option="false"
+                  :show-arrow="false"
+                  :filter-option="false"
+                  :not-found-content="null"
+                  @search="handleValveSearch"
+                  @change="selectValveSerialChange"
+                  v-decorator="[ 'valve_serial', {rules: [{ required: true, message: '请输入阀门序列号'}]} ]"
+                  v-if="showSerialValue"
+                >
+                  <a-select-option v-for="d in valveSerialData" :key="d.value">
+                    {{ d.text }}
+                  </a-select-option>
+                </a-select>
+                <a-input v-if="!showSerialValue" v-decorator="[ 'valve_serial', {rules: [{ required: true, message: '请输入阀门序列号' }]} ]" ></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item>
+                <a-switch :checked="switchChecked" v-decorator="[ 'valve_serial_switch', {rules: [{ required: false }]} ]" style="margin-top:45px;margin-left:5px;" @change="valveSerialInputSwitch"></a-switch>
+              </a-form-item>
+            </a-col>
+          </a-row>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item label="阀体型号">
@@ -83,6 +108,7 @@
               <a-select-option value="9">Cast</a-select-option>
               <a-select-option value="10">Iron</a-select-option>
               <a-select-option value="11">A216 WCB</a-select-option>
+              <a-select-option value="13">Carbon Steel</a-select-option>
               <a-select-option value="12">None</a-select-option>
             </a-select>
           </a-form-item>
@@ -188,8 +214,10 @@
                 {rules: [{ message: '请选择阀内件特性'}]}
               ]" >
               <a-select-option value="1">线性</a-select-option>
-              <a-select-option value="2">等百分</a-select-option>
               <a-select-option value="3">快开</a-select-option>
+              <a-select-option value="2">等百分比</a-select-option>
+              <a-select-option value="4">修正等百分比</a-select-option>
+              <a-select-option value="5">定制</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -286,6 +314,123 @@
             </a-input>
           </a-form-item>
         </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀芯/阀球/蝶板材质">
+            <a-select v-decorator="[ 'valve_core_ball_bettlefly', {rules: [{ message: '请选择单位'}]}]">
+              <a-select-option value="1">
+                S31600
+              </a-select-option>
+              <a-select-option value="2">
+                S41600
+              </a-select-option>
+              <a-select-option value="3">
+                S31600/CORA-A
+              </a-select-option>
+              <a-select-option value="4">
+                S44004
+              </a-select-option>
+              <a-select-option value="5">
+                CF3M
+              </a-select-option>
+              <a-select-option value="6">
+                CF8M
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀杆/阀轴材质">
+            <a-select v-decorator="[ 'valve_stem_axis', {rules: [{ message: '请选择单位'}]}]">
+              <a-select-option value="1">
+                S31600
+              </a-select-option>
+              <a-select-option value="2">
+                S17400
+              </a-select-option>
+              <a-select-option value="3">
+                S20910
+              </a-select-option>
+              <a-select-option value="4">
+                17-4PH
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀笼/保持环材质">
+            <a-select v-decorator="[ 'valve_cage_retaining_ring', {rules: [{ message: '请选择单位'}]}]">
+              <a-select-option value="1">
+                S31600/CORA-A
+              </a-select-option>
+              <a-select-option value="2">
+                S17400
+              </a-select-option>
+              <a-select-option value="3">
+                Carbon Steel
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀座环材质">
+            <a-select v-decorator="[ 'valve_set_ring', {rules: [{ message: '请选择单位'}]}]">
+              <a-select-option value="1">
+                S31600
+              </a-select-option>
+              <a-select-option value="2">
+                S41600
+              </a-select-option>
+              <a-select-option value="3">
+                S42000
+              </a-select-option>
+              <a-select-option value="4">
+                R30006
+              </a-select-option>
+              <a-select-option value="5">
+                316SST
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="村套/轴承材质">
+            <a-select v-decorator="[ 'valve_village_bearing', {rules: [{ message: '请选择单位'}]}]">
+              <a-select-option value="1">
+                S31600
+              </a-select-option>
+              <a-select-option value="2">
+                R30006
+              </a-select-option>
+              <a-select-option value="3">
+                PEEK
+              </a-select-option>
+              <a-select-option value="4">
+                316/NITRIDED
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="垫片材质">
+            <a-select v-decorator="[ 'valve_spacer', {rules: [{ message: '请选择单位'}]}]">
+              <a-select-option value="1">
+                Graphite
+              </a-select-option>
+              <a-select-option value="2">
+                Spiral wound gasket
+              </a-select-option>
+              <a-select-option value="3">
+                Graphite/ Spiral wound gasket
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
       </a-row>
       <a-divider>阀盖</a-divider>
       <!-- 行4 -->
@@ -376,6 +521,7 @@
               <a-select-option value="1">API598</a-select-option>
               <a-select-option value="2">FCI70-2</a-select-option>
               <a-select-option value="3">FGS4L5</a-select-option>
+              <a-select-option value="4">FGS4L6</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -507,7 +653,10 @@
                 水
               </a-select-option>
               <a-select-option value="2">
-                气
+                压缩空气
+              </a-select-option>
+              <a-select-option value="3">
+                氮气
               </a-select-option>
             </a-select>
           </a-form-item>
@@ -662,6 +811,9 @@
 </template>
 
 <script>
+import { fetch } from '@/utils/inputSearch'
+import { querySparePartsBySerial } from '@/api/spareParts'
+// import pick from 'lodash.pick'
 
 export default {
     data () {
@@ -676,8 +828,14 @@ export default {
         butterflyValveTypeSelectKey: ['4', '5', '6'],
         BallValveTypeSelect: ['正向流', '反向流', '双向流'],
         BallValveTypeSelectKey: ['7', '8', '9'],
-        valueTypeValue: '1' // 决定流向字段是选择还是输入
+        valueTypeValue: '1', // 决定流向字段是选择还是输入
+        showSerialValue: true,
+        valveSerialData: [],
+        switchChecked: false
       }
+    },
+    mounted () {
+      // ['valveSelect_id'].stepValveFields.forEach(v => this.form.getFieldDecorator(v))
     },
     methods: {
       nextStep () {
@@ -725,6 +883,34 @@ export default {
               // <a-select-option value="3">Butterfly</a-select-option>
               // <a-select-option value="4">Ball</a-select-option>
               // <a-select-option value="5">Others</a-select-option>
+      },
+      handleValveSearch (value) {
+        this.valveSerialData.length = 0
+        fetch(value, data => (this.valveSerialData = data), this.$t('input.valve.parts.search'))
+      },
+      selectValveSerialChange (value) {
+        const that = this
+        console.log(value)
+        querySparePartsBySerial({ serial: value }).then(e => {
+          e.valve_model = e.model
+          e.valve_serial = e.serial
+          console.log(e)
+          that.$emit('selectValveSerialChange', e)
+        })
+      },
+      addValveSelectData (id, text, switchValue) {
+        this.valveSerialData.push({
+          value: id,
+          text: text
+        })
+        this.switchChecked = switchValue
+        if (this.switchChecked) { // 开关打开，即使用纯input
+          this.showSerialValue = false
+        }
+      },
+      valveSerialInputSwitch (checked) {
+        this.showSerialValue = !checked
+        this.switchChecked = checked
       }
     }
 }

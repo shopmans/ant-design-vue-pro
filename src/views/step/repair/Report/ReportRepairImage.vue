@@ -8,6 +8,7 @@
               <a-card :title="getStepText(beforeImage.current_step)" :bordered="false">
                 <a slot="extra"><a-switch v-model="beforeImage.use_report" :checked="beforeImage.use_report === '1'" /></a>
                 <img
+                  :id="beforeImage.upload_file_flow_id"
                   slot="cover"
                   :src="getImgUrl(beforeImage.md5, beforeImage.content_type)"
                   @click="handlePreview(beforeImage.md5, beforeImage.content_type)"
@@ -24,6 +25,7 @@
                   >
                     <a-icon key="delete" type="delete"/>
                   </a-popconfirm>
+                  <a-icon key="undo" type="undo" @click="rotateImg(beforeImage.upload_file_flow_id)" />
                 </template>
                 <a-card-meta :title="beforeImage.serial_number" :description="beforeImage.title.length <= 0 ? '-' : beforeImage.title">
                 </a-card-meta>
@@ -39,6 +41,7 @@
               <a-card :title="getStepText(afterImage.current_step)" :bordered="false">
                 <a slot="extra"><a-switch v-model="afterImage.use_report" :checked="afterImage.use_report === '1'" /></a>
                 <img
+                  :id="afterImage.upload_file_flow_id"
                   slot="cover"
                   :src="getImgUrl(afterImage.md5, afterImage.content_type)"
                   @click="handlePreview(afterImage.md5, afterImage.content_type)"
@@ -55,6 +58,7 @@
                   >
                     <a-icon key="delete" type="delete"/>
                   </a-popconfirm>
+                  <a-icon key="undo" type="undo" @click="rotateImg(afterImage.upload_file_flow_id)" />
                 </template>
                 <a-card-meta :title="afterImage.serial_number" :description="afterImage.title.length <= 0 ? '-' : afterImage.title">
                 </a-card-meta>
@@ -88,7 +92,7 @@ import moment from 'moment'
 import FooterToolBar from '@/components/FooterToolbar'
 import { baseMixin } from '@/store/app-mixin'
 import { getRepairSplitValue, repairFlowStepValue, getCurrentStepMap, getFlowStepLog } from '@/api/step'
-import { repairReportImgList, saveUseReportImg } from '@/api/report'
+import { repairReportImgList, saveUseReportImg, rotateReportImage } from '@/api/report'
 
 export default {
   mixins: [baseMixin],
@@ -123,35 +127,37 @@ export default {
       }
 
       repairReportImgList(this.$route.params).then(e => {
-        var repairImages = e.result
-        if (repairImages.length <= 0) {
+        this.repairImages = e.result
+        if (this.repairImages.length <= 0) {
             this.$message.info('没有图片')
             return
         }
-        for (var i = 0; i < repairImages.length; i++) {
-          repairImages[i].stepValue = repairFlowStepValue(repairImages[i].current_step)
-          // 序号
-          if (repairImages[i].serial_number.length <= 0) {
-            repairImages[i].serial_number = i + 1 + ''
+        // 首先取流程值，并判断是否是初始状态，如果是初始状态则按流程值排序
+        let isFirst = true
+        for (var k = 0; k < this.repairImages.length; k++) {
+          this.repairImages[k].stepValue = repairFlowStepValue(this.repairImages[k].current_step)
+          // 检查是否存在序号，如果存在序号则不是初始状态
+          if (isFirst && this.repairImages[k].serial_number.length > 0) {
+            isFirst = false
+          }
+          // 生成序号
+          if (this.repairImages[k].serial_number.length <= 0) {
+            this.repairImages[k].serial_number = k + 1 + ''
           }
           // 把 use_report 转换成bool
-          if (repairImages[i].use_report === '1') {
-            repairImages[i].use_report = true
+          if (this.repairImages[k].use_report === '1') {
+            this.repairImages[k].use_report = true
           } else {
-            repairImages[i].use_report = false
+            this.repairImages[k].use_report = false
           }
         }
 
         // 排序流程
-        repairImages.sort(compare('stepValue'))
-        const stepSplitValue = getRepairSplitValue()
-        repairImages.forEach(item => {
-          if (item.stepValue < stepSplitValue) {
-            this.repairBeforeImages.push(item)
-          } else {
-            this.repairAfterImages.push(item)
-          }
-        })
+        if (isFirst) { // 初始状态按流程顺序排序
+          this.sortImage('stepValue')
+        } else {
+          this.sortImage('serial_number')
+        }
 
         // 未知原因，页面第一次点击图片时不能显未，因此在此预先点击一次
         if (this.repairBeforeImages && this.repairBeforeImages.length > 0) {
@@ -175,7 +181,9 @@ export default {
       modelVisible: false,
       modelInputValue: '',
       currentModelImgID: '',
-      modelEditType: 0
+      modelEditType: 0,
+      repairImages: [],
+      rotateIntevel: (new Date()).getTime()
     }
   },
   methods: {
@@ -274,6 +282,9 @@ export default {
           this.currentModelImgID = ''
           this.modelTitle = ''
           this.modelVisible = false
+
+          // 排序流程
+          this.sortImage('serial_number')
           return
         }
       }
@@ -289,6 +300,9 @@ export default {
           this.currentModelImgID = ''
           this.modelTitle = ''
           this.modelVisible = false
+
+          // 排序流程
+          this.sortImage('serial_number')
           return
         }
       }
@@ -345,6 +359,20 @@ export default {
         }
       }
     },
+    rotateImg (id) {
+      const curTimestamp = (new Date()).getTime()
+      if ((curTimestamp - this.rotateIntevel) <= 1000) {
+        return
+      }
+      this.rotateIntevel = curTimestamp
+
+      var tmpObj = {}
+      tmpObj.upload_file_flow_id = id
+      rotateReportImage(tmpObj).then(e => {
+        const imgSrc = window.document.getElementById(id).getAttribute('src')
+        window.document.getElementById(id).setAttribute('src', imgSrc + '?t=' + curTimestamp)
+      })
+    },
     deleteImgCancel () {},
     deleteImg (id) {
       for (let i = 0; i < this.repairBeforeImages.length; i++) {
@@ -367,6 +395,20 @@ export default {
           return
         }
       }
+    },
+    sortImage (sortField) {
+      // 排序流程
+      this.repairImages.sort(compare(sortField))
+      const stepSplitValue = getRepairSplitValue()
+      this.repairBeforeImages.length = 0
+      this.repairAfterImages.length = 0
+      this.repairImages.forEach(item => {
+        if (item.stepValue < stepSplitValue) {
+          this.repairBeforeImages.push(item)
+        } else {
+          this.repairAfterImages.push(item)
+        }
+      })
     }
   }
 }
@@ -374,14 +416,14 @@ export default {
 // 定义一个比较器
 function compare (propertyName) {
   return function (object1, object2) {
-    var value1 = object1[propertyName]
-    var value2 = object2[propertyName]
+    var value1 = Number(object1[propertyName])
+    var value2 = Number(object2[propertyName])
     if (value2 < value1) {
-      return 1
+      return 0
     } else if (value2 > value1) {
       return -1
     } else {
-    return 0
+    return 1
     }
   }
 }

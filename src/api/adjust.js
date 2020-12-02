@@ -15,7 +15,7 @@ import request from '@/utils/request'
   export function getInputSignalColumns () {
     return [
       {
-        title: '',
+        title: '输入电流',
         dataIndex: 'leftTitle',
         width: '8%'
       },
@@ -25,48 +25,57 @@ import request from '@/utils/request'
         width: '5%'
       },
       {
-        title: '4 mA',
+        title: '4',
         dataIndex: 'ma4',
+        width: '9%',
         scopedSlots: { customRender: 'ma4' }
       },
       {
-        title: '8 mA',
+        title: '8',
         dataIndex: 'ma8',
+        width: '9%',
         scopedSlots: { customRender: 'ma8' }
       },
       {
-        title: '12 mA',
+        title: '12',
         dataIndex: 'ma12',
+        width: '9%',
         scopedSlots: { customRender: 'ma12' }
       },
       {
-        title: '16 mA',
+        title: '16',
         dataIndex: 'ma16',
+        width: '9%',
         scopedSlots: { customRender: 'ma16' }
       },
       {
-        title: '20 mA',
+        title: '20',
         dataIndex: 'ma20',
+        width: '9%',
         scopedSlots: { customRender: 'ma20' }
       },
       {
-        title: '16 mA',
+        title: '16',
         dataIndex: 'ma161',
+        width: '9%',
         scopedSlots: { customRender: 'ma161' }
       },
       {
-        title: '12 mA',
+        title: '12',
         dataIndex: 'ma121',
+        width: '9%',
         scopedSlots: { customRender: 'ma121' }
       },
       {
-        title: '8 mA',
+        title: '8',
         dataIndex: 'ma81',
+        width: '9%',
         scopedSlots: { customRender: 'ma81' }
       },
       {
-        title: '4 mA',
+        title: '4',
         dataIndex: 'ma41',
+        width: '9%',
         scopedSlots: { customRender: 'ma41' }
       },
       {
@@ -81,7 +90,7 @@ import request from '@/utils/request'
   export function getInputSignalData () {
     return [
       {
-        leftTitle: '输入信号',
+        leftTitle: '输入阀位',
         key: '1',
         ma: '%',
         ma4: '',
@@ -95,7 +104,7 @@ import request from '@/utils/request'
         ma41: ''
       },
       {
-        leftTitle: '反馈信号',
+        leftTitle: '反馈电流',
         key: '2',
         ma: 'mA',
         ma4: '',
@@ -109,7 +118,7 @@ import request from '@/utils/request'
         ma41: ''
       },
       {
-        leftTitle: '反馈位置',
+        leftTitle: '反馈阀位',
         key: '3',
         ma: '%',
         ma4: '',
@@ -152,26 +161,31 @@ import request from '@/utils/request'
       {
         title: '0%',
         dataIndex: 'p0',
+        width: '15%',
         scopedSlots: { customRender: 'p0' }
       },
       {
         title: '25%',
         dataIndex: 'p25',
+        width: '15%',
         scopedSlots: { customRender: 'p25' }
       },
       {
         title: '50%',
         dataIndex: 'p50',
+        width: '15%',
         scopedSlots: { customRender: 'p50' }
       },
       {
         title: '75%',
         dataIndex: 'p75',
+        width: '15%',
         scopedSlots: { customRender: 'p75' }
       },
       {
         title: '100%',
         dataIndex: 'p100',
+        width: '15%',
         scopedSlots: { customRender: 'p100' }
       },
       {

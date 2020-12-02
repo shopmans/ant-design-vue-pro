@@ -9,8 +9,8 @@
         <a-descriptions-item label="压力表量程">{{ getPressureGaugeRangeUnit(PreRepairTestData.hardware_check_locator_pressure_gauge_range) }}</a-descriptions-item>
         <a-descriptions-item label="压力表是否损坏">{{ getYesNoSwitchUnit(PreRepairTestData.hardware_check_locator_pressure_gauge_yesno) }}</a-descriptions-item>
         <a-descriptions-item label="放大器类型">{{ getABCSwitchUnit(PreRepairTestData.hardware_check_locator_amplifier_type) }}</a-descriptions-item>
-        <a-descriptions-item label="接线端子电压 4mA">{{ PreRepairTestData.hardware_check_locator_terminal_voltage_4ma }}</a-descriptions-item>
-        <a-descriptions-item label="接线端子电压 20mA">{{ PreRepairTestData.hardware_check_locator_terminal_voltage_20ma }}</a-descriptions-item>
+        <a-descriptions-item label="接线端子电压 @4mA">{{ PreRepairTestData.hardware_check_locator_terminal_voltage_4ma }}VDC</a-descriptions-item>
+        <a-descriptions-item label="接线端子电压 @20mA">{{ PreRepairTestData.hardware_check_locator_terminal_voltage_20ma }}VDC</a-descriptions-item>
         <a-descriptions-item label="PWB生产代码">{{ PreRepairTestData.hardware_check_locator_pwb_production_code }}</a-descriptions-item>
         <a-descriptions-item label="I/P生产代码">{{ PreRepairTestData.hardware_check_locator_ip_production_code }}</a-descriptions-item>
       </a-descriptions>

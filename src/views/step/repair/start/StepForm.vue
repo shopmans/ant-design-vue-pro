@@ -6,7 +6,7 @@
           <StepBase ref="baseInfo" @repairSelectChange="repairSelectChange($event,repairSelectChange)" @projectSelectChange="projectSelectChange($event,projectSelectChange)" />
         </a-tab-pane>
         <a-tab-pane key="2" tab="阀门信息" v-if="showValveForm">
-          <ValveForm v-if="showValveForm" />
+          <ValveForm v-if="showValveForm" @selectValveSerialChange="getValveContentByInputSearch($event, getValveContentByInputSearch)" />
         </a-tab-pane>
         <a-tab-pane key="3" tab="执行机构信息" v-if="showActuatorForm">
           <ActuatorForm v-if="showActuatorForm" />
@@ -35,8 +35,11 @@
   import ValveForm from '@/views/step/modules/ValveForm'
   import SlaveForm from '@/views/step/modules/SlaveForm'
   import ValveParts from '@/views/step/modules/ValveParts'
-  import { newStep } from '@/api/step'
   import { baseMixin } from '@/store/app-mixin'
+  import pick from 'lodash.pick'
+  import { newStep, takeValveSize, takeValveMaterial, takeValvePressureLevel, takeValveValveCoreBallBettlefly,
+  takeActuator, takeSpoolMaterial, takeSeatMaterial, takeCageMaterial, takeBenchset, takeAttachment,
+  takeLeakageLevel, takePackingType, takeTravel, getStepValveFields, getStepActuatorFields, getStepSlaveFields } from '@/api/step'
 
 export default {
   name: 'StepForm',
@@ -53,6 +56,12 @@ export default {
     firstButton: false,
     nextButton: false
   },
+  mounted () {
+    // 防止表单未注册
+    this.stepValveFields.forEach(v => this.form.getFieldDecorator(v))
+    this.stepActuatorFields.forEach(v => this.form.getFieldDecorator(v))
+    this.stepSlaveFields.forEach(v => this.form.getFieldDecorator(v))
+  },
   data () {
     return {
       form: this.$form.createForm(this),
@@ -62,7 +71,10 @@ export default {
       showValveForm: false,
       showActuatorForm: false,
       showSlaveForm: false,
-      showPartsForm: false
+      showPartsForm: false,
+      stepValveFields: getStepValveFields(),
+      stepActuatorFields: getStepActuatorFields(),
+      stepSlaveFields: getStepSlaveFields()
     }
   },
   methods: {
@@ -192,6 +204,40 @@ export default {
       // 清空上传文件信息
       this.$store.commit('SET_UPLOAD_MD5', [])
       this.$router.push({ path: '/step/steplist' })
+    },
+    getValveContentByInputSearch (data) {
+      // 解析阀尺寸
+      takeValveSize(data, this)
+      // 解析阀材质
+      takeValveMaterial(data, this)
+      // 解析压力等级和连接方式
+      takeValvePressureLevel(data, this)
+      // 解析阀杆材质
+      takeValveValveCoreBallBettlefly(data, this)
+      // 解析执行机构
+      takeActuator(data, this)
+      // 解析阀芯
+      takeSpoolMaterial(data, this)
+      // 解析阀芯/阀球/蝶板材质
+      takeSpoolMaterial(data, this)
+      // 阀座
+      takeSeatMaterial(data, this)
+      // 阀笼材质
+      takeCageMaterial(data, this)
+      // 泄漏等级
+      takeLeakageLevel(data, this)
+      // 填料类型
+      takePackingType(data, this)
+      // 阀门行程
+      takeTravel(data, this)
+      // bench set
+      takeBenchset(data, this)
+      // 附件
+      takeAttachment(data, this)
+
+      this.form.setFieldsValue(pick(data, this.stepValveFields))
+      this.form.setFieldsValue(pick(data, this.stepActuatorFields))
+      this.form.setFieldsValue(pick(data, this.stepSlaveFields))
     }
   }
 }

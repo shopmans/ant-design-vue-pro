@@ -733,12 +733,12 @@ export const asyncRouterMap = [
       {
         path: '/step',
         name: 'workorder',
-        redirect: '/step/steplist/:pageNo([1-9]\\d*)?',
+        redirect: '/step/steplist',
         component: RouteView,
         meta: { title: 'menu.workOrder', keepAlive: true, icon: 'snippets', permission: [ 'dashboard', 'repairWorkOrder' ] },
         children: [
           {
-            path: '/step/steplist/:pageNo([1-9]\\d*)?',
+            path: '/step/steplist',
             name: 'stepList',
             component: () => import('@/views/step/repair/StepList'),
             meta: { title: 'permissionid.repairWorkOrder', keepAlive: false, permission: [ 'dashboard' ] }

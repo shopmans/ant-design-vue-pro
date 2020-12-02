@@ -1,10 +1,16 @@
 <template>
-  <div></div>
+  <page-header-wrapper>
+    <baseInfo :showBaseInfo="false" />
+  </page-header-wrapper>
 </template>
 
 <script>
-export default {
+import baseInfo from '../../modules/StepBaseInfo'
 
+export default {
+  components: {
+    baseInfo
+  }
 }
 </script>
 

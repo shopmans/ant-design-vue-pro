@@ -37,8 +37,15 @@
               </a-select>
             </a-form-item>
           </a-col>
-        </a-row>
-        <a-row :gutter="16">
+          <a-col :lg="12" :md="12" :sm="24">
+            <a-form-item :label="$t('menu.customer.new.finallyUser')">
+              <a-input
+                v-decorator="[
+                  'finally_user',
+                  {rules: [{}]}
+                ]" />
+            </a-form-item>
+          </a-col>
           <a-col :lg="12" :md="12" :sm="24">
             <a-form-item :label="$t('menu.project.view.table.column.sales')">
               <a-select
@@ -65,8 +72,6 @@
                 ]" />
             </a-form-item>
           </a-col>
-        </a-row>
-        <a-row :gutter="16">
           <a-col :lg="12" :md="12" :sm="24">
             <a-form-item :label="$t('menu.project.detail.contractNumber')">
               <a-input
@@ -88,8 +93,6 @@
                 ]" />
             </a-form-item>
           </a-col>
-        </a-row>
-        <a-row :gutter="16">
           <a-col :lg="12" :md="12" :sm="24">
             <a-form-item :label="$t('menu.project.new.contractTotal')">
               <a-input-number
@@ -115,8 +118,6 @@
                 ]" />
             </a-form-item>
           </a-col>
-        </a-row>
-        <a-row :gutter="16">
           <a-col :lg="12" :md="12" :sm="24">
             <a-form-item :label="$t('menu.project.detail.estCloseDate')">
               <a-date-picker
@@ -140,8 +141,6 @@
                 ]" />
             </a-form-item>
           </a-col>
-        </a-row>
-        <a-row :gutter="16">
           <a-col :lg="12" :md="12" :sm="24">
             <a-form-item :label="$t('menu.project.new.estWorkTime')">
               <a-input-number
@@ -164,8 +163,6 @@
                 ]" />
             </a-form-item>
           </a-col>
-        </a-row>
-        <a-row :gutter="16">
           <a-col :lg="12" :md="12" :sm="24">
             <a-form-item :label="$t('menu.project.view.query.projectState')">
               <a-select v-decorator="['state', { initialValue:'1' }, {rules: []}]" :disabled="projectStateDisable">
@@ -199,7 +196,7 @@ import { getProjectSerial } from '@/api/project'
 
 // 表单字段
 const fields = ['id', 'repair_plan', 'customer_id', 'sales_id', 'serial', 'number', 'total', 'ex_open_date', 'ex_close_date', 'ex_working_hours',
-'ex_material_fee', 'parts_order_no', 'contract_serial', 'state']
+'ex_material_fee', 'parts_order_no', 'contract_serial', 'state', 'finally_user']
 
 export default {
   components: {

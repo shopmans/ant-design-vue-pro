@@ -10,7 +10,25 @@ const spareApi = {
     PartsImport: '/parts-import',
     DeletePart: '/delete-parts',
     ModifyPart: '/modify-parts',
-    AddPart: '/add-parts'
+    AddPart: '/add-parts',
+    querySpareParts: '/query/spare-parts',
+    querySparePartsBySerial: '/query/spare-parts-serial'
+}
+
+export function querySparePartsBySerial (parameter) {
+    return request({
+        url: spareApi.querySparePartsBySerial,
+        method: 'post',
+        data: parameter
+      })
+}
+
+export function querySpareParts (parameter) {
+    return request({
+        url: spareApi.querySpareParts,
+        method: 'post',
+        data: parameter
+      })
 }
 
 export function sparePartsList (parameter) {

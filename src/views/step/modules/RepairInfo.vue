@@ -1,5 +1,13 @@
 <template>
   <div>
+    <a-card :bordered="false" title="执行信息">
+      <a-descriptions title="">
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <a-tabs default-active-key="1">
       <!-- 阀维修内容 -->
       <a-tab-pane v-if="ValueRepairData && ValueRepairData.length > 0" key="1" tab="阀维修内容" :forceRender="true">
@@ -118,7 +126,7 @@
 <script>
 import { getValveASFields, getActuatorASFields, getAccessariesASFields, getRepairCheckBoxOptions } from '@/api/assessment'
 import UploadImgRead from '../modules/UploadImgRead'
-import { queryStepDataOnlyread, getColumnsPurchased } from '@/api/step'
+import { queryStepDataOnlyread, getColumnsPurchased, getStepUser, formatDateYMD } from '@/api/step'
 
 export default {
     components: {
@@ -135,6 +143,8 @@ export default {
       this.repairContentText = repairData.repair_content_text
       this.purchasedParts = repairData.purchased_parts
       this.getPurchasedData()
+      this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
+      this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
 
       // 提取维修数据
       this.ValveRepairFields.forEach(e => {
@@ -236,7 +246,9 @@ export default {
         ActuatorRepairData: [],
         AccessariesRepairData: [],
         repairContentText: '',
-        purchasedParts: []
+        purchasedParts: [],
+        stepUser: '',
+        stepDoneDate: ''
       }
     },
     methods: {

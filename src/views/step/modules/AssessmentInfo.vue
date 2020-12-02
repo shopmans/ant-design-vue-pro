@@ -1,5 +1,12 @@
 <template>
   <div>
+    <a-card :bordered="false" title="执行信息">
+      <a-descriptions title="">
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <a-tabs default-active-key="1">
       <a-tab-pane key="1" tab="阀门评估" :forceRender="true" v-if="ValveAS">
         <a-card>
@@ -207,7 +214,7 @@ import { getValveASFields, getActuatorASFields, getAccessariesASFields, getRepai
 getAssessmentCheckOrRepairUnit } from '@/api/assessment'
 import UploadImgRead from '../modules/UploadImgRead'
 import { getSelectRepairData } from '@/api/preRepairTest'
-import { getColumnsPurchased } from '@/api/step'
+import { getColumnsPurchased, getStepUser, formatDateYMD } from '@/api/step'
 
 export default {
     components: {
@@ -241,6 +248,8 @@ export default {
       this.assessmentData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
       this.$refs.uploadImgRead.imgFileList = this.assessmentData.uploads
       this.purchasedParts = this.assessmentData.purchased_parts
+      this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
+      this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
 
       // 获取引用数据（维修前测试选择的维修东东）
       // 先选择了维修什么才需要评估
@@ -289,7 +298,9 @@ export default {
             AccessoryAS: false,
             ActuatorAS: false,
             ValveAS: false,
-            purchasedParts: []
+            purchasedParts: [],
+            stepUser: '',
+            stepDoneDate: ''
         }
     }
 }

@@ -6,7 +6,7 @@
           <StepBase ref="baseInfo" @repairSelectChange="repairSelectChange($event,repairSelectChange)" />
         </a-tab-pane>
         <a-tab-pane key="2" tab="阀门信息" v-if="showValveForm" :forceRender="true">
-          <ValveForm v-if="showValveForm" ref="valveForm" />
+          <ValveForm v-if="showValveForm" ref="valveForm" @selectValveSerialChange="getValveContentByInputSearch($event, getValveContentByInputSearch)" />
         </a-tab-pane>
         <a-tab-pane key="3" tab="执行机构信息" v-if="showActuatorForm" :forceRender="true">
           <ActuatorForm v-if="showActuatorForm" />
@@ -36,41 +36,12 @@
   import ValveForm from '@/views/step/modules/ValveForm'
   import SlaveForm from '@/views/step/modules/SlaveForm'
   import ValveParts from '@/views/step/modules/ValveParts'
-  import { saveStep, stepDone } from '@/api/step'
+  import { saveStep, stepDone, takeValveSize, takeValveMaterial, takeValvePressureLevel, takeValveValveCoreBallBettlefly,
+  takeActuator, takeSpoolMaterial, takeSeatMaterial, takeCageMaterial, takeBenchset, takeAttachment,
+  takeLeakageLevel, takePackingType, takeTravel, getStepValveFields, getStepActuatorFields, getStepSlaveFields, getStepBaseFields,
+  getStepPartsFields } from '@/api/step'
   import pick from 'lodash.pick'
   import { baseMixin } from '@/store/app-mixin'
-
-  const stepBaseFields = ['id', 'date', 'work_order_serial', 'type', 'tag',
-  'estimate', 'return_part', 'repair_part', 'disassembly', 'receipt_date',
-  'requirst_done_date', 'project_serial', 'serial', 'content', 'receipt_number', 'purchased_part_list', 'control_model', 'process_medium']
-
-  const stepValveFields = ['id', 'date', 'valve_manufacturer', 'valve_serial', 'valve_size', 'valve_material', 'valve_pressure_level',
-  'valve_flow', 'valve_push_done', 'valve_hydrostatic_test_value', 'valve_hydrostatic_test_time', 'valve_cover_bolt_torque',
-  'valve_cover_bolt_material', 'valve_cover_bolt_size', 'valve_fill_bolt_torque', 'valve_seat_bolt_torque', 'valve_flow_char',
-  'valve_caliber', 'valve_rod_diameter', 'valve_fill_config', 'valve_seat_leak_test', 'valve_leak_level', 'valve_leak_test_value',
-  'valve_flange_bolt_tool', 'valve_cover_bolt_tool', 'valve_fill_bolt_tool', 'valve_seat_bolt_tool', 'valve_connect_bolt_tool',
-  'valve_type', 'valve_model', 'valve_size_unit', 'valve_hydrostatic_test_time_unit', 'valve_hydrostatic_test_value_unit',
-  'valve_cover_bolt_torque_unit', 'valve_cover_bolt_size_unit', 'valve_fill_bolt_torque_unit', 'valve_seat_bolt_torque_unit',
-  'valve_caliber_unit', 'valve_rod_diameter_unit', 'valve_leak_test_value_unit', 'valve_flange_bolt_tool_unit',
-  'valve_cover_bolt_tool_unit', 'valve_fill_bolt_tool_unit', 'valve_seat_bolt_tool_unit', 'valve_connect_bolt_tool_unit',
-  'valve_leak_test_time', 'valve_leak_test_time_unit', 'valve_travel', 'valve_travel_unit', 'valve_lv', 'valve_test_medium',
-  'valve_flow_input', 'valve_leak_test_medium', 'valve_leak_test_std_pressed', 'valve_leak_test_std_pressed_unit', 'valve_test_std',
-  'valve_connect_model']
-
-  const stepActuatorFields = ['id', 'date', 'actu_manufacturer', 'actu_size', 'actu_type', 'actuator_serial', 'actu_action_mode',
-  'actu_spring_set_pressure', 'actu_failure', 'actu_install_point', 'actu_cover_bolt_tool', 'actu_cover_bolt_torque',
-  'actu_cover_bolt_material', 'actu_cover_bolt_size', 'actu_use_mode', 'actu_model', 'actu_spring_set_pressure_unit',
-  'actu_cover_bolt_tool_unit', 'actu_cover_bolt_tool_item', 'actu_cover_bolt_torque_unit', 'actu_cover_bolt_size_unit',
-  'actu_size_unit', 'actu_air_pressed', 'actu_air_pressed_unit']
-
-  const stepSlaveFields = ['id', 'date', 'slave_locator_brand', 'slave_locator_model', 'slave_input_signal_scope', 'slave_standard_output',
-  'slave_filter_valve_brand', 'slave_filter_valve_model', 'slave_elect_valve_brand1', 'slave_elect_valve_model1', 'slave_elect_valve_vol1',
-  'slave_elect_valve_active1', 'slave_elect_valve_brand2', 'slave_elect_valve_model2', 'slave_elect_valve_vol2', 'slave_elect_valve_active2',
-  'slave_elect_valve_brand3', 'slave_elect_valve_model3', 'slave_elect_valve_vol3', 'slave_elect_valve_active3',
-  'slave_point_switch_brand', 'slave_point_switch_model', 'slave_other_slave', 'slave_locator_serial', 'slave_locator_actionmode',
-  'slave_retaining_valve_brand', 'slave_retaining_valve_model', 'slave_retaining_valve_setpoint', 'slave_retaining_valve_setpoint_unit',
-  'slave_retaining_valve_active']
-  const stepPartsFields = ['valve_part_type']
 
 export default {
   name: 'EditStepDataForm',
@@ -95,10 +66,23 @@ export default {
       showPartsForm: false,
       flowID: '',
       currentStep: '',
-      projectData: {}
+      projectData: {},
+      stepValveFields: getStepValveFields(),
+      stepActuatorFields: getStepActuatorFields(),
+      stepSlaveFields: getStepSlaveFields(),
+      stepBaseFields: getStepBaseFields(),
+      stepPartsFields: getStepPartsFields()
+      // valveSerial: ''
     }
   },
   mounted () {
+    // 防止表单未注册
+    this.stepValveFields.forEach(v => this.form.getFieldDecorator(v))
+    this.stepActuatorFields.forEach(v => this.form.getFieldDecorator(v))
+    this.stepSlaveFields.forEach(v => this.form.getFieldDecorator(v))
+    this.stepBaseFields.forEach(v => this.form.getFieldDecorator(v))
+    this.stepPartsFields.forEach(v => this.form.getFieldDecorator(v))
+
     const dataList = this.$store.state.editStepData.stepEditData.step_data
     this.flowID = this.$store.state.editStepData.stepEditData.flow_id
     this.currentStep = this.$store.state.editStepData.stepEditData.current_step
@@ -109,13 +93,10 @@ export default {
       const stepJSONData = JSON.parse(item.JSON)
       if (item.DataNum === 1) {
         // 防止表单未注册
-        stepBaseFields.forEach(v => this.form.getFieldDecorator(v))
         // 维修内容
         switch (stepJSONData.repair_part) {
           // 阀门
           case '1':
-            // 防止表单未注册
-            stepValveFields.forEach(v => this.form.getFieldDecorator(v))
             this.showValveForm = true
             this.showActuatorForm = false
             this.showSlaveForm = false
@@ -124,7 +105,6 @@ export default {
           // 执行机构
           case '2':
             // 防止表单未注册
-            stepActuatorFields.forEach(v => this.form.getFieldDecorator(v))
             this.showValveForm = false
             this.showActuatorForm = true
             this.showSlaveForm = false
@@ -133,8 +113,6 @@ export default {
           // 阀门+执行机构
           case '3':
             // 防止表单未注册
-            stepValveFields.forEach(v => this.form.getFieldDecorator(v))
-            stepActuatorFields.forEach(v => this.form.getFieldDecorator(v))
             this.showValveForm = true
             this.showActuatorForm = true
             this.showSlaveForm = false
@@ -143,9 +121,6 @@ export default {
           // 阀门+执行机构+附件
           case '4':
             // 防止表单未注册
-            stepValveFields.forEach(v => this.form.getFieldDecorator(v))
-            stepActuatorFields.forEach(v => this.form.getFieldDecorator(v))
-            stepSlaveFields.forEach(v => this.form.getFieldDecorator(v))
             this.showValveForm = true
             this.showActuatorForm = true
             this.showSlaveForm = true
@@ -154,7 +129,6 @@ export default {
           // 零部件
           case '5':
             // 防止表单未注册
-            stepPartsFields.forEach(v => this.form.getFieldDecorator(v))
             this.showValveForm = false
             this.showActuatorForm = false
             this.showSlaveForm = false
@@ -163,7 +137,6 @@ export default {
             // 执行机构+附件
           case '6':
             // 防止表单未注册
-            stepPartsFields.forEach(v => this.form.getFieldDecorator(v))
             this.showValveForm = false
             this.showActuatorForm = true
             this.showSlaveForm = true
@@ -178,9 +151,10 @@ export default {
               const tmpBaseInfo = JSON.parse(item.JSON)
               tmpBaseInfo.project_serial = this.projectData.serial
               this.$refs.baseInfo.$emit('baseHasEdit', tmpBaseInfo)
-              this.form.setFieldsValue(pick(tmpBaseInfo, stepBaseFields))
+              this.form.setFieldsValue(pick(tmpBaseInfo, this.stepBaseFields))
             } else if (this.showValveForm && item.DataNum === 2) {
-                this.form.setFieldsValue(pick(JSON.parse(item.JSON), stepValveFields))
+                const valvaData = JSON.parse(item.JSON)
+                this.form.setFieldsValue(pick(valvaData, this.stepValveFields))
                 // 根据阀类型决定流向字段内容
                 const valveType = this.form.getFieldsValue(['valve_type'])
                 switch (valveType.valve_type) {
@@ -208,12 +182,15 @@ export default {
                     this.form.setFieldsValue({ valve_flow_input: this.form.getFieldsValue(['valve_flow_input']).valve_flow_input })
                   }
                 }
+
+                // 还原阀门序号 还原阀门输入选择开关
+                this.$refs.valveForm.addValveSelectData(valvaData.valve_serial, valvaData.valve_serial, valvaData.valve_serial_switch)
             } else if (this.showActuatorForm && item.DataNum === 3) {
-                this.form.setFieldsValue(pick(JSON.parse(item.JSON), stepActuatorFields))
+                this.form.setFieldsValue(pick(JSON.parse(item.JSON), this.stepActuatorFields))
             } else if (this.showSlaveForm && item.DataNum === 4) {
-                this.form.setFieldsValue(pick(JSON.parse(item.JSON), stepSlaveFields))
+                this.form.setFieldsValue(pick(JSON.parse(item.JSON), this.stepSlaveFields))
             } else if (this.showPartsForm && item.DataNum === 5) {
-                this.form.setFieldsValue(pick(JSON.parse(item.JSON), stepPartsFields))
+                this.form.setFieldsValue(pick(JSON.parse(item.JSON), this.stepPartsFields))
             }
         })
     })
@@ -265,6 +242,41 @@ export default {
           break
       }
     },
+    getValveContentByInputSearch (data) {
+      // 解析阀尺寸
+      takeValveSize(data, this)
+      // 解析阀材质
+      takeValveMaterial(data, this)
+      // 解析压力等级和连接方式
+      takeValvePressureLevel(data, this)
+      // 解析阀杆材质
+      takeValveValveCoreBallBettlefly(data, this)
+      // 解析执行机构
+      takeActuator(data, this)
+      // 解析阀芯
+      takeSpoolMaterial(data, this)
+      // 解析阀芯/阀球/蝶板材质
+      takeSpoolMaterial(data, this)
+      // 阀座
+      takeSeatMaterial(data, this)
+      // 阀笼材质
+      takeCageMaterial(data, this)
+      // 泄漏等级
+      takeLeakageLevel(data, this)
+      // 填料类型
+      takePackingType(data, this)
+      // 阀门行程
+      takeTravel(data, this)
+      // bench set
+      takeBenchset(data, this)
+      // 附件
+      takeAttachment(data, this)
+
+      // this.valveSerial = data.valve_serial
+      this.form.setFieldsValue(pick(data, this.stepValveFields))
+      this.form.setFieldsValue(pick(data, this.stepActuatorFields))
+      this.form.setFieldsValue(pick(data, this.stepSlaveFields))
+    },
     handleSubmit (e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
@@ -280,6 +292,13 @@ export default {
           }
           // 采购部件列表
           values.valve_purchased_parts = this.$refs.baseInfo.dataPurchased
+          // 阀序列号
+          // values.valve_serial = this.valveSerial
+          // 读取swith不存在设置为false
+          var switchValue = this.form.getFieldsValue(['valve_serial_switch'])
+          if (!switchValue) {
+            values.valve_serial_switch = false
+          }
 
           saveStep(values).then(res => {
             // 刷新表格
@@ -316,6 +335,7 @@ export default {
     }
   }
 }
+
 </script>
 
 <style lang="less" scoped>

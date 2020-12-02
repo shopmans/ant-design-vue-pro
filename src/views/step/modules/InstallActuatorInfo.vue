@@ -1,5 +1,13 @@
 <template>
   <div>
+    <a-card :bordered="false" title="执行信息">
+      <a-descriptions title="">
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <a-card title="安装执行机构" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-row :gutter="16">
         <a-descriptions title="">
@@ -37,7 +45,8 @@
 
 <script>
   import UploadImgRead from '../modules/UploadImgRead'
-  import { queryStepData, getValveSizeUnitText, getActuFailureUnit, getInstallActuatorValveRealFailPointUnit } from '@/api/step'
+  import { queryStepData, getValveSizeUnitText, getActuFailureUnit, getInstallActuatorValveRealFailPointUnit,
+  getStepUser, formatDateYMD } from '@/api/step'
 
 export default {
   components: {
@@ -55,6 +64,8 @@ export default {
     }
     this.installActuatorData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
     this.$refs.uploadImgRead.imgFileList = this.installActuatorData.uploads
+    this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
+    this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
 
     queryStepData({ id: this.installActuatorData.flow_id, current_step: '(start)' }).then(res => {
       const stepDate = res.result.step_data
@@ -76,7 +87,9 @@ export default {
       return {
         installActuatorData: {},
         valveData: {},
-        actuData: {}
+        actuData: {},
+        stepUser: '',
+        stepDoneDate: ''
       }
     }
 }

@@ -58,7 +58,7 @@
           <template>
             <a @click="handleDescrption(record)">{{ $t('menu.project.view.action.detail') }}</a>
             <a-divider type="vertical" />
-            <span v-if="record.current_step==='Assessment' || record.current_step==='FinalCheck' || record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</span>
+            <span v-if="record.current_step==='Assessment' || record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</span>
             <a v-else @click="handleDispatchUser(record)">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</a>
             <a-divider type="vertical" />
             <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.execution') }}</span>
@@ -126,7 +126,7 @@
     <!-- 二维码 -->
     <a-modal
       :title="$t('menu.project.view.action.qrcode')"
-      :width="620"
+      :width="680"
       :visible="visibleQrcode"
       :destroyOnClose="true"
       :maskClosable="false"
@@ -232,10 +232,8 @@ export default {
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
-
         return getStepList(requestParameters)
           .then(res => {
-            console.log(res.result)
             return res.result
           })
       },
@@ -295,6 +293,7 @@ export default {
     },
     handleEdit (record) {
       stepEdit(record).then(res => {
+        console.log(res)
         this.$store.commit('SET_UPLOAD_MD5', [])
         this.$store.commit('SET_STEP_EDIT_DATA', res.result)
         this.$router.push({ path: '/step/' + res.result.path })
@@ -387,6 +386,8 @@ export default {
         this.visible = true
       })
     }
+  },
+  mounted () {
   }
 }
 </script>

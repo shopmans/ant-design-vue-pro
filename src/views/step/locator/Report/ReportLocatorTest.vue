@@ -6,6 +6,7 @@
           <a-card :title="getStepText(image.current_step)" :bordered="false">
             <a slot="extra"><a-switch v-model="image.use_report" :checked="image.use_report === '1'" /></a>
             <img
+              :id="image.upload_file_flow_id"
               slot="cover"
               :src="getImgUrl(image.md5, image.content_type)"
               @click="handlePreview(image.md5, image.content_type)"
@@ -22,6 +23,7 @@
               >
                 <a-icon key="delete" type="delete"/>
               </a-popconfirm>
+              <a-icon key="undo" type="undo" @click="rotateImg(image.upload_file_flow_id)" />
             </template>
             <a-card-meta :title="image.serial_number" :description="image.title.length <= 0 ? '-' : image.title"></a-card-meta>
           </a-card>
@@ -52,7 +54,7 @@ import moment from 'moment'
 import FooterToolBar from '@/components/FooterToolbar'
 import { baseMixin } from '@/store/app-mixin'
 import { getRepairSplitValue, repairFlowStepValue, getCurrentStepMap, getFlowStepLog } from '@/api/step'
-import { localtorTestReportImgList, saveUseReportImgFotLocatorTest } from '@/api/report'
+import { localtorTestReportImgList, saveUseReportImgFotLocatorTest, rotateReportImage } from '@/api/report'
 
 export default {
   mixins: [baseMixin],
@@ -92,8 +94,14 @@ export default {
           this.$message.info('没有图片')
           return
       }
-      for (var i = 0; i < testImages.length; i++) {
+      // 首先取流程值，并判断是否是初始状态，如果是初始状态则按流程值排序
+      let isFirst = true
+      for (let i = 0; i < testImages.length; i++) {
         testImages[i].stepValue = repairFlowStepValue(testImages[i].current_step)
+        // 检查是否存在序号，如果存在序号则不是初始状态
+        if (isFirst && testImages[i].serial_number.length > 0) {
+          isFirst = false
+        }
         // 序号
         if (testImages[i].serial_number.length <= 0) {
           testImages[i].serial_number = i + 1 + ''
@@ -106,8 +114,12 @@ export default {
         }
       }
 
-      // 排序流程
-      testImages.sort(compare('stepValue'))
+      // 存在序号则按序号排序
+      if (isFirst) {
+        testImages.sort(compare('stepValue'))
+      } else {
+        testImages.sort(compare('serial_number'))
+      }
       this.valveTestImages = testImages
 
       // 未知原因，页面第一次点击图片时不能显未，因此在此预先点击一次
@@ -268,6 +280,20 @@ export default {
           return
         }
       }
+    },
+    rotateImg (id) {
+      const curTimestamp = (new Date()).getTime()
+      if ((curTimestamp - this.rotateIntevel) <= 1000) {
+        return
+      }
+      this.rotateIntevel = curTimestamp
+
+      var tmpObj = {}
+      tmpObj.upload_file_flow_id = id
+      rotateReportImage(tmpObj).then(e => {
+        const imgSrc = window.document.getElementById(id).getAttribute('src')
+        window.document.getElementById(id).setAttribute('src', imgSrc + '?t=' + curTimestamp)
+      })
     }
   }
 }
@@ -275,14 +301,14 @@ export default {
 // 定义一个比较器
 function compare (propertyName) {
   return function (object1, object2) {
-    var value1 = object1[propertyName]
-    var value2 = object2[propertyName]
+    var value1 = Number(object1[propertyName])
+    var value2 = Number(object2[propertyName])
     if (value2 < value1) {
-      return 1
+      return 0
     } else if (value2 > value1) {
       return -1
     } else {
-    return 0
+    return 1
     }
   }
 }

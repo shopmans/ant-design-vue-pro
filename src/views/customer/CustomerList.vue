@@ -82,7 +82,7 @@
           <a-row :gutter="24">
             <a-col :span="8">
               <a-form-item :label="$t('menu.customer.query.companyType')">
-                <a-select v-decorator="['class', { rules: [{required: true, message: $t('menu.customer.new.companyType.require')}] }]" >
+                <a-select v-decorator="['class', { rules: [{}] }]" >
                   <a-select-option value="1">{{ $t('menu.customer.query.companyType.item1') }}</a-select-option>
                   <a-select-option value="2">{{ $t('menu.customer.query.companyType.item2') }}</a-select-option>
                 </a-select>
@@ -97,6 +97,8 @@
               <a-form-item :label="$t('menu.customer.new.group')">
                 <a-select v-decorator="['group_name', { initialValue: '1', rules: [{required: true, message: $t('menu.customer.new.group.require')}] }]">
                   <a-select-option value="1">{{ $t('menu.customer.new.finallyUser') }}</a-select-option>
+                  <a-select-option value="2">OEM</a-select-option>
+                  <a-select-option value="3">EPC</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>

@@ -16,7 +16,6 @@
             <div class="linehight">实际测试压力</div>
             <a-input
               style="width:200px;"
-              :min="0"
               v-decorator="[
                 'seat_leak_test_real_pressed',
                 {rules: []}
@@ -70,6 +69,33 @@
                 否
               </a-radio>
             </a-radio-group>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item>
+            <div class="linehight">阀座泄漏实际测试介质</div>
+            <a-select v-decorator="[ 'seat_leak_test_real_medium', {rules: [{ message: '请选择单位'}]}]" >
+              <a-select-option value="1">
+                水
+              </a-select-option>
+              <a-select-option value="2">
+                压缩空气
+              </a-select-option>
+              <a-select-option value="3">
+                氮气
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item>
+            <div class="linehight">见证人</div>
+            <a-input
+              style="width:100%;"
+              v-decorator="[
+                'seat_leak_test_witness',
+                {rules: []}
+              ]" />
           </a-form-item>
         </a-col>
       </a-row>

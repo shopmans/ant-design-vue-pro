@@ -19,11 +19,15 @@
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
         <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
+        <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
         <a-button style="margin-left: 38px" @click="stepDone">结束流程</a-button>
       </footer-tool-bar>
 
       <div hidden><StepBase ref="baseInfo" @repairSelectChange="repairSelectChange($event,repairSelectChange)" /></div>
     </a-form>
+
+    <!-- 工单详细 -->
+    <stepAllDetailModel ref="stepAllDetailModel" />
   </page-header-wrapper>
 </template>
 
@@ -38,6 +42,7 @@
   import { saveRepairConfirmData } from '@/api/repairConfirm'
   import pick from 'lodash.pick'
   import { baseMixin } from '@/store/app-mixin'
+  import stepAllDetailModel from '../../modules/StepAllDetailModel'
 
   const stepBaseFields = ['id', 'date', 'work_order_serial', 'type', 'tag',
   'estimate', 'return_part', 'repair_part', 'disassembly', 'receipt_date',
@@ -54,13 +59,14 @@
   'valve_cover_bolt_tool_unit', 'valve_fill_bolt_tool_unit', 'valve_seat_bolt_tool_unit', 'valve_connect_bolt_tool_unit',
   'valve_leak_test_time', 'valve_leak_test_time_unit', 'valve_travel', 'valve_travel_unit', 'valve_lv', 'valve_test_medium',
   'valve_flow_input', 'valve_leak_test_medium', 'valve_leak_test_std_pressed', 'valve_leak_test_std_pressed_unit', 'valve_test_std',
-  'valve_connect_model']
+  'valve_connect_model', 'valve_core_ball_bettlefly', 'valve_cage_retaining_ring', 'valve_set_ring', 'valve_village_bearing',
+  'valve_spacer', 'valve_stem_axis']
 
   const stepActuatorFields = ['id', 'date', 'actu_manufacturer', 'actu_size', 'actu_type', 'actuator_serial', 'actu_action_mode',
   'actu_spring_set_pressure', 'actu_failure', 'actu_install_point', 'actu_cover_bolt_tool', 'actu_cover_bolt_torque',
   'actu_cover_bolt_material', 'actu_cover_bolt_size', 'actu_use_mode', 'actu_model', 'actu_spring_set_pressure_unit',
   'actu_cover_bolt_tool_unit', 'actu_cover_bolt_tool_item', 'actu_cover_bolt_torque_unit', 'actu_cover_bolt_size_unit',
-  'actu_size_unit', 'actu_air_pressed', 'actu_air_pressed_unit']
+  'actu_size_unit', 'actu_air_pressed', 'actu_air_pressed_unit', 'actu_install_bracket', 'actu_install_directore', 'actu_handwheel']
 
   const stepSlaveFields = ['id', 'date', 'slave_locator_brand', 'slave_locator_model', 'slave_input_signal_scope', 'slave_standard_output',
   'slave_filter_valve_brand', 'slave_filter_valve_model', 'slave_elect_valve_brand1', 'slave_elect_valve_model1', 'slave_elect_valve_vol1',
@@ -81,7 +87,8 @@ export default {
     SlaveForm,
     ValveParts,
     baseMixin,
-    FooterToolBar
+    FooterToolBar,
+    stepAllDetailModel
   },
   data () {
     return {
@@ -312,6 +319,9 @@ export default {
           })
         }
       })
+    },
+    handleStepDetail () {
+      this.$refs.stepAllDetailModel.showSetpDetailData(this.flowID, this.currentStep)
     }
   }
 }

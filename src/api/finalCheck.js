@@ -95,7 +95,6 @@ import request from '@/utils/request'
   export function getFinalCheckFieldsLabelD () {
     return ['维修订单完成',
     '工作指令完成',
-    '维修报告完成',
     '诊断报告完成',
     '焊接报告和PWHT图表完成'
   ]
@@ -115,8 +114,8 @@ import request from '@/utils/request'
     '最后整体照片齐全',
     '法兰封盖',
     '开放口封堵',
-    '旧备件：返回',
-    '旧备件：报废'
+    '旧备件，返回',
+    '旧备件，报废'
   ]
   }
 

@@ -1,5 +1,12 @@
 <template>
   <div>
+    <a-card :bordered="false" title="执行信息">
+      <a-descriptions title="">
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <a-card title="最终检查" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-descriptions>
         <a-descriptions-item label="工作单号">{{ baseInfo.work_order_serial }}</a-descriptions-item>
@@ -10,7 +17,7 @@
         <a-descriptions-item label="序列号">{{ valveInfo.valve_serial }}</a-descriptions-item>
         <a-descriptions-item label="阀门型号">{{ valveInfo.valve_model }}</a-descriptions-item>
       </a-descriptions>
-      <a-divider style="margin-bottom: 32px">检查实物</a-divider>
+      <a-divider style="margin-bottom: 32px">检查阀门</a-divider>
       <template v-for="(item,index) in finalCheckFieldsA">
         <!-- 判断是否存在值 -->
         <template v-if="finalCheckData[item]">
@@ -32,7 +39,7 @@
           </a-row>
         </template>
       </template>
-      <a-divider style="margin-bottom: 32px">检查报告</a-divider>
+      <a-divider style="margin-bottom: 32px">检查执行机构</a-divider>
       <template v-for="(item,index) in finalCheckFieldsB">
         <!-- 判断是否存在值 -->
         <template v-if="finalCheckData[item]">
@@ -66,7 +73,7 @@
 
 <script>
 import UploadImgRead from '../modules/UploadImgRead'
-import { queryStepDataOnlyread } from '@/api/step'
+import { queryStepDataOnlyread, getStepUser, formatDateYMD } from '@/api/step'
 import { getFinalCheckFieldsLabelA, getFinalCheckFieldsA, getFinalCheckFieldsLabelB, getFinalCheckFieldsB } from '@/api/finalCheck'
 import moment from 'moment'
 
@@ -84,6 +91,8 @@ export default {
     }
     this.finalCheckData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
     this.$refs.uploadImgRead.imgFileList = this.finalCheckData.uploads
+    this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
+    this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
 
     queryStepDataOnlyread({ id: this.finalCheckData.flow_id, current_step: '(start)' }).then(res => {
       // 找到 baseInfo
@@ -108,7 +117,9 @@ export default {
         finalCheckFieldsLabelA: getFinalCheckFieldsLabelA(),
         finalCheckFieldsA: getFinalCheckFieldsA(),
         finalCheckFieldsLabelB: getFinalCheckFieldsLabelB(),
-        finalCheckFieldsB: getFinalCheckFieldsB()
+        finalCheckFieldsB: getFinalCheckFieldsB(),
+        stepUser: '',
+        stepDoneDate: ''
       }
     }
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card title="维修执行要构信息" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+    <a-card title="维修执行机构信息" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <!-- 行1 -->
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
@@ -62,6 +62,14 @@
                 'actu_size',
                 {rules: [{ message: '请输入尺寸'}]}
               ]">
+              <a-select v-decorator="[ 'actu_size_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+                <a-select-option value="1">
+                  inch
+                </a-select-option>
+                <a-select-option value="2">
+                  mm
+                </a-select-option>
+              </a-select>
             </a-input>
           </a-form-item>
         </a-col>
@@ -246,6 +254,47 @@
                 </a-select-option>
               </a-select>
             </a-input>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="是否集成附件安装支架">
+            <a-select
+              v-decorator="[
+                'actu_install_bracket',
+                {rules: [{ message: '请输入阀盖螺栓材质'}]}
+              ]" >
+              <a-select-option value="1">是</a-select-option>
+              <a-select-option value="2">否</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="附件安装支架方向">
+            <a-select
+              v-decorator="[
+                'actu_install_directore',
+                {rules: [{ message: ''}]}
+              ]" >
+              <a-select-option value="1">方向1</a-select-option>
+              <a-select-option value="2">方向2</a-select-option>
+              <a-select-option value="3">方向3</a-select-option>
+              <a-select-option value="4">方向4</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="手轮">
+            <a-select
+              v-decorator="[
+                'actu_handwheel',
+                {rules: [{ message: ''}]}
+              ]" >
+              <a-select-option value="1">顶装</a-select-option>
+              <a-select-option value="2">侧装</a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
       </a-row>

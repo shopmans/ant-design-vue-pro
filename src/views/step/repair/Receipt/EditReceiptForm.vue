@@ -3,18 +3,17 @@
     <a-form @submit="handleSubmit" :form="form" class="form">
       <!-- 收货日期 -->
       <a-card title="收货" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <a-row class="form-row" :gutter="16">
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-descriptions>
-              <a-descriptions-item label="序列号">{{ refData1.serial }}</a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-descriptions>
-              <a-descriptions-item label="出入厂单据号码">{{ refData1.receipt_number }}</a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-        </a-row>
+        <a-descriptions title="">
+          <a-descriptions-item label="序号">{{ refData1.serial }}</a-descriptions-item>
+          <a-descriptions-item label="出入厂单据号码">{{ refData1.receipt_number }}</a-descriptions-item>
+          <a-descriptions-item label="工单号">{{ refData1.work_order_serial }}</a-descriptions-item>
+          <a-descriptions-item label="合同号">{{ refData2.contract_serial }}</a-descriptions-item>
+          <a-descriptions-item label="客户名称">{{ refData2.customer_name }}</a-descriptions-item>
+          <a-descriptions-item label="执行机构型号">{{ actuRefData.actu_model }}</a-descriptions-item>
+          <a-descriptions-item label="阀门位号">{{ refData1.tag }}</a-descriptions-item>
+          <a-descriptions-item label="序列号">{{ valveRefData.valve_serial }}</a-descriptions-item>
+          <a-descriptions-item label="阀门型号">{{ valveRefData.valve_model }}</a-descriptions-item>
+        </a-descriptions>
         <a-divider></a-divider>
         <a-row>
           <a-col :lg="6" :md="12" :sm="24">
@@ -34,18 +33,6 @@
       <br><br>
       <!-- 已购买备件清单 -->
       <a-card title="已购买备件清单" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <a-descriptions title="已购买备件清单">
-          <a-descriptions-item label="工单号">{{ refData1.work_order_serial }}</a-descriptions-item>
-          <a-descriptions-item label="合同号">{{ refData2.contract_serial }}</a-descriptions-item>
-          <a-descriptions-item label="客户名称">{{ refData2.customer_name }}</a-descriptions-item>
-          <a-descriptions-item label="执行机构型号">{{ actuRefData.actu_model }}</a-descriptions-item>
-          <a-descriptions-item label="阀门位号">{{ refData1.tag }}</a-descriptions-item>
-          <a-descriptions-item label="序列号">{{ valveRefData.valve_serial }}</a-descriptions-item>
-          <a-descriptions-item label="阀门型号"></a-descriptions-item>
-        </a-descriptions>
-
-        <a-divider style="margin-bottom: 32px">备件清单</a-divider>
-
         <a-row class="form-row" :gutter="16">
           <a-table
             :columns="columnsPurchased"

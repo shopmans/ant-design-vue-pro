@@ -78,6 +78,8 @@ export default {
   }),
   watch: {
     'localPagination.current' (val) {
+      this.$store.commit('SET_CUR_PAGE_NO', val)
+      this.$store.commit('SET_CUR_PAGE_SIZE', this.pageSize)
       this.pageURI && this.$router.push({
         ...this.$route,
         name: this.$route.name,
@@ -136,6 +138,17 @@ export default {
      * @param {Object} sorter 排序条件
      */
     loadData (pagination, filters, sorter) {
+      if (!pagination) {
+        if (this.$store.state.user.curPageNo > 0) {
+          this.pageNum = this.$store.state.user.curPageNo
+          this.localPagination.current = this.$store.state.user.curPageNo
+        }
+        if (this.$store.state.user.curPageSize > 0) {
+          this.pageSize = this.$store.state.user.curPageSize
+          this.localPagination.pageSize = this.$store.state.user.curPageSize
+        }
+      }
+
       this.localLoading = true
       const parameter = Object.assign({
         pageNo: (pagination && pagination.current) ||

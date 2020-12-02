@@ -1,5 +1,12 @@
 <template>
   <div>
+    <a-card :bordered="false" title="执行信息">
+      <a-descriptions title="">
+        <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
+        <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+      </a-descriptions>
+    </a-card>
     <a-tabs default-active-key="1">
       <a-tab-pane key="1" tab="阀座泄漏测试" v-if="SeatLeakTest">
         <a-card :bordered="false">
@@ -25,6 +32,8 @@
               <div v-if="PreRepairTestData.seat_leak_test_is_success===2" class="red-circle"></div>
               <div v-if="PreRepairTestData.seat_leak_test_is_success===1" class="green-circle"></div>
             </a-descriptions-item>
+            <a-descriptions-item label="阀座泄漏实际测试介质">{{ getValveTestMediumUnit(PreRepairTestData.seat_leak_test_real_medium) }}</a-descriptions-item>
+            <a-descriptions-item label="见证人">{{ PreRepairTestData.seat_leak_test_witness }}</a-descriptions-item>
           </a-descriptions>
           <a-divider></a-divider>
           <a-descriptions title="">
@@ -103,7 +112,18 @@
     <br>
     <!-- 结论 -->
     <a-card title="结论">
-      <a-textarea disabled rows="6" :value="PreRepairTestData.prerepair_content" />
+      结论:
+      <template v-if="PreRepairTestData.prerepair_content && PreRepairTestData.prerepair_content === 1">
+        <a-badge>合格</a-badge>
+      </template>
+      <template v-else>
+        <a-badge>不合格</a-badge>
+      </template>
+    </a-card>
+    <br>
+    <!-- 备注 -->
+    <a-card title="备注">
+      <a-textarea disabled :rows="4" :value="PreRepairTestData.prerepair_memo" />
     </a-card>
     <br>
     <a-card :bordered="false" title="上传图片">
@@ -116,7 +136,7 @@
 import { getReferencePreRepairTestData } from '@/api/preRepairTest'
 import UploadImgRead from '../modules/UploadImgRead'
 import { getValveLeakLevel, getValveSeatLeakTestUnitText, getValveTestMediumUnit, getValveHydrostaticTestValueUnitText,
-getValveHydrostaticTestTimeUnitText } from '@/api/step'
+getValveHydrostaticTestTimeUnitText, getStepUser, formatDateYMD } from '@/api/step'
 
 export default {
     components: {
@@ -128,7 +148,9 @@ export default {
             ActuatorLeakTest: false,
             AccessoryTest: false,
             PreRepairTestData: {},
-            valveData: {}
+            valveData: {},
+            stepUser: '',
+            stepDoneDate: ''
         }
     },
     methods: {
@@ -146,6 +168,8 @@ export default {
       }
       // 修改数据
       const editData = this.$store.state.editStepData.stepEditData
+      this.stepUser = getStepUser(editData.users)
+      this.stepDoneDate = formatDateYMD(editData.step_done_date)
 
       // 获取引用数据
       getReferencePreRepairTestData({ id: editData.flow_id, current_step: '(start)' }).then(res => {

@@ -109,9 +109,9 @@
                 'slave_elect_valve_active1',
                 {rules: [{ message: '请选择电磁阀动作'}]}
               ]" >
-              <a-select-option value="1">开</a-select-option>
-              <a-select-option value="2">关</a-select-option>
-              <a-select-option value="3">保位</a-select-option>
+              <a-select-option value="1">故障开</a-select-option>
+              <a-select-option value="2">故障关</a-select-option>
+              <a-select-option value="3">故障保位</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -143,9 +143,9 @@
                 'slave_elect_valve_active2',
                 {rules: [{ message: '请选择电磁阀动作'}]}
               ]" >
-              <a-select-option value="1">开</a-select-option>
-              <a-select-option value="2">关</a-select-option>
-              <a-select-option value="3">保位</a-select-option>
+              <a-select-option value="1">故障开</a-select-option>
+              <a-select-option value="2">故障关</a-select-option>
+              <a-select-option value="3">故障保位</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -177,9 +177,9 @@
                 'slave_elect_valve_active3',
                 {rules: [{ message: '请选择电磁阀动作'}]}
               ]" >
-              <a-select-option value="1">开</a-select-option>
-              <a-select-option value="2">关</a-select-option>
-              <a-select-option value="3">保位</a-select-option>
+              <a-select-option value="1">故障开</a-select-option>
+              <a-select-option value="2">故障关</a-select-option>
+              <a-select-option value="3">故障保位</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -239,9 +239,9 @@
                 'slave_retaining_valve_active',
                 {rules: [{ message: '请选择保位阀动作'}]}
               ]" >
-              <a-select-option value="1">开</a-select-option>
-              <a-select-option value="2">关</a-select-option>
-              <a-select-option value="3">保位</a-select-option>
+              <a-select-option value="1">故障开</a-select-option>
+              <a-select-option value="2">故障关</a-select-option>
+              <a-select-option value="3">故障保位</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>

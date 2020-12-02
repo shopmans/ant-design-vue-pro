@@ -3,7 +3,7 @@
   <div v-if="showInModel">
     <a-modal
       :title="$t('menu.workOrder.repair.workOrderDetail')"
-      :width="1024"
+      :width="1080"
       :visible="visible"
       :maskClosable="false"
       @ok="cancel"
@@ -26,6 +26,7 @@
           <LeakPressureTestInfo v-if="stepDetailSwitchMap['LeakPressureTest'].switch" />
           <InstallSlaveInfo v-if="stepDetailSwitchMap['InstallSlave'].switch" />
           <AdjustInfo v-if="stepDetailSwitchMap['Adjust'].switch" />
+          <StepBaseInfo :showBaseInfo="false" v-if="stepDetailSwitchMap['RepairConfirm'].switch" />
           <FinalCheckInfo v-if="stepDetailSwitchMap['FinalCheck'].switch" />
           <LocatorIntoFactoryCheckInfo v-if="stepDetailSwitchMap['LocatorIntoFactoryCheck'].switch" />
           <LocatorPreRepairTestDetailInfo v-if="stepDetailSwitchMap['LocatorPreRepairTest'].switch" />
@@ -54,6 +55,7 @@
         <LeakPressureTestInfo v-if="stepDetailSwitchMap['LeakPressureTest'].switch" />
         <InstallSlaveInfo v-if="stepDetailSwitchMap['InstallSlave'].switch" />
         <AdjustInfo v-if="stepDetailSwitchMap['Adjust'].switch" />
+        <StepBaseInfo :showBaseInfo="false" v-if="stepDetailSwitchMap['RepairConfirm'].switch" />
         <FinalCheckInfo v-if="stepDetailSwitchMap['FinalCheck'].switch" />
         <LocatorIntoFactoryCheckInfo v-if="stepDetailSwitchMap['LocatorIntoFactoryCheck'].switch" />
         <LocatorPreRepairTestDetailInfo v-if="stepDetailSwitchMap['LocatorPreRepairTest'].switch" />

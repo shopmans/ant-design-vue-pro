@@ -7,7 +7,8 @@ import request from '@/utils/request'
     useReportImgSave: '/save-use-report-img',
     valveTestReportImgSave: '/save-valve-test-use-report-img',
     locatorTestReportImgSave: '/save-locator-test-use-report-img',
-    valveRepairProcess: '/get-valve-repair-process-report'
+    valveRepairProcess: '/get-valve-repair-process-report',
+    rotateReportImage: '/rotate-image'
   }
 
   export function getvalveRepairProcessReport (parameter) {
@@ -67,5 +68,13 @@ import request from '@/utils/request'
       method: 'post',
       data: parameter,
       responseType: 'blob'
+    })
+  }
+
+  export function rotateReportImage (parameter) {
+    return request({
+      url: reportApi.rotateReportImage,
+      method: 'post',
+      data: parameter
     })
   }

@@ -11,6 +11,7 @@ const locale = {
   'input.user.search': '/api/user-input',
   'input.customer.search': '/api/customer-input',
   'input.project.search': '/api/input-project',
+  'input.valve.parts.search': '/api/input-search-valve-parts/oo',
   'message': '-',
   'menu.home': '主页',
   'menu.dashboard': '仪表盘',
