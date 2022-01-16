@@ -25,9 +25,11 @@ import Print from 'vue-print-nb'
 import 'viewerjs/dist/viewer.css'
 import Viewer from 'v-viewer'
 import VueCookies from 'vue-cookies'
+import pageDataStack from './components/PageDataStack'
 
 Vue.use(VueCookies)
 Vue.use(Viewer)
+Vue.prototype.pageDataStack = pageDataStack
 
 Vue.config.productionTip = false
 

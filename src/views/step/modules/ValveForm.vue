@@ -7,33 +7,42 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀类型">
-            <a-select
-              @change="handleValveTypeChange"
-              v-decorator="[
-                'valve_type',
-                {rules: [{ message: '请选择阀类型'}]}
-              ]" >
-              <a-select-option value="1">GLOBE balanced</a-select-option>
-              <a-select-option value="2">GLOBE unbalanced</a-select-option>
-              <a-select-option value="3">Butterfly</a-select-option>
-              <a-select-option value="4">Ball</a-select-option>
-              <a-select-option value="5">Others</a-select-option>
-            </a-select>
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_type',
+                  {initialValue: '', rules: [{ message: '请输入阀类型'}]}
+                ]"
+                style="width: 65%" />
+              <a-select style="width: 35%" @change="selectValveTypeChange" :allowClear="true">
+                <a-select-option v-for="item in valveTypeList" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀门品牌">
-            <a-input
-              v-decorator="[
-                'valve_manufacturer',
-                {rules: [{ message: '请输入阀门品牌'}]}
-              ]" />
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_manufacturer',
+                  {initialValue: 'FISHER', rules: [{ message: '请输入阀门品牌'}]}
+                ]"
+                style="width: 65%" />
+              <a-select style="width: 35%" @change="selectInputChange" :allowClear="true">
+                <a-select-option v-for="item in ValveBannerList" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
+        <!-- <a-col :lg="6" :md="12" :sm="24">
           <a-row>
-            <a-col :span="18">
+             <a-col :span="18">
               <a-form-item
                 label="阀门序列号">
                 <a-select
@@ -54,14 +63,14 @@
                 </a-select>
                 <a-input v-if="!showSerialValue" v-decorator="[ 'valve_serial', {rules: [{ required: true, message: '请输入阀门序列号' }]} ]" ></a-input>
               </a-form-item>
-            </a-col>
-            <a-col :span="6">
+            </a-col> -->
+        <!-- <a-col :span="6">
               <a-form-item>
                 <a-switch :checked="switchChecked" v-decorator="[ 'valve_serial_switch', {rules: [{ required: false }]} ]" style="margin-top:45px;margin-left:5px;" @change="valveSerialInputSwitch"></a-switch>
               </a-form-item>
             </a-col>
           </a-row>
-        </a-col>
+        </a-col> -->
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item label="阀体型号">
             <a-input
@@ -78,64 +87,68 @@
                 'valve_size',
                 {rules: [{ message: '请输入阀门尺寸'}]}
               ]">
-              <a-select v-decorator="[ 'valve_size_unit', {initialValue: '1', rules: [{ message: '请选择阀尺寸单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_size_unit', {initialValue: '1', rules: [{ message: '请选择阀尺寸单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  inch
+                  Inch
                 </a-select-option>
                 <a-select-option value="2">
-                  mm
+                  Mm
                 </a-select-option>
               </a-select>
             </a-input>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="阀门材质">
-            <a-select
+          <a-form-item label="阀门材质">
+            <a-input
               v-decorator="[
                 'valve_material',
-                {rules: [{ message: '请选择阀门材质'}]}
-              ]" >
-              <a-select-option value="1">WCB</a-select-option>
-              <a-select-option value="2">WCC</a-select-option>
-              <a-select-option value="3">WC5</a-select-option>
-              <a-select-option value="4">WC6</a-select-option>
-              <a-select-option value="5">WC9</a-select-option>
-              <a-select-option value="6">SST</a-select-option>
-              <a-select-option value="7">C3FM</a-select-option>
-              <a-select-option value="8">C8FM</a-select-option>
-              <a-select-option value="9">Cast</a-select-option>
-              <a-select-option value="10">Iron</a-select-option>
-              <a-select-option value="11">A216 WCB</a-select-option>
-              <a-select-option value="13">Carbon Steel</a-select-option>
-              <a-select-option value="12">None</a-select-option>
+                {rules: [{ message: '请输入阀门尺寸'}]}
+              ]"
+              style="width: 65%">
+            </a-input>
+            <a-select style="width: 35%" @change="selectValveMaterialChange" :allowClear="true">
+              <a-select-option v-for="item in ValveMaterial" :value="item" :key="item">
+                {{ item }}
+              </a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀门压力等级">
-            <a-select
-              v-decorator="[
-                'valve_pressure_level',
-                {rules: [{ message: '请选择阀门压力等级'}]}
-              ]" >
-              <a-select-option value="1">class 125</a-select-option>
-              <a-select-option value="2">class 150</a-select-option>
-              <a-select-option value="3">class 250</a-select-option>
-              <a-select-option value="4">class 300</a-select-option>
-              <a-select-option value="5">class 600</a-select-option>
-              <a-select-option value="6">class 900</a-select-option>
-              <a-select-option value="7">class 1500</a-select-option>
-              <a-select-option value="8">class 2500</a-select-option>
-            </a-select>
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_pressure_level',
+                  {rules: [{}]}
+                ]"
+                style="width: 65%" />
+              <a-select default-value="" style="width: 35%" @change="selectPressureInputChange" :allowClear="true">
+                <a-select-option v-for="item in ValvePressureList" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀门流向">
-            <template v-if="valueTypeValue == '99'">
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_flow',
+                  {rules: [{}]}
+                ]"
+                style="width: 65%" />
+              <a-select default-value="" style="width: 35%" @change="selectValvaFlowInputChange" :allowClear="true">
+                <a-select-option v-for="item in ValveFlowList" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
+            <!-- <template v-if="valueTypeValue == '99'">
               <a-input
                 v-decorator="[
                   'not_user'
@@ -158,7 +171,7 @@
                     {rules: [{ message: '请选择阀门流向'}]}
                   ]" />
               </template>
-            </template>
+            </template> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -168,7 +181,8 @@
               v-decorator="[
                 'valve_push_done',
                 {rules: [{ message: '请选择向下压'}]}
-              ]" >
+              ]"
+              :allowClear="true" >
               <a-select-option value="1">Open</a-select-option>
               <a-select-option value="2">Close</a-select-option>
             </a-select>
@@ -182,12 +196,12 @@
                 'valve_travel',
                 {rules: [{ message: '请输入阀门行程'}]}
               ]">
-              <a-select v-decorator="[ 'valve_travel_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_travel_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  inch
+                  Inch
                 </a-select-option>
                 <a-select-option value="2">
-                  mm
+                  Mm
                 </a-select-option>
                 <a-select-option value="3">
                   °
@@ -212,12 +226,32 @@
               v-decorator="[
                 'valve_flow_char',
                 {rules: [{ message: '请选择阀内件特性'}]}
-              ]" >
+              ]"
+              :allowClear="true" >
               <a-select-option value="1">线性</a-select-option>
               <a-select-option value="3">快开</a-select-option>
               <a-select-option value="2">等百分比</a-select-option>
               <a-select-option value="4">修正等百分比</a-select-option>
               <a-select-option value="5">定制</a-select-option>
+              <a-select-option value="6">修正线性</a-select-option>
+              <a-select-option value="7">Anti-Cav</a-select-option>
+              <a-select-option value="8">Cavitrol III</a-select-option>
+              <a-select-option value="9">Cavitrol IV</a-select-option>
+              <a-select-option value="10">M-Flat</a-select-option>
+              <a-select-option value="11">M-Flow</a-select-option>
+              <a-select-option value="12">M-Flute</a-select-option>
+              <a-select-option value="13">M-Form</a-select-option>
+              <a-select-option value="14">Micro Notch</a-select-option>
+              <a-select-option value="15">Noise Atten</a-select-option>
+              <a-select-option value="16">Notchflo</a-select-option>
+              <a-select-option value="17">Whisper I</a-select-option>
+              <a-select-option value="18">Whisper III</a-select-option>
+              <a-select-option value="19">Whisperflo</a-select-option>
+              <a-select-option value="20">N/A</a-select-option>
+              <a-select-option value="21">Other</a-select-option>
+              <!-- <a-select-option value="22">M-Flute</a-select-option>
+              <a-select-option value="23">M-Flute</a-select-option> -->
+
             </a-select>
           </a-form-item>
         </a-col>
@@ -229,12 +263,12 @@
                 'valve_rod_diameter',
                 {rules: [{ message: '请输入口径'}]}
               ]">
-              <a-select v-decorator="[ 'valve_rod_diameter_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_rod_diameter_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  inch
+                  Inch
                 </a-select-option>
                 <a-select-option value="2">
-                  mm
+                  Mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -248,12 +282,15 @@
                 'valve_caliber',
                 {rules: [{ message: '请输入口径'}]}
               ]">
-              <a-select v-decorator="[ 'valve_caliber_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_caliber_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  inch
+                  Inch
                 </a-select-option>
                 <a-select-option value="2">
-                  mm
+                  Mm
+                </a-select-option>
+                <a-select-option value="3">
+                  N/A
                 </a-select-option>
               </a-select>
             </a-input>
@@ -266,7 +303,8 @@
               v-decorator="[
                 'valve_connect_model',
                 {rules: [{ message: '请选择连接方式'}]}
-              ]" >
+              ]"
+              :allowClear="true" >
               <a-select-option value="1">RF</a-select-option>
               <a-select-option value="2">RTJ</a-select-option>
               <a-select-option value="3">对夹</a-select-option>
@@ -284,12 +322,12 @@
                 'valve_flange_bolt_tool',
                 {rules: [{ message: '请输入法兰螺栓工具'}]}
               ]">
-              <a-select v-decorator="[ 'valve_flange_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_flange_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  inch
+                  Inch
                 </a-select-option>
                 <a-select-option value="2">
-                  mm
+                  Mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -303,12 +341,15 @@
                 'valve_connect_bolt_tool',
                 {rules: [{ message: '请输入连接夹块螺栓工具'}]}
               ]">
-              <a-select v-decorator="[ 'valve_connect_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_connect_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  inch
+                  Inch
                 </a-select-option>
                 <a-select-option value="2">
-                  mm
+                  Mm
+                </a-select-option>
+                <a-select-option value="3">
+                  N/A
                 </a-select-option>
               </a-select>
             </a-input>
@@ -317,118 +358,109 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀芯/阀球/蝶板材质">
-            <a-select v-decorator="[ 'valve_core_ball_bettlefly', {rules: [{ message: '请选择单位'}]}]">
-              <a-select-option value="1">
-                S31600
-              </a-select-option>
-              <a-select-option value="2">
-                S41600
-              </a-select-option>
-              <a-select-option value="3">
-                S31600/CORA-A
-              </a-select-option>
-              <a-select-option value="4">
-                S44004
-              </a-select-option>
-              <a-select-option value="5">
-                CF3M
-              </a-select-option>
-              <a-select-option value="6">
-                CF8M
-              </a-select-option>
-            </a-select>
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_core_ball_bettlefly',
+                  {rules: [{}]}
+                ]"
+                style="width: 50%" />
+              <a-select default-value="" style="width: 50%" @change="selectValveCoreBallBettleflyChange" :allowClear="true">
+                <a-select-option v-for="item in ValveCoreBallBettlefly" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀杆/阀轴材质">
-            <a-select v-decorator="[ 'valve_stem_axis', {rules: [{ message: '请选择单位'}]}]">
-              <a-select-option value="1">
-                S31600
-              </a-select-option>
-              <a-select-option value="2">
-                S17400
-              </a-select-option>
-              <a-select-option value="3">
-                S20910
-              </a-select-option>
-              <a-select-option value="4">
-                17-4PH
-              </a-select-option>
-            </a-select>
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_stem_axis',
+                  {rules: [{}]}
+                ]"
+                style="width: 60%" />
+              <a-select default-value="" style="width: 40%" @change="selectValveStemAxisChange" :allowClear="true">
+                <a-select-option v-for="item in ValveStemAxis" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀笼/保持环材质">
-            <a-select v-decorator="[ 'valve_cage_retaining_ring', {rules: [{ message: '请选择单位'}]}]">
-              <a-select-option value="1">
-                S31600/CORA-A
-              </a-select-option>
-              <a-select-option value="2">
-                S17400
-              </a-select-option>
-              <a-select-option value="3">
-                Carbon Steel
-              </a-select-option>
-            </a-select>
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_cage_retaining_ring',
+                  {rules: [{}]}
+                ]"
+                style="width: 50%" />
+              <a-select default-value="" style="width: 50%" @change="selectValveCageRetainingRingChange" :allowClear="true">
+                <a-select-option v-for="item in ValveCageRetainingRing" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="阀座环材质">
-            <a-select v-decorator="[ 'valve_set_ring', {rules: [{ message: '请选择单位'}]}]">
-              <a-select-option value="1">
-                S31600
-              </a-select-option>
-              <a-select-option value="2">
-                S41600
-              </a-select-option>
-              <a-select-option value="3">
-                S42000
-              </a-select-option>
-              <a-select-option value="4">
-                R30006
-              </a-select-option>
-              <a-select-option value="5">
-                316SST
-              </a-select-option>
-            </a-select>
+            label="阀座环/蝶阀密封圈材质">
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_set_ring',
+                  {rules: [{}]}
+                ]"
+                style="width: 50%" />
+              <a-select default-value="" style="width: 50%" @change="selectValveSetRingChange" :allowClear="true">
+                <a-select-option v-for="item in ValveSetRing" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="村套/轴承材质">
-            <a-select v-decorator="[ 'valve_village_bearing', {rules: [{ message: '请选择单位'}]}]">
-              <a-select-option value="1">
-                S31600
-              </a-select-option>
-              <a-select-option value="2">
-                R30006
-              </a-select-option>
-              <a-select-option value="3">
-                PEEK
-              </a-select-option>
-              <a-select-option value="4">
-                316/NITRIDED
-              </a-select-option>
-            </a-select>
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_village_bearing',
+                  {rules: [{}]}
+                ]"
+                style="width: 50%" />
+              <a-select default-value="" style="width: 50%" @change="selectValveVillageBearingChange" :allowClear="true">
+                <a-select-option v-for="item in ValveVillageBearing" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="垫片材质">
-            <a-select v-decorator="[ 'valve_spacer', {rules: [{ message: '请选择单位'}]}]">
-              <a-select-option value="1">
-                Graphite
-              </a-select-option>
-              <a-select-option value="2">
-                Spiral wound gasket
-              </a-select-option>
-              <a-select-option value="3">
-                Graphite/ Spiral wound gasket
-              </a-select-option>
-            </a-select>
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_spacer',
+                  {rules: [{}]}
+                ]"
+                style="width: 50%" />
+              <a-select default-value="" style="width: 50%" @change="selectValveSpacerChange" :allowClear="true">
+                <a-select-option v-for="item in ValveSpacer" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
       </a-row>
@@ -443,12 +475,12 @@
                 'valve_cover_bolt_torque',
                 {rules: [{ message: '请输入阀盖螺栓扭矩标准值'}]}
               ]">
-              <a-select v-decorator="[ 'valve_cover_bolt_torque_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_cover_bolt_torque_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  N-M
+                  N.m
                 </a-select-option>
                 <a-select-option value="2">
-                  Lbt-ft
+                  Lbf.ft
                 </a-select-option>
               </a-select>
             </a-input>
@@ -457,15 +489,19 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀盖螺栓材质">
-            <a-select
-              v-decorator="[
-                'valve_cover_bolt_material',
-                {rules: [{ message: '请输入阀盖螺栓材质'}]}
-              ]" >
-              <a-select-option value="1">SST(不锈钢)</a-select-option>
-              <a-select-option value="2">B7(碳钢)</a-select-option>
-              <a-select-option value="3">B8(碳钢)</a-select-option>
-            </a-select>
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_cover_bolt_material',
+                  {rules: [{}]}
+                ]"
+                style="width: 50%" />
+              <a-select default-value="" style="width: 50%" @change="selectValveCoverBoltMaterialChange" :allowClear="true">
+                <a-select-option v-for="item in ValveCoverBoltMaterial" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -476,12 +512,12 @@
                 'valve_cover_bolt_size',
                 {rules: [{ message: '阀盖螺栓尺寸'}]}
               ]">
-              <a-select v-decorator="[ 'valve_cover_bolt_size_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_cover_bolt_size_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  inch
+                  Inch
                 </a-select-option>
                 <a-select-option value="2">
-                  mm
+                  Mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -495,12 +531,12 @@
                 'valve_cover_bolt_tool',
                 {rules: [{ message: '请输入阀盖螺栓工具'}]}
               ]">
-              <a-select v-decorator="[ 'valve_cover_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_cover_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  inch
+                  Inch
                 </a-select-option>
                 <a-select-option value="2">
-                  mm
+                  Mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -512,49 +548,18 @@
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="阀座泄漏测试标准">
-            <a-select
-              v-decorator="[
-                'valve_seat_leak_test',
-                {rules: [{ message: '请选择阀座泄漏测试标准'}]}
-              ]" >
-              <a-select-option value="1">API598</a-select-option>
-              <a-select-option value="2">FCI70-2</a-select-option>
-              <a-select-option value="3">FGS4L5</a-select-option>
-              <a-select-option value="4">FGS4L6</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="泄漏等级">
-            <a-select
-              v-decorator="[
-                'valve_leak_level',
-                {rules: [{ message: '请选择泄漏等级'}]}
-              ]" >
-              <a-select-option value="1">Class Ⅱ</a-select-option>
-              <a-select-option value="2">Class Ⅲ</a-select-option>
-              <a-select-option value="3">Class Ⅳ</a-select-option>
-              <a-select-option value="4">Class Ⅴ</a-select-option>
-              <a-select-option value="5">Class Ⅵ</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
             label="阀座螺栓扭矩标准值">
             <a-input
               v-decorator="[
                 'valve_seat_bolt_torque',
                 {rules: [{ message: '请输入阀座螺栓扭矩标准值'}]}
               ]">
-              <a-select v-decorator="[ 'valve_seat_bolt_torque_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_seat_bolt_torque_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  N-M
+                  N.m
                 </a-select-option>
                 <a-select-option value="2">
-                  Lbt-ft
+                  Lbf.ft
                 </a-select-option>
               </a-select>
             </a-input>
@@ -568,12 +573,12 @@
                 'valve_seat_bolt_tool',
                 {rules: [{ message: '请输入阀座螺栓工具'}]}
               ]">
-              <a-select v-decorator="[ 'valve_seat_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_seat_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  inch
+                  Inch
                 </a-select-option>
                 <a-select-option value="2">
-                  mm
+                  Mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -586,22 +591,19 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="填料配置">
-            <a-select
-              v-decorator="[
-                'valve_fill_config',
-                {rules: [{ message: '请选择填料配置'}]}
-              ]" >
-              <a-select-option value="1">PTFE/Single</a-select-option>
-              <a-select-option value="2">PTFE/Double</a-select-option>
-              <a-select-option value="3">COMPOSITION</a-select-option>
-              <a-select-option value="4">Graphite/Single</a-select-option>
-              <a-select-option value="5">Graphite/Double</a-select-option>
-              <a-select-option value="6">Enviro-Seal</a-select-option>
-              <a-select-option value="7">PTFE</a-select-option>
-              <a-select-option value="8">Env-Seal Graph</a-select-option>
-              <a-select-option value="9">Hi-Seal Graph</a-select-option>
-              <a-select-option value="10">FFKM</a-select-option>
-            </a-select>
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_fill_config',
+                  {rules: [{}]}
+                ]"
+                style="width: 50%" />
+              <a-select default-value="" style="width: 50%" @change="selectValveFillInputChange" :allowClear="true">
+                <a-select-option v-for="item in ValveFillInputList" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -612,12 +614,12 @@
                 'valve_fill_bolt_tool',
                 {rules: [{ message: '请输入填料螺栓工具'}]}
               ]">
-              <a-select v-decorator="[ 'valve_fill_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_fill_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  inch
+                  Inch
                 </a-select-option>
                 <a-select-option value="2">
-                  mm
+                  Mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -631,24 +633,58 @@
                 'valve_fill_bolt_torque',
                 {rules: [{ message: '请输入填料螺栓扭矩标准值'}]}
               ]">
-              <a-select v-decorator="[ 'valve_fill_bolt_torque_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_fill_bolt_torque_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  N-M
+                  N.m
                 </a-select-option>
                 <a-select-option value="2">
-                  Lbt-ft
+                  Lbf.ft
                 </a-select-option>
               </a-select>
             </a-input>
           </a-form-item>
         </a-col>
       </a-row>
-      <a-divider>阀座测试</a-divider>
+      <a-divider>阀座泄漏测试</a-divider>
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
+            label="泄漏测试标准">
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_seat_leak_test',
+                  {rules: [{}]}
+                ]"
+                style="width: 65%" />
+              <a-select default-value="" style="width: 35%" @change="selectValveLeakTestInputChange" :allowClear="true">
+                <a-select-option v-for="item in ValveLeakTestInputList" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="泄漏等级">
+            <a-select
+              v-decorator="[
+                'valve_leak_level',
+                {rules: [{ message: '请选择泄漏等级'}]}
+              ]"
+              :allowClear="true"
+              @change="selectValveLeakLevelInputChange">
+              <a-select-option v-for="item in ValveLeakLevelList" :value="item" :key="item">
+                {{ item }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
             label="泄漏测试介质">
-            <a-select v-decorator="[ 'valve_leak_test_medium', {rules: [{ message: '请选择单位'}]}]" >
+            <a-select v-decorator="[ 'valve_leak_test_medium', {rules: [{ message: '请选择单位'}]}]" :allowClear="true">
               <a-select-option value="1">
                 水
               </a-select-option>
@@ -669,7 +705,7 @@
                 'valve_leak_test_std_pressed',
                 {rules: [{ message: '请输入口径'}]}
               ]">
-              <a-select v-decorator="[ 'valve_leak_test_std_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_leak_test_std_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
                   PSI
                 </a-select-option>
@@ -678,6 +714,9 @@
                 </a-select-option>
                 <a-select-option value="3">
                   MPa
+                </a-select-option>
+                <a-select-option value="4">
+                  KPa
                 </a-select-option>
               </a-select>
             </a-input>
@@ -691,7 +730,7 @@
                 'valve_leak_test_value',
                 {rules: [{ message: '请输入口径'}]}
               ]">
-              <a-select v-decorator="[ 'valve_leak_test_value_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 120px">
+              <a-select v-decorator="[ 'valve_leak_test_value_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 120px" :allowClear="true">
                 <a-select-option value="1">
                   SCFH
                 </a-select-option>
@@ -699,7 +738,13 @@
                   ml/min
                 </a-select-option>
                 <a-select-option value="3">
-                  bubbles/min
+                  bbl/min
+                </a-select-option>
+                <a-select-option value="4">
+                  cc/min
+                </a-select-option>
+                <a-select-option value="5">
+                  L/min
                 </a-select-option>
               </a-select>
             </a-input>
@@ -713,7 +758,7 @@
                 'valve_leak_test_time',
                 {rules: [{ message: '请输入时间'}]}
               ]">
-              <a-select v-decorator="[ 'valve_leak_test_time_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_leak_test_time_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
                   Min
                 </a-select-option>
@@ -735,7 +780,8 @@
               v-decorator="[
                 'valve_test_medium',
                 {rules: [{ message: '请选择泄漏等级'}]}
-              ]" >
+              ]"
+              :allowClear="true" >
               <a-select-option value="1">
                 水
               </a-select-option>
@@ -748,18 +794,19 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="水压测试标准">
-            <a-select
-              v-decorator="[
-                'valve_test_std',
-                {rules: [{ message: '请选水压测试标准'}]}
-              ]" >
-              <a-select-option value="1">
-                API598
-              </a-select-option>
-              <a-select-option value="2">
-                FGS4LI
-              </a-select-option>
-            </a-select>
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'valve_test_std',
+                  {rules: [{}]}
+                ]"
+                style="width: 65%" />
+              <a-select default-value="" style="width: 35%" @change="selectValveStdTestInputChange" :allowClear="true">
+                <a-select-option v-for="item in ValveStdTestInputList" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -770,7 +817,7 @@
                 'valve_hydrostatic_test_value',
                 {rules: [{ message: '请输入水压测试标准值'}]}
               ]">
-              <a-select v-decorator="[ 'valve_hydrostatic_test_value_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_hydrostatic_test_value_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
                   PSI
                 </a-select-option>
@@ -792,7 +839,7 @@
                 'valve_hydrostatic_test_time',
                 {rules: [{ message: '请输入水压测试时间'}]}
               ]">
-              <a-select v-decorator="[ 'valve_hydrostatic_test_time_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select v-decorator="[ 'valve_hydrostatic_test_time_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
                   Min
                 </a-select-option>
@@ -811,8 +858,10 @@
 </template>
 
 <script>
-import { fetch } from '@/utils/inputSearch'
-import { querySparePartsBySerial } from '@/api/spareParts'
+import { getValvaBanner, getValvePressureList, getValveFlowList, getValveFillInputList, getValveLeakTestInputList, getValveStdTestInputList,
+getValveCoreBallBettlefly, getValveStemAxis, getValveCageRetainingRing, getValveSetRing, getValveVillageBearing, getValveSpacerData,
+getValveCoverBoltMaterial, getValveTypeList, getValveLeakLevelList, getValveMaterial } from '@/api/step'
+
 // import pick from 'lodash.pick'
 
 export default {
@@ -830,12 +879,29 @@ export default {
         BallValveTypeSelectKey: ['7', '8', '9'],
         valueTypeValue: '1', // 决定流向字段是选择还是输入
         showSerialValue: true,
+        valveSetRingSwitch: false,
+        valveSetRingSwitchValue: false,
+        ValveBannerList: getValvaBanner(),
+        ValveMaterial: getValveMaterial(),
+        ValvePressureList: getValvePressureList(),
+        ValveFlowList: getValveFlowList(),
+        ValveFillInputList: getValveFillInputList(),
+        ValveLeakTestInputList: getValveLeakTestInputList(),
+        ValveStdTestInputList: getValveStdTestInputList(),
+        ValveCoreBallBettlefly: getValveCoreBallBettlefly(),
+        ValveStemAxis: getValveStemAxis(),
+        ValveCageRetainingRing: getValveCageRetainingRing(),
+        ValveSetRing: getValveSetRing(),
+        ValveVillageBearing: getValveVillageBearing(),
+        ValveSpacer: getValveSpacerData(),
+        ValveCoverBoltMaterial: getValveCoverBoltMaterial(),
         valveSerialData: [],
-        switchChecked: false
+        valveTypeList: getValveTypeList(),
+        ValveLeakLevelList: getValveLeakLevelList()
       }
     },
     mounted () {
-      // ['valveSelect_id'].stepValveFields.forEach(v => this.form.getFieldDecorator(v))
+      // ['valve_manufacturer'].forEach(v => this.form.getFieldDecorator(v))
     },
     methods: {
       nextStep () {
@@ -884,20 +950,6 @@ export default {
               // <a-select-option value="4">Ball</a-select-option>
               // <a-select-option value="5">Others</a-select-option>
       },
-      handleValveSearch (value) {
-        this.valveSerialData.length = 0
-        fetch(value, data => (this.valveSerialData = data), this.$t('input.valve.parts.search'))
-      },
-      selectValveSerialChange (value) {
-        const that = this
-        console.log(value)
-        querySparePartsBySerial({ serial: value }).then(e => {
-          e.valve_model = e.model
-          e.valve_serial = e.serial
-          console.log(e)
-          that.$emit('selectValveSerialChange', e)
-        })
-      },
       addValveSelectData (id, text, switchValue) {
         this.valveSerialData.push({
           value: id,
@@ -911,6 +963,58 @@ export default {
       valveSerialInputSwitch (checked) {
         this.showSerialValue = !checked
         this.switchChecked = checked
+      },
+      valveSerialInputSwitchChange (checked) {
+        this.valveSetRingSwitch = checked
+        this.valveSetRingSwitchValue = checked
+      },
+      selectInputChange (value) {
+        this.$emit('selectInputChange', { valve_manufacturer: value })
+      },
+      selectPressureInputChange (value) {
+        this.$emit('selectInputChange', { valve_pressure_level: value })
+      },
+      selectValvaFlowInputChange (value) {
+        this.$emit('selectInputChange', { valve_flow: value })
+      },
+      selectValveFillInputChange (value) {
+        this.$emit('selectInputChange', { valve_fill_config: value })
+      },
+      selectValveCoreBallBettleflyChange (value) {
+        this.$emit('selectInputChange', { valve_core_ball_bettlefly: value })
+      },
+      selectValveStemAxisChange (value) {
+        this.$emit('selectInputChange', { valve_stem_axis: value })
+      },
+      selectValveCageRetainingRingChange (value) {
+        this.$emit('selectInputChange', { valve_cage_retaining_ring: value })
+      },
+      selectValveSetRingChange (value) {
+        this.$emit('selectInputChange', { valve_set_ring: value })
+      },
+      selectValveVillageBearingChange (value) {
+        this.$emit('selectInputChange', { valve_village_bearing: value })
+      },
+      selectValveSpacerChange (value) {
+        this.$emit('selectInputChange', { valve_spacer: value })
+      },
+      selectValveCoverBoltMaterialChange (value) {
+        this.$emit('selectInputChange', { valve_cover_bolt_material: value })
+      },
+      selectValveLeakTestInputChange (value) {
+        this.$emit('selectInputChange', { valve_seat_leak_test: value })
+      },
+      selectValveStdTestInputChange (value) {
+        this.$emit('selectInputChange', { valve_test_std: value })
+      },
+      selectValveTypeChange (value) {
+        this.$emit('selectInputChange', { valve_type: value })
+      },
+      selectValveLeakLevelInputChange (value) {
+        this.$emit('selectInputChange', { valve_leak_level: value })
+      },
+      selectValveMaterialChange (value) {
+        this.$emit('selectInputChange', { valve_material: value })
       }
     }
 }

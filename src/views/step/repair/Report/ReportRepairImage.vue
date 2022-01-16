@@ -76,7 +76,9 @@
 
     <!-- 页脚 -->
     <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
-      <a-button @click="getReport" type="primary">生成报告</a-button>
+      <a-button @click="getReport('1')" type="primary" :loading="loading">生成报告(Excel)</a-button>
+      <a-button @click="getReport('2')" style="margin-left: 8px" type="primary" :loading="loading">生成报告(PDF)</a-button>
+      <a-button style="margin-left: 8px" @click="saveReportConfig" :loading="loading">保存设置</a-button>
       <a-button style="margin-left: 8px" @click="cancelReport" >取消</a-button>
     </footer-tool-bar>
 
@@ -88,11 +90,12 @@
 </template>
 
 <script>
-import moment from 'moment'
+// import moment from 'moment'
+import { saveAs } from 'file-saver'
 import FooterToolBar from '@/components/FooterToolbar'
 import { baseMixin } from '@/store/app-mixin'
 import { getRepairSplitValue, repairFlowStepValue, getCurrentStepMap, getFlowStepLog } from '@/api/step'
-import { repairReportImgList, saveUseReportImg, rotateReportImage } from '@/api/report'
+import { repairReportImgList, saveUseReportImg, rotateReportImage, deleteTmpReportFile, saveReportImgConfig } from '@/api/report'
 
 export default {
   mixins: [baseMixin],
@@ -101,6 +104,7 @@ export default {
     },
   mounted () {
     getFlowStepLog({ FlowID: this.$route.params.id }).then(e => {
+      console.log(e)
       // 检查流程是否存在FinalCheck
       let isFinalCheck = 0
       // 检查是否是维修流程
@@ -121,7 +125,7 @@ export default {
         return
       }
       if (isFinalCheck === 0) {
-        this.$message.info('工单流程没有结束不能出具维修报告')
+        this.$message.info('工单维修流程没有结束不能出具维修报告')
         this.$router.push({ path: '/step/steplist' })
         return
       }
@@ -137,12 +141,8 @@ export default {
         for (var k = 0; k < this.repairImages.length; k++) {
           this.repairImages[k].stepValue = repairFlowStepValue(this.repairImages[k].current_step)
           // 检查是否存在序号，如果存在序号则不是初始状态
-          if (isFirst && this.repairImages[k].serial_number.length > 0) {
+          if (isFirst && this.repairImages[k].serial_number > 0) {
             isFirst = false
-          }
-          // 生成序号
-          if (this.repairImages[k].serial_number.length <= 0) {
-            this.repairImages[k].serial_number = k + 1 + ''
           }
           // 把 use_report 转换成bool
           if (this.repairImages[k].use_report === '1') {
@@ -155,6 +155,12 @@ export default {
         // 排序流程
         if (isFirst) { // 初始状态按流程顺序排序
           this.sortImage('stepValue')
+          for (var n = 0; n < this.repairImages.length; n++) {
+            // 生成序号
+            this.repairImages[n].serial_number = n + 1 + ''
+            this.repairImages[n].use_report = true
+            this.repairImages[n].title = this.getStepText(this.repairImages[n].current_step)
+          }
         } else {
           this.sortImage('serial_number')
         }
@@ -183,7 +189,8 @@ export default {
       currentModelImgID: '',
       modelEditType: 0,
       repairImages: [],
-      rotateIntevel: (new Date()).getTime()
+      rotateIntevel: (new Date()).getTime(),
+      loading: false
     }
   },
   methods: {
@@ -193,10 +200,13 @@ export default {
     getCurrentStepMap,
     saveUseReportImg,
     getStepText (val) {
+      if (val.length <= 3) {
+        return ''
+      }
       const stepMap = getCurrentStepMap()
       return this.$t(stepMap[val].text)
     },
-    getReport () {
+    getReport (type) {
       var tmpList = { use_report_images: [] }
       this.repairBeforeImages.forEach(item => {
         // 将false true 转成字符
@@ -210,28 +220,17 @@ export default {
         tmpItem.use_report = tmpItem.use_report ? '1' : ''
         tmpList.use_report_images.push(tmpItem)
       })
-      console.log(tmpList)
-      saveUseReportImg(tmpList).then(res => {
-        const content = res
-        const blob = new Blob([content])
-        const fileName = 'SinoRepairReport_' + moment(new Date()).format('YYYY_MM_DD_HH_mm_ss') + '.xlsx'
-        if ('download' in document.createElement('a')) { // 非IE下载
-          const elink = document.createElement('a')
-          elink.download = fileName
-          elink.style.display = 'none'
-          elink.href = URL.createObjectURL(blob)
-          document.body.appendChild(elink)
-          elink.click()
-          URL.revokeObjectURL(elink.href) // 释放URL 对象
-          document.body.removeChild(elink)
-        } else { // IE10+下载
-          navigator.msSaveBlob(blob, fileName)
-        }
+      this.loading = true
+      saveUseReportImg(tmpList, type).then(res => {
+        const filename = res.replace('/api/report/download/', '')
+        saveAs(res, filename)
+        deleteTmpReportFile(filename)
+        this.loading = false
         this.$message.info('报告生成完毕')
       })
     },
     cancelReport () {
-      this.$router.push({ path: '/step/steplist' })
+      this.$router.back(-1)
     },
     getImgUrl (md5, type) {
       if (type.indexOf('jpeg') >= 0) {
@@ -408,6 +407,26 @@ export default {
         } else {
           this.repairAfterImages.push(item)
         }
+      })
+    },
+    saveReportConfig () {
+      var tmpList = { use_report_images: [] }
+      this.repairBeforeImages.forEach(item => {
+        // 将false true 转成字符
+        var tmpItem = { ...item }
+        tmpItem.use_report = tmpItem.use_report ? '1' : ''
+        tmpList.use_report_images.push(tmpItem)
+      })
+      this.repairAfterImages.forEach(item => {
+        // 将false true 转成字符
+        var tmpItem = { ...item }
+        tmpItem.use_report = tmpItem.use_report ? '1' : ''
+        tmpList.use_report_images.push(tmpItem)
+      })
+      this.loading = true
+      saveReportImgConfig(tmpList).then(res => {
+        this.loading = false
+        this.$message.info('保存设置成功')
       })
     }
   }

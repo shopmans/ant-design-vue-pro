@@ -38,7 +38,9 @@
 
     <!-- 页脚 -->
     <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
-      <a-button @click="getReport" type="primary">生成报告</a-button>
+      <a-button @click="getReport('1')" type="primary" :loading="loading">生成报告(Excel)</a-button>
+      <a-button @click="getReport('2')" style="margin-left: 8px" type="primary" :loading="loading">生成报告(PDF)</a-button>
+      <a-button style="margin-left: 8px" @click="saveReportConfig" :loading="loading">保存设置</a-button>
       <a-button style="margin-left: 8px" @click="cancelReport" >取消</a-button>
     </footer-tool-bar>
 
@@ -50,11 +52,12 @@
 </template>
 
 <script>
-import moment from 'moment'
+// import moment from 'moment'
+import { saveAs } from 'file-saver'
 import FooterToolBar from '@/components/FooterToolbar'
 import { baseMixin } from '@/store/app-mixin'
 import { getRepairSplitValue, repairFlowStepValue, getCurrentStepMap, getFlowStepLog } from '@/api/step'
-import { localtorTestReportImgList, saveUseReportImgFotLocatorTest, rotateReportImage } from '@/api/report'
+import { localtorTestReportImgList, saveUseReportImgFotLocatorTest, rotateReportImage, deleteTmpReportFile, saveLocatorReportImgConfig } from '@/api/report'
 
 export default {
   mixins: [baseMixin],
@@ -78,13 +81,13 @@ export default {
       })
 
       if (isLocatorStep < 0) {
-          this.$message.info('工单流程不是定位器流程')
-          this.$router.push({ path: '/step/steplist' })
+          // this.$message.info('工单流程不是定位器流程')
+          // this.$router.push({ path: '/step/steplist' })
           return
       }
       if (isLocatorAssessment === 0) {
-        this.$message.info('工单流程没有完成评估不能出具检测报告')
-        this.$router.push({ path: '/step/steplist' })
+        // this.$message.info('工单流程没有完成评估不能出具检测报告')
+        // this.$router.push({ path: '/step/steplist' })
         return
       }
 
@@ -99,12 +102,8 @@ export default {
       for (let i = 0; i < testImages.length; i++) {
         testImages[i].stepValue = repairFlowStepValue(testImages[i].current_step)
         // 检查是否存在序号，如果存在序号则不是初始状态
-        if (isFirst && testImages[i].serial_number.length > 0) {
+        if (isFirst && testImages[i].serial_number > 0) {
           isFirst = false
-        }
-        // 序号
-        if (testImages[i].serial_number.length <= 0) {
-          testImages[i].serial_number = i + 1 + ''
         }
         // 把 use_report 转换成bool
         if (testImages[i].use_report === '1') {
@@ -117,6 +116,12 @@ export default {
       // 存在序号则按序号排序
       if (isFirst) {
         testImages.sort(compare('stepValue'))
+        for (var n = 0; n < testImages.length; n++) {
+          // 生成序号
+          testImages[n].serial_number = n + 1 + ''
+          testImages[n].use_report = true
+          testImages[n].title = this.getStepText(testImages[n].current_step)
+        }
       } else {
         testImages.sort(compare('serial_number'))
       }
@@ -143,7 +148,8 @@ export default {
       modelVisible: false,
       modelInputValue: '',
       currentModelImgID: '',
-      modelEditType: 0
+      modelEditType: 0,
+      loading: false
     }
   },
   methods: {
@@ -155,7 +161,7 @@ export default {
       const stepMap = getCurrentStepMap()
       return this.$t(stepMap[val].text)
     },
-    getReport () {
+    getReport (type) {
       var tmpList = { use_report_images: [] }
       this.valveTestImages.forEach(item => {
         // 将false true 转成字符
@@ -163,27 +169,33 @@ export default {
         tmpItem.use_report = tmpItem.use_report ? '1' : ''
         tmpList.use_report_images.push(tmpItem)
       })
-      saveUseReportImgFotLocatorTest(tmpList).then(res => {
-        const content = res
-        const blob = new Blob([content])
-        const fileName = 'SinoLocatorTestReport_' + moment(new Date()).format('YYYY_MM_DD_HH_mm_ss') + '.xlsx'
-        if ('download' in document.createElement('a')) { // 非IE下载
-          const elink = document.createElement('a')
-          elink.download = fileName
-          elink.style.display = 'none'
-          elink.href = URL.createObjectURL(blob)
-          document.body.appendChild(elink)
-          elink.click()
-          URL.revokeObjectURL(elink.href) // 释放URL 对象
-          document.body.removeChild(elink)
-        } else { // IE10+下载
-          navigator.msSaveBlob(blob, fileName)
-        }
+      this.loading = true
+      saveUseReportImgFotLocatorTest(tmpList, type).then(res => {
+        const filename = res.replace('/api/report/download/', '')
+        saveAs(res, filename)
+        deleteTmpReportFile(filename)
+        this.loading = false
         this.$message.info('报告生成完毕')
+        // const content = res
+        // const blob = new Blob([content])
+        // const fileName = 'SinoLocatorTestReport_' + moment(new Date()).format('YYYY_MM_DD_HH_mm_ss') + '.xlsx'
+        // if ('download' in document.createElement('a')) { // 非IE下载
+        //   const elink = document.createElement('a')
+        //   elink.download = fileName
+        //   elink.style.display = 'none'
+        //   elink.href = URL.createObjectURL(blob)
+        //   document.body.appendChild(elink)
+        //   elink.click()
+        //   URL.revokeObjectURL(elink.href) // 释放URL 对象
+        //   document.body.removeChild(elink)
+        // } else { // IE10+下载
+        //   navigator.msSaveBlob(blob, fileName)
+        // }
+        // this.$message.info('报告生成完毕')
       })
     },
     cancelReport () {
-      this.$router.push({ path: '/step/steplist' })
+      this.$router.back(-1)
     },
     getImgUrl (md5, type) {
       if (type.indexOf('jpeg') >= 0) {
@@ -293,6 +305,20 @@ export default {
       rotateReportImage(tmpObj).then(e => {
         const imgSrc = window.document.getElementById(id).getAttribute('src')
         window.document.getElementById(id).setAttribute('src', imgSrc + '?t=' + curTimestamp)
+      })
+    },
+    saveReportConfig () {
+      var tmpList = { use_report_images: [] }
+      this.valveTestImages.forEach(item => {
+        // 将false true 转成字符
+        var tmpItem = { ...item }
+        tmpItem.use_report = tmpItem.use_report ? '1' : ''
+        tmpList.use_report_images.push(tmpItem)
+      })
+      this.loading = true
+      saveLocatorReportImgConfig(tmpList).then(res => {
+        this.loading = false
+        this.$message.info('保存设置成功')
       })
     }
   }

@@ -17,6 +17,36 @@ const defaultRoutePath = 'project/project-list'
 router.beforeEach((to, from, next) => {
   console.log('router to: ' + to.fullPath)
   console.log('router from: ' + from.fullPath)
+  if (store.state.user.savePropmt === '1') {
+  //   this.$confirm({
+  //     title: '确认删除此项目吗?',
+  //     icon: <ExclamationCircleOutlined/>,
+  //     content: '',
+  //     okText: '是',
+  //     okType: 'danger',
+  //     cancelText: '否',
+  //     onOk: () => {
+  //     },
+  //     onCancel: () => {
+  //     }
+  // })
+  //   return
+    // let isNext = false
+
+    // confirm({
+    //   title: '确认',
+    //   content: '还未保存确定要离开吗？',
+    //   okText: '确认',
+    //   cancelText: '取消',
+    //   onOk () {
+    //     isNext = true
+    //   }
+    // })
+
+    // if (!isNext) {
+    //   return
+    // }
+  }
 
   const userAgent = navigator.userAgent
   if (userAgent.indexOf('Android') > -1) {
@@ -42,6 +72,14 @@ router.beforeEach((to, from, next) => {
       next({ path: defaultRoutePath })
       NProgress.done()
     } else {
+      // 退出浏览器或关闭标签时不会读到 ISLogin 标志
+      // 注意：只检windows桌面流览器
+      if (!window.sessionStorage['ISlogin'] && userAgent.indexOf('Android') < 0) {
+        store.dispatch('Logout').then(() => {
+          next({ path: loginRoutePath, query: { redirect: to.fullPath } })
+        })
+        return
+      }
       // check login user.roles is null
       if (store.getters.roles.length === 0) {
         // request login userInfo

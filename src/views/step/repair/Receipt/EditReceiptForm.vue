@@ -1,10 +1,15 @@
 <template>
   <page-header-wrapper>
+    <template slot="extra">
+      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+        不适用
+      </a-checkbox>
+    </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
       <!-- 收货日期 -->
       <a-card title="收货" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-descriptions title="">
-          <a-descriptions-item label="序号">{{ refData1.serial }}</a-descriptions-item>
+          <a-descriptions-item label="序号">{{ refData1.serial_number }}</a-descriptions-item>
           <a-descriptions-item label="出入厂单据号码">{{ refData1.receipt_number }}</a-descriptions-item>
           <a-descriptions-item label="工单号">{{ refData1.work_order_serial }}</a-descriptions-item>
           <a-descriptions-item label="合同号">{{ refData2.contract_serial }}</a-descriptions-item>
@@ -20,6 +25,7 @@
             <a-form-item >
               <div class="linehight">收货日期</div>
               <a-date-picker
+                :disabled="disableAll"
                 style="width:100%;"
                 :format="dateFormat"
                 v-decorator="[
@@ -29,8 +35,29 @@
             </a-form-item>
           </a-col>
         </a-row>
+        <a-divider></a-divider>
+        <a-row>
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item label="工时(min)">
+              <a-input-number
+                :disabled="disableAll"
+                style="width:100%;"
+                :min="0"
+                v-decorator="[
+                  'work_time',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+          </a-col>
+        </a-row>
       </a-card>
       <br><br>
+
+      <a-card title="派员" :headStyle="{fontWeight:'bold'}">
+        <DispatchUser v-if="showDispatchUser" :disableAll="disableAll" :flowID="flow_id" :currentStep="current_step" />
+      </a-card>
+      <br><br>
+
       <!-- 已购买备件清单 -->
       <a-card title="已购买备件清单" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-row class="form-row" :gutter="16">
@@ -42,6 +69,7 @@
           >
             <template v-for="(col, i) in ['purchased_part_no', 'purchased_part_key_number', 'purchased_part_number', 'purchased_part_name', 'purchased_part_qty', 'purchased_part_memo']" :slot="col" slot-scope="text, record">
               <a-input
+                :disabled="disableAll"
                 :key="col"
                 v-if="record.editable"
                 style="margin: -5px 0"
@@ -56,22 +84,27 @@
             <!--  ssssssssssssssssssssssssss -->
             <!--  ssssssssssssssssssssssssss -->
             <template slot="operation" slot-scope="record">
-              <a-checkbox @change="onChange" :value="record" :default-checked="record.checked" />
+              <a-checkbox :disabled="disableAll" @change="onChange" :value="record" :default-checked="record.checked" />
             </template>
           </a-table>
         </a-row>
       </a-card>
+      <!-- 文件上传 -->
+      <br>
+      <br>
+      <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+        <UploadImg ref="uploadImg" :disableAll="disableAll" :queueType="'3'" :isMobile="isMobile" />
+      </a-card>
 
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
-        <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
-        <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
+        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >取消</a-button>
+        <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
     </a-form>
 
-    <stepAllDetailModel ref="stepAllDetailModel" />
-
+    <stepAllDetailModel ref="stepAllDetailModel" :currenStep="current_step" :flowId="flow_id" />
   </page-header-wrapper>
 </template>
 
@@ -84,9 +117,11 @@ import selectUser from '../../modules/SelectUser'
 import pick from 'lodash.pick'
 import stepDetail from '../../modules/StepBaseInfo'
 import stepAllDetailModel from '../../modules/StepAllDetailModel'
+import DispatchUser from '../../modules/DispatchUser'
+import UploadImg from '../../modules/UploadImg'
 
   const receiptFields = ['receipt_date', 'receipt_valve_serial', 'receipt_valve_factory_no', 'work_order_serial',
-  'contract_serial', 'customer_name', 'valve_serial']
+  'contract_serial', 'customer_name', 'valve_serial', 'not_applicable', 'work_time']
 
 export default {
   name: 'ReceiptForm',
@@ -96,7 +131,9 @@ export default {
     FooterToolBar,
     baseMixin,
     stepDetail,
-    stepAllDetailModel
+    stepAllDetailModel,
+    DispatchUser,
+    UploadImg
   },
   data () {
     return {
@@ -113,7 +150,10 @@ export default {
       columnsPurchased: getColumnsPurchased(),
       dataPurchased: [],
       receiptPurchased: [],
-      dateFormat: 'YYYY-MM-DD'
+      dateFormat: 'YYYY-MM-DD',
+      showDispatchUser: false,
+      not_applicable: false,
+      disableAll: false
     }
   },
   mounted () {
@@ -122,6 +162,9 @@ export default {
     this.current_step = editData.current_step
     // 防止表单未注册
     receiptFields.forEach(v => this.form.getFieldDecorator(v))
+    this.showDispatchUser = true
+    // 供flutter刷新上传文件列表
+    window.refreshUploads = this.refreshUploads
 
     // 读baseinfo
     queryStepData({ id: this.flow_id, current_step: '(start)' }).then(res => {
@@ -130,11 +173,14 @@ export default {
       let receiptData = {}
       if (editData.step_data.length > 0) {
         receiptData = JSON.parse(editData.step_data[0].JSON)
+        this.$refs.uploadImg.imgFileList = receiptData.uploads
       } else {
         receiptData.receipt_parts = []
       }
 
       this.form.setFieldsValue(pick(receiptData, receiptFields))
+      this.not_applicable = receiptData.not_applicable
+      this.disableAll = receiptData.not_applicable
 
       res.result.step_data.forEach(e => {
         // 查找 baseinfo
@@ -195,18 +241,19 @@ export default {
           values.flow_id = this.flow_id
           values.receipt_parts = this.receiptPurchased
           values.receipt_user_id = this.$store.state.user.info.id
+          values.uploads = this.$refs.uploadImg.imgFileList
+          values.not_applicable = this.not_applicable
+
           saveReceipt(values).then(res => {
-            // 刷新表格
-            this.$router.push({ path: '/step/steplist' })
             this.$message.info('保存成功')
-            // 重置表单数据
-            this.form.resetFields()
+            // eslint-disable-next-line no-undef
+            callFlutterBacktoList.postMessage('save_step_ok') // 告诉移动端vue页面本流程已经保存成功
           })
         }
       })
     },
     cancelSubmit () {
-        this.$router.push({ path: '/step/steplist' })
+        this.$router.back(-1)
     },
     handleStepDone () {
       const letThis = this
@@ -239,9 +286,23 @@ export default {
           check: e.target.checked
         })
       }
+    },
+    refreshUploads () {
+      queryStepData({ id: this.flow_id, current_step: this.current_step }).then(res => {
+        if (res.result.step_data && res.result.step_data.length > 0) {
+          const tmpData = JSON.parse(res.result.step_data[0].JSON)
+          this.$refs.uploadImg.imgFileList = tmpData.uploads
+          this.$message.info('上传照片成功')
+        }
+      })
+    },
+    naChange (e) {
+      this.not_applicable = e.target.checked
+      this.disableAll = e.target.checked
     }
   }
 }
+
 </script>
 
 <style scoped>

@@ -19,14 +19,13 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="$refs.table.refresh(true)">{{ $t('menu.project.view.query.query') }}</a-button>
+                <a-button type="primary" @click="startQuery">{{ $t('menu.project.view.query.query') }}</a-button>
                 <a-button style="margin-left: 8px" @click="resetQuery">{{ $t('menu.project.view.query.reset') }}</a-button>
               </span>
             </a-col>
           </a-row>
         </a-form>
       </div>
-
       <div class="table-operator">
         <a-button type="primary" icon="plus" @click="handleAdd">{{ $t('menu.project.view.newproject') }}</a-button>
       </div>
@@ -37,7 +36,6 @@
         size="default"
         :columns="columns"
         :data="loadData"
-        showPagination="auto"
       >
         <span slot="state" slot-scope="text">
           <a-tag :color="text === '1' ? 'blue' : 'red'" slot="state" >{{ $t(state[text]) }}</a-tag>
@@ -115,7 +113,7 @@
 <script>
 import md5 from 'md5'
 import pick from 'lodash.pick'
-import { STable } from '@/components'
+import { STable, Ellipsis } from '@/components'
 import { getUserList, addUser, modifyUser, disableUser, deleteUser } from '@/api/user'
 // import { PERMISSION_ENUM } from '@/utils/helper/permission'
 
@@ -126,7 +124,9 @@ const state = {
 
 const position = {
   1: 'menu.project.view.table.column.sales',
-  2: 'menu.user.manager.new.maintenanceEngineer'
+  2: 'menu.user.manager.new.maintenanceEngineer',
+  3: 'menu.project.view.table.column.part.manager',
+  4: 'menu.project.view.table.column.deputy.general.manager'
 }
 
 const columns = [
@@ -166,7 +166,8 @@ const columns = [
 export default {
   name: 'TableList',
   components: {
-    STable
+    STable,
+    Ellipsis
   },
   data () {
     return {
@@ -176,6 +177,10 @@ export default {
       form: this.$form.createForm(this),
       permissions: [],
       addOrModify: true,
+      state: state,
+      position: position,
+      columns: columns,
+      userModelTitle: '',
 
       // 高级搜索 展开/关闭
       advanced: false,
@@ -190,10 +195,26 @@ export default {
             return res.result
         })
       },
-      state: state,
-      position: position,
-      columns: columns,
-      userModelTitle: ''
+      paginationOpt: {
+        defaultCurrent: 1, // 默认当前页数
+        defaultPageSize: 10, // 默认当前页显示数据的大小
+        total: 0, // 总数，必须先有
+        showSizeChanger: true,
+        showQuickJumper: true,
+        pageSizeOptions: ['10', '20', '30', '50'],
+        showTotal: (total) => `共 ${total} 条`, // 显示总数
+        onShowSizeChange: (current, pageSize) => {
+          this.paginationOpt.defaultCurrent = 1
+          this.paginationOpt.defaultPageSize = pageSize
+          this.$refs.table.refresh(true)
+        },
+        // 改变每页数量时更新显示
+        onChange: (current, size) => {
+          this.paginationOpt.defaultCurrent = current
+          this.paginationOpt.defaultPageSize = size
+          this.$refs.table.refresh(true)
+        }
+      }
     }
   },
   filters: {
@@ -211,9 +232,16 @@ export default {
       this.visible = true
       this.userModelTitle = this.$t('menu.user.manager.new.createUser')
     },
+    startQuery () {
+      this.$store.commit('SET_CUR_PAGE_NO', 0)
+      this.$store.commit('SET_CUR_PAGE_SIZE', 10)
+      this.$refs.table.refresh(true)
+    },
     resetQuery () {
-        this.queryParam = {}
-        this.$refs.table.refresh(true)
+      this.$store.commit('SET_CUR_PAGE_NO', 0)
+      this.$store.commit('SET_CUR_PAGE_SIZE', 10)
+      this.queryParam = {}
+      this.$refs.table.refresh(true)
     },
     handleEdit (record) {
       this.addOrModify = false

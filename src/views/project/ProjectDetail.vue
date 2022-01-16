@@ -12,6 +12,9 @@
         <a-descriptions-item :label="$t('menu.project.detail.repairShop')">{{ $t(projectRepairPlan(detailData.repair_plan)) }}</a-descriptions-item>
         <a-descriptions-item :label="$t('menu.project.detail.repairNumber')">{{ detailData.number }}</a-descriptions-item>
         <a-descriptions-item :label="$t('menu.project.detail.projectOwner')">{{ detailData.create_user_name }}</a-descriptions-item>
+        <a-descriptions-item :label="$t('menu.project.principal1')">{{ detailData.principal1 }}</a-descriptions-item>
+        <a-descriptions-item :label="$t('menu.project.principal2')">{{ detailData.principal2 }}</a-descriptions-item>
+        <a-descriptions-item :label="$t('menu.project.principal3')">{{ detailData.principal3 }}</a-descriptions-item>
       </a-descriptions>
       <a-divider style="margin-bottom: 32px"/>
       <a-descriptions :title="$t('menu.project.detail.contractInfo')">
@@ -23,13 +26,15 @@
       </a-descriptions>
     </a-card>
     <br>
-    <a-button type="primary" @click="cancelDetail">{{ $t('app.button.cancel') }}</a-button>
+    <div style="float: right">
+      <a-button type="primary" @click="cancelDetail">{{ $t('app.button.cancel') }}</a-button>
+    </div>
   </page-header-wrapper>
 </template>
 
 <script>
 import moment from 'moment'
-import { formatTotal } from '@/api/project'
+import { formatTotal, projectState, projectRepairPlan } from '@/api/project'
 
 export default {
   data () {
@@ -43,38 +48,23 @@ export default {
     }
   },
   methods: {
+    projectState,
+    projectRepairPlan,
     cancelDetail () {
-        this.$router.push({ path: '/project/project-list' })
+        // this.$router.push({ path: '/project/project-list' })
+        this.$router.back(-1)
     },
     formatDate (val) {
-      if (val === undefined || val.length <= 0) {
+      if (val === undefined || val.length <= 0 || val.indexOf('1970-') >= 0) {
         return ''
       }
       return moment(val).format('YYYY-MM-DD HH:mm:ss')
     },
     formatExDate (val) {
-      if (val === undefined || val.length <= 0) {
+      if (val === undefined || val.length <= 0 || val.indexOf('1970-') >= 0) {
         return ''
       }
       return moment(val).format('YYYY-MM-DD')
-    },
-    projectState (val) {
-        switch (val) {
-            case '1':
-                return 'menu.project.view.query.projectState.item1'
-            case '2':
-                return 'menu.project.view.query.projectState.item2'
-            case '3':
-                return 'menu.project.view.query.projectState.item3'
-        }
-    },
-    projectRepairPlan (val) {
-        switch (val) {
-            case '1':
-                return 'menu.project.detail.repairShop.item1'
-            case '2':
-                return 'menu.project.detail.repairShop.item2'
-        }
     },
     formatContractTotal (val) {
       return formatTotal(val)

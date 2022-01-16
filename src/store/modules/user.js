@@ -14,7 +14,11 @@ const user = {
     workOrderType: '',
     detailData: {},
     curPageNo: '',
-    curPageSize: ''
+    curPageSize: '',
+    parentPageNo: '',
+    parentPageSize: '',
+    valveSerial: '',
+    savePropmt: ''
   },
 
   mutations: {
@@ -45,6 +49,18 @@ const user = {
     },
     SET_CUR_PAGE_SIZE: (state, data) => {
       state.curPageSize = data
+    },
+    PARENT_PAGE_NO: (state, data) => {
+      state.parentPageNo = data
+    },
+    PARENT_PAGE_SIZE: (state, data) => {
+      state.parentPageSize = data
+    },
+    VALVE_SERIAL: (state, data) => {
+      state.valveSerial = data
+    },
+    SAVE_PROMPT: (state, data) => {
+      state.savePropmt = data
     }
   },
 
@@ -59,6 +75,8 @@ const user = {
           commit('SET_TOKEN', result.token)
           commit('SET_WORK_ORDER_TYPE', userInfo.workOrderType)
           resolve()
+          // 关闭浏览器或退出登录 ‘ISlogin’ 会失效
+          window.sessionStorage['ISlogin'] = true
         }).catch(error => {
           reject(error)
         })
@@ -108,6 +126,7 @@ const user = {
           commit('SET_ROLES', [])
           commit('SET_WORK_ORDER_TYPE', '')
           storage.remove(ACCESS_TOKEN)
+          window.sessionStorage.removeItem('ISlogin')
         })
       })
     }

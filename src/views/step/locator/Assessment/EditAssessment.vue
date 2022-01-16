@@ -1,19 +1,23 @@
 <template>
   <page-header-wrapper>
+    <template slot="extra">
+      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+        不适用
+      </a-checkbox>
+    </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
       <a-card title="评估内容">
         <!-- 结论 -->
         <a-form-item label="评估内容">
-          <a-textarea :rows="5" v-decorator="['localtor_assessment_content',{rules: []}]" />
+          <a-textarea :disabled="not_applicable" :rows="5" v-decorator="['localtor_assessment_content',{rules: []}]" />
         </a-form-item>
       </a-card>
 
       <br>
-
       <a-card title="结论">
         <!-- 结论 -->
         <a-form-item label="结论">
-          <a-textarea :rows="5" v-decorator="['localtor_assessment_conclusion',{rules: []}]" />
+          <a-textarea :disabled="not_applicable" :rows="5" v-decorator="['localtor_assessment_conclusion',{rules: []}]" />
         </a-form-item>
       </a-card>
 
@@ -40,6 +44,7 @@
           >
             <template v-for="(col, i) in ['purchased_part_no', 'purchased_part_key_number', 'purchased_part_number', 'purchased_part_name', 'purchased_part_qty', 'purchased_part_memo']" :slot="col" slot-scope="text, record">
               <a-input
+                :disabled="not_applicable"
                 :key="col"
                 v-if="record.editable"
                 style="margin: -5px 0"
@@ -57,39 +62,39 @@
             <template slot="operation" slot-scope="text, record">
               <template v-if="record.editable">
                 <span v-if="record.isNew">
-                  <a @click="saveRow(record)">添加</a>
+                  <a :disabled="not_applicable" @click="saveRow(record)">添加</a>
                   <a-divider type="vertical" />
                   <a-popconfirm title="是否要删除此行？" @confirm="removeRow(record.key)">
-                    <a>删除</a>
+                    <a :disabled="not_applicable">删除</a>
                   </a-popconfirm>
                 </span>
                 <span v-else>
-                  <a @click="saveRow(record)">保存</a>
+                  <a :disabled="not_applicable" @click="saveRow(record)">保存</a>
                   <a-divider type="vertical" />
-                  <a @click="cancel(record.key)">取消</a>
+                  <a :disabled="not_applicable" @click="cancel(record.key)">取消</a>
                 </span>
               </template>
               <span v-else>
                 <a-popconfirm title="是否要删除此行？" @confirm="removeRow(record.key)">
-                  <a>删除</a>
+                  <a :disabled="not_applicable">删除</a>
                 </a-popconfirm>
               </span>
             </template>
           </a-table>
           <a-row>
-            <a-col :span="24"><a-button style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus" @click="newPartMember">新增部件</a-button></a-col>
+            <a-col :span="24"><a-button :disabled="not_applicable" style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus" @click="newPartMember">新增部件</a-button></a-col>
           </a-row>
         </a-row>
       </a-card>
 
       <br>
-
       <!-- 工时 -->
       <a-card title="工时" :headStyle="{fontWeight:'bold'}" >
         <a-row :gutter="16">
           <a-col :span="8">
             <a-form-item label="工时(min)">
               <a-input-number
+                :disabled="not_applicable"
                 style="width:100%;"
                 :min="0"
                 v-decorator="[
@@ -102,11 +107,10 @@
       </a-card>
 
       <br>
-
       <!-- 检测\维修 -->
       <a-card title="检测\维修" :headStyle="{fontWeight:'bold'}" >
         <a-form-item label="检测\维修">
-          <a-radio-group v-decorator="['localtor_repair_or_test', {rules: [{ required: true, message: '请选择定位器流程‘检测’或‘维修’'}]}]">
+          <a-radio-group :disabled="not_applicable" v-decorator="['localtor_repair_or_test', {rules: [{ required: true, message: '请选择定位器流程‘检测’或‘维修’'}]}]">
             <a-radio :value="1">
               检测
             </a-radio>
@@ -121,7 +125,7 @@
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
         <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
-        <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
+        <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
     </a-form>
@@ -130,11 +134,11 @@
 
     <!-- 文件上传 -->
     <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <UploadImg ref="uploadImg" :QueueType="3" :isMobile="isMobile" />
+      <UploadImg :disableAll="not_applicable" ref="uploadImg" :queueType="'3'" :isMobile="isMobile" />
     </a-card>
 
     <!-- 工单详细 -->
-    <stepAllDetailModel ref="stepAllDetailModel" />
+    <stepAllDetailModel ref="stepAllDetailModel" :currenStep="currentStep" :flowId="flowID" />
   </page-header-wrapper>
 </template>
 
@@ -165,7 +169,8 @@ export default {
         isNew: true,
         dataPurchased: [],
         columnsPurchased: getColumnsPurchased(),
-        memberLoading: false
+        memberLoading: false,
+        not_applicable: false
       }
     },
     methods: {
@@ -178,16 +183,10 @@ export default {
             values.save_user_id = this.$store.state.user.info.id
             values.uploads = this.$refs.uploadImg.imgFileList
             values.purchased_parts = this.dataPurchased
+            values.not_applicable = this.not_applicable
 
             saveStepPublic(values).then(res => {
-              // 清空数据
-              this.$store.commit('SET_STEP_EDIT_DATA', null)
-              // 刷新表格
-              this.$router.push({ path: '/step/steplist' })
               this.$message.info('保存成功')
-
-              // 重置表单数据
-              this.form.resetFields()
             })
           }
         })
@@ -247,6 +246,9 @@ export default {
       removeRow (key) {
         const newData = this.dataPurchased.filter(item => item.key !== key)
         this.dataPurchased = newData
+      },
+      naChange (e) {
+        this.not_applicable = e.target.checked
       }
     },
     mounted () {
@@ -262,17 +264,18 @@ export default {
         if (assessmentData.uploads) {
             this.$refs.uploadImg.imgFileList = assessmentData.uploads
         }
+        this.not_applicable = assessmentData.not_applicable
         if (assessmentData.purchased_parts) {
-            // 没有建议更换零件清单时加载(start) 步骤清单内容
-            if (assessmentData.purchased_parts.length === 0) {
-                queryStepDataOnlyread({ id: this.flowID, current_step: '(start)' }).then(res => {
-                    if (res.result.step_data && res.result.step_data.length > 0) {
-                        const tmpData = JSON.parse(res.result.step_data[0].JSON)
-                        this.dataPurchased = tmpData.valve_purchased_parts
-                    }
-                })
-            }
-            this.dataPurchased = assessmentData.purchased_parts
+          // 没有建议更换零件清单时加载(start) 步骤清单内容
+          if (assessmentData.purchased_parts.length === 0) {
+            queryStepDataOnlyread({ id: this.flowID, current_step: '(start)' }).then(res => {
+              if (res.result.step_data && res.result.step_data.length > 0) {
+                const tmpData = JSON.parse(res.result.step_data[0].JSON)
+                this.dataPurchased = tmpData.valve_purchased_parts
+              }
+            })
+          }
+          this.dataPurchased = assessmentData.purchased_parts
         }
       }
     }

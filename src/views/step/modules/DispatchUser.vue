@@ -2,7 +2,7 @@
   <div class="table-operator">
     <a-row class="form-row" :gutter="16">
       <a-col :lg="6" :md="12" :sm="24">
-        <a-select
+        <!-- <a-select
           show-search
           :default-active-first-option="false"
           :show-arrow="false"
@@ -15,10 +15,23 @@
           <a-select-option v-for="d in userData" :key="d.value">
             {{ d.text }}
           </a-select-option>
+        </a-select> -->
+        <a-select
+          :disabled="disableAll"
+          show-search
+          :default-active-first-option="false"
+          :filter-option="false"
+          :not-found-content="null"
+          @select="handleSelect"
+          style="width:100%;"
+        >
+          <a-select-option v-for="d in userList" :key="d.id" :value="d.id">
+            {{ d.user_name }}
+          </a-select-option>
         </a-select>
       </a-col>
       <a-col :lg="6" :md="12" :sm="24">
-        <a-button type="primary" icon="plus" @click="handleAdd">{{ $t('app.button.add') }}</a-button>
+        <a-button :disabled="disableAll" type="primary" icon="plus" @click="handleAdd">{{ $t('app.button.add') }}</a-button>
       </a-col>
     </a-row>
 
@@ -31,7 +44,7 @@
     >
       <span slot="action" slot-scope="text, record">
         <template>
-          <a @click="deleteStep(record)">{{ $t('menu.project.view.action.delete') }}</a>
+          <a :disabled="disableAll" @click="deleteStep(record)">{{ $t('menu.project.view.action.delete') }}</a>
         </template>
       </span>
       <template v-for="(item, index) in columns" :slot="item.slotName">
@@ -45,6 +58,7 @@
 <script>
 import { fetch } from '../../../utils/inputSearch'
 import { getStepUsers, addStepUsers, delStepUsers } from '@/api/step'
+import { getUserList } from '@/api/user'
 import { STable, Ellipsis } from '@/components'
 // import pick from 'lodash.pick'
 // import { fetch } from '../../../utils/inputSearch'
@@ -86,6 +100,14 @@ export default {
           type: String,
           default: '',
           required: true
+      },
+      flag: {
+          type: String,
+          default: ''
+      },
+      disableAll: {
+        type: Boolean,
+        default: false
       }
   },
   data () {
@@ -104,8 +126,12 @@ export default {
       userData: {},
       selectUserID: '',
       columns: columns,
+      userList: [],
       loadData: parameter => {
-        return getStepUsers({ flow_id: this.flowID, current_step: this.currentStep }).then(res => {
+        if (this.flowID === undefined || this.currentStep === undefined) {
+          return
+        }
+        return getStepUsers({ flow_id: this.flowID, current_step: this.currentStep, flag: this.flag }).then(res => {
             return res.result
         })
       }
@@ -120,12 +146,14 @@ export default {
         const addUser = {
             user_id: this.selectUserID,
             flow_id: this.flowID,
-            current_step: this.currentStep
+            current_step: this.currentStep,
+            flag: this.flag
         }
         if (this.selectUserID.length <= 0) {
           this.$message.info(this.$t('app.note.selectuser'))
           return
         }
+
         addStepUsers(addUser).then(res => {
           this.selectUserID = ''
             this.$refs.stepUserTable.refresh()
@@ -139,6 +167,11 @@ export default {
             this.$refs.stepUserTable.refresh()
         })
     }
+  },
+  mounted () {
+    getUserList({ pageSize: 99999999, pageNo: 1, position: '2' }).then(e => {
+      this.userList = e.result.data
+    })
   }
 }
 </script>

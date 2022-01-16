@@ -4,7 +4,7 @@
       <a-descriptions title="">
         <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
         <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
-        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+        <a-descriptions-item label="总工时">{{ stepData.work_time_all }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
     <br>
@@ -134,6 +134,18 @@
             </a-descriptions>
           </a-col>
         </a-row>
+      </a-card>
+
+      <br><br>
+      <a-card title="适用" :headStyle="{fontWeight:'bold'}">
+        <a-descriptions :column="4">
+          <a-descriptions-item label="不适用" v-if="adjustData.not_applicable">
+            是
+          </a-descriptions-item>
+          <a-descriptions-item label="不适用" v-if="!adjustData.not_applicable">
+            否
+          </a-descriptions-item>
+        </a-descriptions>
       </a-card>
     </template>
 
@@ -336,6 +348,7 @@ export default {
       this.$message.warning('当前流程没有保存数据')
       return
     }
+    this.stepData = this.$store.state.editStepData.stepEditData
     const flowId = this.$store.state.editStepData.stepEditData.flow_id
     this.adjustData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
     this.$refs.uploadImgRead.imgFileList = this.adjustData.uploads
@@ -380,7 +393,8 @@ export default {
         adjustMemo: '',
         valveControlModel: 0,
         stepUser: '',
-        stepDoneDate: ''
+        stepDoneDate: '',
+        stepData: {}
       }
     }
 }

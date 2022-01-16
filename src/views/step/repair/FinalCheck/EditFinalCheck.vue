@@ -1,11 +1,16 @@
 <template>
   <page-header-wrapper>
+    <template slot="extra">
+      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+        不适用
+      </a-checkbox>
+    </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
       <a-card title="最终检查" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-descriptions>
           <a-descriptions-item label="工作单号">{{ baseInfo.work_order_serial }}</a-descriptions-item>
           <a-descriptions-item label="维修合同号">{{ project.contract_serial }}</a-descriptions-item>
-          <a-descriptions-item label="日期">{{ moment(project.date).format('YYYY-MM-DD HH:mm:ss') }}</a-descriptions-item>
+          <a-descriptions-item label="工程日期">{{ moment(project.date).format('YYYY-MM-DD HH:mm:ss') }}</a-descriptions-item>
           <a-descriptions-item label="客户名称">{{ project.customer_name }}</a-descriptions-item>
           <a-descriptions-item label="位号">{{ baseInfo.tag }}</a-descriptions-item>
           <a-descriptions-item label="序列号">{{ valveInfo.valve_serial }}</a-descriptions-item>
@@ -22,7 +27,7 @@
               </a-col>
               <a-col :span="6">
                 <a-form-item>
-                  <a-radio-group v-decorator="[finalCheckFieldsA[index], { }]" :options="finalCheckOpt" />
+                  <a-radio-group :disabled="not_applicable" v-decorator="[finalCheckFieldsA[index], { }]" :options="finalCheckOpt" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -36,7 +41,7 @@
               </a-col>
               <a-col :span="6">
                 <a-form-item>
-                  <a-radio-group v-decorator="[finalCheckFieldsB[index], { }]" :options="finalCheckOpt" />
+                  <a-radio-group :disabled="not_applicable" v-decorator="[finalCheckFieldsB[index], { }]" :options="finalCheckOpt" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -50,7 +55,7 @@
               </a-col>
               <a-col :span="6">
                 <a-form-item>
-                  <a-radio-group v-decorator="[finalCheckFieldsC[index], { }]" :options="finalCheckOpt" />
+                  <a-radio-group :disabled="not_applicable" v-decorator="[finalCheckFieldsC[index], { }]" :options="finalCheckOpt" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -64,7 +69,7 @@
               </a-col>
               <a-col :span="6">
                 <a-form-item>
-                  <a-radio-group v-decorator="[finalCheckFieldsD[index], { }]" :options="finalCheckOpt" />
+                  <a-radio-group :disabled="not_applicable" v-decorator="[finalCheckFieldsD[index], { }]" :options="finalCheckOpt" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -78,7 +83,7 @@
               </a-col>
               <a-col :span="6">
                 <a-form-item>
-                  <a-radio-group v-decorator="[finalCheckFieldsE[index], { }]" :options="finalCheckOpt" />
+                  <a-radio-group :disabled="not_applicable" v-decorator="[finalCheckFieldsE[index], { }]" :options="finalCheckOpt" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -86,23 +91,54 @@
         </a-tabs>
       </a-card>
 
+      <br>
+      <a-card title="工时" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+        <a-row>
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item label="工时(min)">
+              <a-input-number
+                :disabled="not_applicable"
+                style="width:100%;"
+                :min="0"
+                v-decorator="[
+                  'work_time',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-card>
+      <br>
+
+      <!-- 备注 -->
+      <a-card>
+        <a-form-item label="建议">
+          <a-textarea
+            :disabled="not_applicable"
+            rows="6"
+            v-decorator="[
+              'finalcheck_content_text',
+              {rules: []}
+            ]" />
+        </a-form-item>
+      </a-card>
+      <br>
+
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
-        <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
-        <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
+        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >取消</a-button>
+        <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
     </a-form>
 
-    <br><br>
-
     <!-- 文件上传 -->
     <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <UploadImg ref="uploadImg" :QueueType="3" :isMobile="isMobile" />
+      <UploadImg :disableAll="not_applicable" ref="uploadImg" :queueType="'3'" :isMobile="isMobile" />
     </a-card>
 
-    <stepAllDetailModel ref="stepAllDetailModel" />
+    <stepAllDetailModel ref="stepAllDetailModel" :currenStep="currentStep" :flowId="flowID" />
 
   </page-header-wrapper>
 </template>
@@ -139,22 +175,18 @@
             values.current_step = this.currentStep
             values.save_user_id = this.$store.state.user.info.id
             values.uploads = this.$refs.uploadImg.imgFileList
+            values.not_applicable = this.not_applicable
 
             saveFinalCheckData(values).then(res => {
-              // 清空数据
-              this.$store.commit('SET_STEP_EDIT_DATA', null)
-              // 刷新表格
-              this.$router.push({ path: '/step/steplist' })
               this.$message.info('保存成功')
-
-              // 重置表单数据
-              this.form.resetFields()
+              // eslint-disable-next-line no-undef
+              callFlutterBacktoList.postMessage('save_step_ok') // 告诉移动端vue页面本流程已经保存成功
             })
           }
         })
       },
       cancelSubmit () {
-        this.$router.push({ path: '/step/steplist' })
+        this.$router.back(-1)
       },
       handleStepDetail () {
         this.$refs.stepAllDetailModel.showSetpDetailData(this.flowID, this.currentStep)
@@ -174,6 +206,18 @@
             })
           }
         })
+      },
+      refreshUploads () {
+        queryStepData({ id: this.flowID, current_step: this.currentStep }).then(res => {
+          if (res.result.step_data && res.result.step_data.length > 0) {
+            const tmpData = JSON.parse(res.result.step_data[0].JSON)
+            this.$refs.uploadImg.imgFileList = tmpData.uploads
+            this.$message.info('上传照片成功')
+          }
+        })
+      },
+      naChange (e) {
+        this.not_applicable = e.target.checked
       }
     },
     mounted () {
@@ -182,9 +226,14 @@
       this.finalCheckFieldsC.forEach(v => this.form.getFieldDecorator(v))
       this.finalCheckFieldsD.forEach(v => this.form.getFieldDecorator(v))
       this.finalCheckFieldsE.forEach(v => this.form.getFieldDecorator(v))
+      var tmpFields = []
+      tmpFields.push('not_applicable', 'work_time')
+      tmpFields.forEach(v => this.form.getFieldDecorator(v))
       const editData = this.$store.state.editStepData.stepEditData
       this.flowID = editData.flow_id
       this.currentStep = editData.current_step
+      // 供flutter刷新上传文件列表
+      window.refreshUploads = this.refreshUploads
 
       queryStepData({ id: editData.flow_id, current_step: '(start)' }).then(res => {
         // 找到 baseInfo
@@ -208,7 +257,9 @@
           this.form.setFieldsValue(pick(installIAData, this.finalCheckFieldsC))
           this.form.setFieldsValue(pick(installIAData, this.finalCheckFieldsD))
           this.form.setFieldsValue(pick(installIAData, this.finalCheckFieldsE))
+          this.form.setFieldsValue(pick(installIAData, ['not_applicable', 'work_time']))
           this.$refs.uploadImg.imgFileList = installIAData.uploads
+          this.not_applicable = installIAData.not_applicable
         })
       }
     },
@@ -235,7 +286,8 @@
         finalCheckFieldsLabelD: getFinalCheckFieldsLabelD(),
         finalCheckFieldsD: getFinalCheckFieldsD(),
         finalCheckFieldsLabelE: getFinalCheckFieldsLabelE(),
-        finalCheckFieldsE: getFinalCheckFieldsE()
+        finalCheckFieldsE: getFinalCheckFieldsE(),
+        not_applicable: false
       }
     }
   }

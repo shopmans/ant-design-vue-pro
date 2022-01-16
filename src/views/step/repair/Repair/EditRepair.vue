@@ -1,9 +1,20 @@
 <template>
   <page-header-wrapper>
+    <template slot="extra">
+      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+        不适用
+      </a-checkbox>
+    </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
-      <a-tabs default-active-key="1">
+      <a-tabs default-active-key="1" @change="tabChange">
+        <!-- 阀维修内容 -->
         <a-tab-pane key="1" v-if="showValveForm" tab="阀维修内容" :forceRender="true">
           <a-card>
+            <template slot="extra">
+              <a-checkbox v-model="disableAll_1" @change="valveNa">
+                不适用
+              </a-checkbox>
+            </template>
             <template v-for="(field,fieldIndex) in ValveRepairFields">
               <!-- 首先确定是否有值 -->
               <template v-if="assessmentData[field.state + '_state']">
@@ -19,11 +30,11 @@
                 <template v-if="!assessmentData[field.state + '_repair']">
                   没有维修动作
                 </template>
-                <a-row :gutter="16" :key="assessmentData[field] + 'repair_content' + fieldIndex">
-                  <template v-for="(check,index) in repairCheckFields">
+                <a-row :gutter="8" :key="assessmentData[field] + 'repair_content' + fieldIndex">
+                  <template v-for="(check,index) in getValveRepairCheckList(field)">
                     <!-- 首先判断repair值是否存在 -->
                     <template v-if="assessmentData[field.state + '_repair'] && assessmentData[field.state + '_repair'].indexOf(check.value) >= 0">
-                      <a-col class="gutter-row" :span="2" :key="assessmentData[field] + '_repair' + index">
+                      <a-col class="gutter-row" :span="4" :key="assessmentData[field] + '_repair' + index">
                         <!-- 维修内容标签  -->
                         <a-row :gutter="16">
                           <a-col class="gutter-row">
@@ -36,6 +47,7 @@
                             <a-form-item>
                               <a-select
                                 label-in-value
+                                :disabled="disableAll_1"
                                 :default-active-first-option="false"
                                 :show-arrow="false"
                                 :filter-option="false"
@@ -57,7 +69,7 @@
                         <!-- 工时 -->
                         <a-row :gutter="16">
                           <a-col class="gutter-row">
-                            <a-form-item><a-input-number :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
+                            <a-form-item><a-input-number :disabled="disableAll_1" :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
                           </a-col>
                         </a-row>
                       </a-col>
@@ -66,17 +78,27 @@
                 </a-row>
                 <!-- 备注 -->
                 <a-row :gutter="16" :key="assessmentData[field.state + '_state_memo']">
-                  <a-col class="gutter-row">
+                  <a-col :span="4" class="gutter-row">
                     <span v-if="assessmentData[field.state + '_memo']">{{ '备注: ' + assessmentData[field.state + '_memo'] }}</span>
                   </a-col>
                 </a-row>
               </template>
             </template>
+            <!-- 文件上传 -->
+            <br>
+            <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+              <uploadImg ref="uploadImg1" :disableAll="disableAll_1" :isMobile="isMobile" :queueType="'3'" :flag="'1'" />
+            </a-card>
           </a-card>
         </a-tab-pane>
-
+        <!-- 执行机构维修内容 -->
         <a-tab-pane key="2" v-if="showActuatorForm" tab="执行机构维修内容" :forceRender="true">
           <a-card>
+            <template slot="extra">
+              <a-checkbox v-model="disableAll_2" @change="actuatorNa">
+                不适用
+              </a-checkbox>
+            </template>
             <template v-for="(field,fieldIndex) in ActuatorRepairFields">
               <!-- 首先确定是否有值 -->
               <template v-if="assessmentData[field.state + '_state']">
@@ -92,11 +114,11 @@
                 <template v-if="!assessmentData[field.state + '_repair']">
                   没有维修动作
                 </template>
-                <a-row :gutter="16" :key="assessmentData[field] + 'repair_content' + fieldIndex">
-                  <template v-for="(check,index) in repairCheckFields">
+                <a-row :gutter="8" :key="assessmentData[field] + 'repair_content' + fieldIndex">
+                  <template v-for="(check,index) in getActuatorRepairCheckList(field)">
                     <!-- 首先判断repair值是否存在 -->
                     <template v-if="assessmentData[field.state + '_repair'] && assessmentData[field.state + '_repair'].indexOf(check.value) >= 0">
-                      <a-col class="gutter-row" :span="2" :key="assessmentData[field] + '_repair' + index">
+                      <a-col class="gutter-row" :span="4" :key="assessmentData[field] + '_repair' + index">
                         <!-- 维修内容标签  -->
                         <a-row :gutter="16">
                           <a-col class="gutter-row">
@@ -108,6 +130,7 @@
                           <a-col class="gutter-row">
                             <a-form-item>
                               <a-select
+                                :disabled="disableAll_2"
                                 label-in-value
                                 :default-active-first-option="false"
                                 :show-arrow="false"
@@ -130,7 +153,7 @@
                         <!-- 工时 -->
                         <a-row :gutter="16">
                           <a-col class="gutter-row">
-                            <a-form-item><a-input-number :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
+                            <a-form-item><a-input-number :disabled="disableAll_2" :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
                           </a-col>
                         </a-row>
                       </a-col>
@@ -145,11 +168,21 @@
                 </a-row>
               </template>
             </template>
+            <!-- 文件上传 -->
+            <br>
+            <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+              <uploadImg ref="uploadImg2" :disableAll="disableAll_2" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+            </a-card>
           </a-card>
         </a-tab-pane>
-
+        <!-- 附件维修内容 -->
         <a-tab-pane key="3" v-if="showSlaveForm" tab="附件维修内容" :forceRender="true">
           <a-card>
+            <template slot="extra">
+              <a-checkbox v-model="disableAll_3" @change="accessoryNa">
+                不适用
+              </a-checkbox>
+            </template>
             <template v-for="(field,fieldIndex) in AccessariesRepairFields">
               <!-- 首先确定是否有值 -->
               <template v-if="assessmentData[field.state + '_state']">
@@ -165,11 +198,11 @@
                 <template v-if="!assessmentData[field.state + '_repair']">
                   没有维修动作
                 </template>
-                <a-row :gutter="16" :key="assessmentData[field] + 'repair_content' + fieldIndex">
-                  <template v-for="(check,index) in repairCheckFields">
+                <a-row :gutter="8" :key="assessmentData[field] + 'repair_content' + fieldIndex">
+                  <template v-for="(check,index) in getOtherRepairCheckList(field)">
                     <!-- 首先判断repair值是否存在 -->
                     <template v-if="assessmentData[field.state + '_repair'] && assessmentData[field.state + '_repair'].indexOf(check.value) >= 0">
-                      <a-col class="gutter-row" :span="2" :key="assessmentData[field] + '_repair' + index">
+                      <a-col class="gutter-row" :span="4" :key="assessmentData[field] + '_repair' + index">
                         <!-- 维修内容标签  -->
                         <a-row :gutter="16">
                           <a-col class="gutter-row">
@@ -181,6 +214,7 @@
                           <a-col class="gutter-row">
                             <a-form-item>
                               <a-select
+                                :disabled="disableAll_3"
                                 show-search
                                 label-in-value
                                 :default-active-first-option="false"
@@ -205,7 +239,7 @@
                         <!-- 工时 -->
                         <a-row :gutter="16">
                           <a-col class="gutter-row">
-                            <a-form-item><a-input-number :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
+                            <a-form-item><a-input-number :disabled="disableAll_3" :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
                           </a-col>
                         </a-row>
                       </a-col>
@@ -220,12 +254,16 @@
                 </a-row>
               </template>
             </template>
+            <!-- 文件上传 -->
+            <br>
+            <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+              <uploadImg ref="uploadImg3" :disableAll="disableAll_3" :isMobile="isMobile" :queueType="'3'" :flag="'3'" />
+            </a-card>
           </a-card>
         </a-tab-pane>
       </a-tabs>
 
-      <br><br>
-
+      <br>
       <!-- 更换零部件清单 -->
       <a-card title="更换零部件清单" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-row class="form-row" :gutter="16">
@@ -253,37 +291,42 @@
             <template slot="operation" slot-scope="record">
               <template v-if="record.editable">
                 <span v-if="record.isNew">
-                  <a @click="saveRow(record)">添加</a>
+                  <a :disabled="not_applicable" @click="saveRow(record)">添加</a>
                   <a-divider type="vertical" />
                   <a-popconfirm title="是否要删除此行？" @confirm="removeRow(record.key)">
-                    <a>删除</a>
+                    <a :disabled="not_applicable">删除</a>
                   </a-popconfirm>
                 </span>
                 <span v-else>
-                  <a @click="saveRow(record)">保存</a>
-                  <a-divider type="vertical" />
-                  <a @click="cancel(record.key)">取消</a>
+                  <a :disabled="not_applicable" @click="saveRow(record)">保存</a>
                 </span>
               </template>
               <span v-else>
                 <a-popconfirm title="是否要删除此行？" @confirm="removeRow(record.key)">
-                  <a>删除</a>
+                  <a :disabled="not_applicable">删除</a>
                 </a-popconfirm>
+                <a-divider type="vertical" />
+                <a :disabled="not_applicable" @click="editRow(record)">编辑</a>
               </span>
             </template>
           </a-table>
           <a-row>
-            <a-col :span="12"><a-button style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus" @click="newPartMember">新增部件</a-button></a-col>
-            <a-col :span="12"><div class="upload-no-inline-block"><a-upload accept=".xls,.xlsx" :before-upload="importExcel" :show-upload-list="false" className=".ant-upload.ant-upload-select"><a-button style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus">Excel导入</a-button></a-upload></div></a-col>
+            <a-col :span="12"><a-button :disabled="not_applicable" style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus" @click="newPartMember">新增部件</a-button></a-col>
+            <a-col :span="12"><div class="upload-no-inline-block"><a-upload :disabled="not_applicable" accept=".xls,.xlsx" :before-upload="importExcel" :show-upload-list="false" className=".ant-upload.ant-upload-select"><a-button :disabled="not_applicable" style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus">Excel导入</a-button></a-upload></div></a-col>
           </a-row>
         </a-row>
       </a-card>
+      <br>
 
-      <br><br>
+      <a-card title="派员" :headStyle="{fontWeight:'bold'}">
+        <DispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flowID" :currentStep="currentStep" />
+      </a-card>
+      <br>
 
       <a-card>
         <a-form-item label="维修内容及结论">
           <a-textarea
+            :disabled="not_applicable"
             rows="6"
             v-decorator="[
               'repair_content_text',
@@ -291,25 +334,29 @@
             ]" />
         </a-form-item>
       </a-card>
+      <br>
+
+      <!-- 检测\维修 -->
+      <a-card title="阀检测\维修" :headStyle="{fontWeight:'bold'}">
+        <a-form-item>
+          <a-radio-group :disabled="not_applicable" v-decorator="[ 'assessment_check_or_repair', {initialValue: 2, rules: [{ required: true, message: '请选择阀检测\\维修' }]} ]">
+            <a-radio :value="1">检测</a-radio>
+            <a-radio :value="2">维修</a-radio>
+          </a-radio-group>
+        </a-form-item>
+      </a-card>
 
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
-        <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
-        <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
+        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >取消</a-button>
+        <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
     </a-form>
 
-    <br><br>
-
-    <!-- 文件上传 -->
-    <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <UploadImg ref="uploadImg" :QueueType="3" :isMobile="isMobile" />
-    </a-card>
-
     <!-- 工单详细 -->
-    <stepAllDetailModel ref="stepAllDetailModel" />
+    <stepAllDetailModel ref="stepAllDetailModel" :currenStep="currentStep" :flowId="flowID" />
   </page-header-wrapper>
 </template>
 
@@ -318,15 +365,16 @@ import FooterToolBar from '@/components/FooterToolbar'
 import { baseMixin } from '@/store/app-mixin'
 import pick from 'lodash.pick'
 import stepDetail from '../../modules/StepBaseInfo'
-import UploadImg from '../../modules/UploadImg'
+import uploadImg from '../../modules/UploadImg'
 import { stepDone, queryStepData, getStepUsers, getColumnsPurchased } from '@/api/step'
-import { getValveASFields, getRepairCheckBoxOptions, getActuatorASFields, getAccessariesASFields } from '@/api/assessment'
+import { getValveASFields, getActuatorASFields, getAccessariesASFields, getValvaRepairCheckFields,
+getActuatorRepairCheckFields, getOtherRepairCheckFields } from '@/api/assessment'
 import { fetch } from '../../../../utils/inputSearch'
 import { saveRepairData } from '@/api/repair'
 import stepAllDetailModel from '../../modules/StepAllDetailModel'
-import { getSelectRepairData } from '@/api/preRepairTest'
 import XLSX from 'xlsx'
 import { randomNum } from '@/api/utils'
+import DispatchUser from '../../modules/DispatchUser'
 
 const repairFields = []
 
@@ -338,8 +386,9 @@ export default {
         baseMixin,
         pick,
         stepDetail,
-        UploadImg,
-        stepAllDetailModel
+        uploadImg,
+        stepAllDetailModel,
+        DispatchUser
     },
     methods: {
       handleSubmit (e) {
@@ -349,24 +398,43 @@ export default {
             values.flow_id = this.flowID
             values.current_step = this.currentStep
             values.save_user_id = this.$store.state.user.info.id
-            values.uploads = this.$refs.uploadImg.imgFileList
             values.purchased_parts = this.dataPurchased
+            values.not_applicable = this.not_applicable
+            values.valve_not_applicable = this.disableAll_1
+            values.actuator_not_applicable = this.disableAll_2
+            values.accessaries_not_applicable = this.disableAll_3
+
+            var tmpUpload = []
+            // 阀门拆解
+            if (this.$refs.uploadImg1) {
+              this.$refs.uploadImg1.imgFileList.forEach(e => {
+                tmpUpload.push(e)
+              })
+            }
+            // 执行机构拆解
+            if (this.$refs.uploadImg2) {
+              this.$refs.uploadImg2.imgFileList.forEach(e => {
+                tmpUpload.push(e)
+              })
+            }
+            // 附件折解
+            if (this.$refs.uploadImg3) {
+              this.$refs.uploadImg3.imgFileList.forEach(e => {
+                tmpUpload.push(e)
+              })
+            }
+            values.uploads = tmpUpload
 
             saveRepairData(values).then(res => {
-              // 清空数据
-              this.$store.commit('SET_STEP_EDIT_DATA', null)
-              // 刷新表格
-              this.$router.push({ path: '/step/steplist' })
               this.$message.info('保存成功')
-
-              // 重置表单数据
-              this.form.resetFields()
+              // eslint-disable-next-line no-undef
+              callFlutterBacktoList.postMessage('save_step_ok') // 告诉移动端vue页面本流程已经保存成功
             })
           }
         })
       },
       cancelSubmit () {
-        this.$router.push({ path: '/step/steplist' })
+        this.$router.back(-1)
       },
       handleStepDetail () {
         this.$refs.stepAllDetailModel.showSetpDetailData(this.flowID, this.currentStep)
@@ -438,23 +506,28 @@ export default {
         return true
       },
       validateFieldImpl (values, repairItem) {
-        // (维修内容：抛光，电镀，车修 。。。。)
-        for (let k = 0; k < this.repairCheckFields.length; k++) {
-          const valveCheckItem = this.repairCheckFields[k]
+        if (!values) { return false }
+        // 维修字段最多11个
+        for (var i = 1; i <= 11; i++) {
+          const userFieldName = 'repair_user_' + repairItem.state + '_' + i
+          const timeFieldName = 'repair_time_' + repairItem.state + '_' + i
+          const userFieldHas = values.hasOwnProperty(userFieldName)
+          const timeFieldHas = values.hasOwnProperty(timeFieldName)
+          if (userFieldName.indexOf('repair_user_break') >= 0 || userFieldName.indexOf('repair_time_break') >= 0) {
+            continue
+          }
 
-          // 判断是否存在需要检查的项
-          if (this.assessmentData[repairItem.state + '_repair'] && this.assessmentData[repairItem.state + '_repair'].indexOf(valveCheckItem.value) >= 0) {
-            // 开始检查内容是否已填写
-            // 1, 检查维修人员
-            const userFieldName = 'repair_user_' + repairItem.state + '_' + valveCheckItem.value
-            if (!values[userFieldName]) {
-              this.$message.error('(' + repairItem.title + ' -  ' + valveCheckItem.label + ') 人员字段未填写')
+          // 检查维修字段是否有值
+          if (userFieldHas) {
+            if (values[userFieldName] === null) {
+              this.$message.error('(' + repairItem.title + ') 存在人员字段未填写')
               return false
             }
-              // 2, 检查维修工时
-              const timeFieldName = 'repair_time_' + repairItem.state + '_' + valveCheckItem.value
-              if (!values[timeFieldName]) {
-              this.$message.error('(' + repairItem.title + ' -  ' + valveCheckItem.label + ') 工时字段未填写')
+          }
+
+          if (timeFieldHas) {
+            if (values[timeFieldName] === null) {
+              this.$message.error('(' + repairItem.title + ') 存在工时字段未填写')
               return false
             }
           }
@@ -471,14 +544,28 @@ export default {
         }
       },
       saveRow (record) {
+        const editData = [...this.dataPurchased]
         const { key } = record
-        const target = this.dataPurchased.find(item => item.key === key)
-        target.editable = false
-        target.isNew = false
+        const target = editData.find(item => item.key === key)
+        if (target) {
+          target.editable = false
+          target.isNew = false
+          this.dataPurchased = editData
+        }
       },
       removeRow (key) {
         const newData = this.dataPurchased.filter(item => item.key !== key)
         this.dataPurchased = newData
+      },
+      editRow (record) {
+        const editData = [...this.dataPurchased]
+        const { key } = record
+        const target = editData.find(item => item.key === key)
+        if (target) {
+          target.editable = true
+          target.isNew = false
+          this.dataPurchased = editData
+        }
       },
       newPartMember () {
         const length = this.dataPurchased.length
@@ -601,121 +688,239 @@ export default {
             }
           }
           fileReader.readAsBinaryString(file)
+      },
+      refreshUploads () {
+        queryStepData({ id: this.flowID, current_step: this.currentStep }).then(res => {
+          if (res.result.step_data && res.result.step_data.length > 0) {
+            const tmpData = JSON.parse(res.result.step_data[0].JSON)
+            this.refreshImageList(tmpData.uploads)
+            this.$message.info('上传照片成功')
+          }
+        })
+      },
+      getCurrentImgFlag () {
+        return this.currentImgFlag
+      },
+      naChange (e) {
+        this.not_applicable = e.target.checked
+        if (this.not_applicable) {
+          this.disableAll_1 = true
+          this.disableAll_2 = true
+          this.disableAll_3 = true
+        } else {
+          this.disableAll_1 = false
+          this.disableAll_2 = false
+          this.disableAll_3 = false
+        }
+      },
+      tabChange (activeKey) {
+        this.currentImgFlag = activeKey
+      },
+      valveNa (e) {
+        this.disableAll_1 = e.target.checked
+        this.checkDiskableAll()
+      },
+      actuatorNa (e) {
+        this.disableAll_2 = e.target.checked
+        this.data_teardown_actuator_not_applicable = true
+        this.checkDiskableAll()
+      },
+      accessoryNa (e) {
+        this.disableAll_3 = e.target.checked
+        this.data_teardown_accessory_not_applicable = true
+        this.checkDiskableAll()
+      },
+      checkDiskableAll () {
+        if (this.disableAll_1 && this.disableAll_2 && this.disableAll_3) {
+          this.not_applicable = true
+        } else {
+          this.not_applicable = false
+        }
+      },
+      refreshImageList (uploadFiles) {
+        var imgList1 = []
+        var imgList2 = []
+        var imgList3 = []
+        uploadFiles.forEach(e => {
+          if (e.flag === '1') {
+            imgList1.push(e)
+          }
+        })
+        uploadFiles.forEach(e => {
+          if (e.flag === '2') {
+            imgList2.push(e)
+          }
+        })
+        uploadFiles.forEach(e => {
+          if (e.flag === '3') {
+            imgList3.push(e)
+          }
+        })
+
+        setTimeout(() => {
+          repairFields.forEach(v => this.form.getFieldDecorator(v))
+          if (this.$refs.uploadImg1) {
+            this.$refs.uploadImg1.imgFileList = imgList1
+          }
+          if (this.$refs.uploadImg2) {
+            this.$refs.uploadImg2.imgFileList = imgList2
+          }
+          if (this.$refs.uploadImg3) {
+            this.$refs.uploadImg3.imgFileList = imgList3
+          }
+        }, 0)
+      },
+      getValveRepairCheckList (field) {
+        return getValvaRepairCheckFields(field.state)
+      },
+      getActuatorRepairCheckList (field) {
+        return getActuatorRepairCheckFields(field.state)
+      },
+      getOtherRepairCheckList (field) {
+        return getOtherRepairCheckFields(field.state)
       }
     },
-    async mounted () {
+    mounted () {
+      var tmpFields = []
+      tmpFields.push('not_applicable')
+      tmpFields.forEach(v => this.form.getFieldDecorator(v))
       // 生成维修字段数据
       repairFields.length = 0
       this.ValveRepairFields.forEach(e => {
-        this.repairCheckFields.forEach(k => {
-          repairFields.push('repair_user_' + e.state + '_' + k.value)
-          repairFields.push('repair_time_' + e.state + '_' + k.value)
-        })
+        for (var i = 1; i <= 11; i++) { // 维修动作最大到11
+          var user = 'repair_user_' + e.state + '_' + i
+          var time = 'repair_time_' + e.state + '_' + i
+          if (repairFields.indexOf(user) < 0) {
+            repairFields.push(user)
+          }
+          if (repairFields.indexOf(time) < 0) {
+            repairFields.push(time)
+          }
+        }
       })
       this.ActuatorRepairFields.forEach(e => {
-        this.repairCheckFields.forEach(k => {
-          repairFields.push('repair_user_' + e.state + '_' + k.value)
-          repairFields.push('repair_time_' + e.state + '_' + k.value)
-        })
+        for (var i = 1; i <= 11; i++) { // 维修动作最大到11
+          var user = 'repair_user_' + e.state + '_' + i
+          var time = 'repair_time_' + e.state + '_' + i
+          if (repairFields.indexOf(user) < 0) {
+            repairFields.push(user)
+          }
+          if (repairFields.indexOf(time) < 0) {
+            repairFields.push(time)
+          }
+        }
       })
       this.AccessariesRepairFields.forEach(e => {
-        this.repairCheckFields.forEach(k => {
-          repairFields.push('repair_user_' + e.state + '_' + k.value)
-          repairFields.push('repair_time_' + e.state + '_' + k.value)
-        })
+        for (var i = 1; i <= 11; i++) { // 维修动作最大到11
+          var user = 'repair_user_' + e.state + '_' + i
+          var time = 'repair_time_' + e.state + '_' + i
+          if (repairFields.indexOf(user) < 0) {
+            repairFields.push(user)
+          }
+          if (repairFields.indexOf(time) < 0) {
+            repairFields.push(time)
+          }
+        }
       })
       repairFields.push('repair_content_text')
 
       const editData = this.$store.state.editStepData.stepEditData
       this.flowID = editData.flow_id
       this.currentStep = editData.current_step
+      this.showDispatchUser = true
       let repairData = null
+      // 供flutter刷新上传文件列表
+      window.refreshUploads = this.refreshUploads
+      window.getCurrentImgFlag = this.getCurrentImgFlag
+
       if (editData.step_data.length > 0) {
         repairData = JSON.parse(editData.step_data[0].JSON)
       }
 
-      // 获取维修前测试中选中的维修项
-      getSelectRepairData({ FlowID: this.flowID }).then(res => {
-        // 阀门 "1"
-        // 执行机构 "2"
-        // 阀门+执行机构 "3"
-        // 阀门+执行机构+附件 "4"
-        // 零部件 "5"
-        // 执行机构+附件 "6"
-        switch (res.select_repair) { // 与 baseInfo 选择的维修部件下拉列表一致
-          case '1': { // 阀门维修
-            this.showValveForm = true
-            break
-          }
-          case '2': { // 执行机构维修
-            this.showActuatorForm = true
-            break
-          }
-          case '3': { // 阀门+执行机构
-            this.showValveForm = true
-            this.showActuatorForm = true
-            break
-          }
-          case '4': { // 阀门+执行机构+附件
-            this.showValveForm = true
-            this.showActuatorForm = true
-            this.showSlaveForm = true
-            break
-          }
-          case '6': { // 执行机构+附件
-            this.AccessoryTest = true
-            this.showActuatorForm = true
-            break
-          }
-        }
-      })
-
-      getStepUsers({ flow_id: this.flowID, current_step: this.currentStep }).then(res => {
-        if (res.result.data.length > 0) {
-          res.result.data.forEach(e => {
-            this.dispatchUserData.push({
-              key: e.user_id,
-              label: e.user_name
-            })
-          })
-        }
-      })
-
       // 查询出评估内容，没有评估内容的项则禁止输入
-      await queryStepData({ id: this.flowID, current_step: 'Assessment' }).then(res => {
+      queryStepData({ id: this.flowID, current_step: 'Assessment' }).then(res => {
         repairFields.forEach(v => this.form.getFieldDecorator(v))
         this.assessmentData = JSON.parse(res.result.step_data[0].JSON)
+        // 已经保存了更换零部件表单
+        if (!repairData || repairData.purchased_parts.length <= 0) {
+          this.dataPurchased = this.assessmentData.purchased_parts
+        } else {
+          this.dataPurchased = repairData.purchased_parts
+        }
 
         // 加载编辑数据
         if (repairData != null) {
           this.form.setFieldsValue(pick(repairData, repairFields))
-          this.$refs.uploadImg.imgFileList = repairData.uploads
+          this.not_applicable = repairData.not_applicable
         }
-      })
 
-      if (repairData.purchased_parts && repairData.purchased_parts.length > 0) {
-        this.dataPurchased = repairData.purchased_parts
-        return
-      }
-
-      queryStepData({ id: this.flowID, current_step: 'Receipt' }).then(res => {
-        const receiptData = JSON.parse(res.result.step_data[0].JSON)
-
+        // 引用评估内容的备注
+        if (repairData && repairData.repair_content_text) {
+          this.form.setFieldsValue(pick({ repair_content_text: this.assessmentData.assessment_content }, ['repair_content_text']))
+        }
+        // 获取维修前测试中选中的维修项
         queryStepData({ id: this.flowID, current_step: '(start)' }).then(res => {
-          res.result.step_data.forEach(e => {
-            // 查找 baseinfo
-            if (e.DataNum === 1) {
-              const baseInfoData = JSON.parse(e.JSON)
-              // 采购清单加checked属性
-              baseInfoData.valve_purchased_parts.forEach(v => {
-                receiptData.receipt_parts.forEach(k => {
-                  if (v.key === k.key && k.check) {
-                    this.dataPurchased.push(v)
-                  }
-                })
-              })
+          res.result.step_data.forEach(stepItem => {
+            switch (stepItem.DataNum) {
+              case 1: // 基本信息
+                this.baseInfo = JSON.parse(stepItem.JSON)
+                break
             }
           })
+          // 阀门 "1"
+          // 执行机构 "2"
+          // 阀门+执行机构 "3"
+          // 阀门+执行机构+附件 "4"
+          // 零部件 "5"
+          // 执行机构+附件 "6"
+          switch (this.baseInfo.repair_part) { // 与 baseInfo 选择的维修部件下拉列表一致
+            case '1': { // 阀门维修
+              this.showValveForm = true
+              break
+            }
+            case '2': { // 执行机构维修
+              this.showActuatorForm = true
+              break
+            }
+            case '3': { // 阀门+执行机构
+              this.showValveForm = true
+              this.showActuatorForm = true
+              break
+            }
+            case '4': { // 阀门+执行机构+附件
+              this.showValveForm = true
+              this.showActuatorForm = true
+              this.showSlaveForm = true
+              break
+            }
+            case '6': { // 执行机构+附件
+              this.AccessoryTest = true
+              this.showActuatorForm = true
+              break
+            }
+          }
+
+          if (repairData.valve_not_applicable) {
+            this.disableAll_1 = repairData.valve_not_applicable
+          }
+          if (repairData.actuator_not_applicable) {
+            this.disableAll_2 = repairData.actuator_not_applicable
+          }
+          if (repairData.accessaries_not_applicable) {
+            this.disableAll_3 = repairData.accessaries_not_applicable
+          }
+          this.refreshImageList(repairData.uploads)
+        })
+
+        getStepUsers({ flow_id: this.flowID, current_step: this.currentStep }).then(res => {
+          if (res.result.data.length > 0) {
+            res.result.data.forEach(e => {
+              this.dispatchUserData.push({
+                key: e.user_id,
+                label: e.user_name
+              })
+            })
+          }
         })
       })
     },
@@ -731,7 +936,6 @@ export default {
         ValveRepairFields: getValveASFields(),
         ActuatorRepairFields: getActuatorASFields(),
         AccessariesRepairFields: getAccessariesASFields(),
-        repairCheckFields: getRepairCheckBoxOptions(),
         assessmentData: {},
         userData: {},
         showValveForm: false,
@@ -739,7 +943,14 @@ export default {
         showSlaveForm: false,
         dispatchUserData: [],
         columnsPurchased: getColumnsPurchased(),
-        dataPurchased: []
+        dataPurchased: [],
+        showDispatchUser: false,
+        not_applicable: false,
+        baseInfo: {},
+        disableAll_1: false,
+        disableAll_2: false,
+        disableAll_3: false,
+        currentImgFlag: '1'
       }
     }
 }

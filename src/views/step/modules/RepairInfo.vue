@@ -4,7 +4,7 @@
       <a-descriptions title="">
         <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
         <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
-        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+        <a-descriptions-item label="总工时">{{ stepData.work_time_all }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
     <br>
@@ -115,7 +115,18 @@
       <a-textarea disabled rows="6" v-model="repairContentText" />
     </a-card>
 
-    <br><br>
+    <br>
+    <a-card title="适用" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="不适用" v-if="repairData.not_applicable">
+          是
+        </a-descriptions-item>
+        <a-descriptions-item label="不适用" v-if="!repairData.not_applicable">
+          否
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <!-- 上传图片 -->
     <a-card :bordered="false" title="上传图片">
       <UploadImgRead ref="uploadImgRead" />
@@ -139,9 +150,10 @@ export default {
       }
 
       let hasData = false
-      const repairData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
-      this.repairContentText = repairData.repair_content_text
-      this.purchasedParts = repairData.purchased_parts
+      this.stepData = this.$store.state.editStepData.stepEditData
+      this.repairData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
+      this.repairContentText = this.repairData.repair_content_text
+      this.purchasedParts = this.repairData.purchased_parts
       this.getPurchasedData()
       this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
       this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
@@ -149,16 +161,16 @@ export default {
       // 提取维修数据
       this.ValveRepairFields.forEach(e => {
         this.repairCheckFields.forEach(k => {
-          if (repairData['repair_user_' + e.state + '_' + k.value]) {
+          if (this.repairData['repair_user_' + e.state + '_' + k.value]) {
             const dataItem = {}
             dataItem.title = e.title
             dataItem.repairContent = k.label // 维修内容
-            dataItem.userName = repairData['repair_user_' + e.state + '_' + k.value].label // 维修人员
+            dataItem.userName = this.repairData['repair_user_' + e.state + '_' + k.value].label // 维修人员
             dataItem.workTime = ''
             dataItem.memo = ''
             dataItem.field = e.state
-            if (repairData['repair_time_' + e.state + '_' + k.value]) {
-              dataItem.workTime = repairData['repair_time_' + e.state + '_' + k.value]// 工时
+            if (this.repairData['repair_time_' + e.state + '_' + k.value]) {
+              dataItem.workTime = this.repairData['repair_time_' + e.state + '_' + k.value]// 工时
             }
 
             this.ValueRepairData.push(dataItem)
@@ -168,16 +180,16 @@ export default {
       })
       this.ActuatorRepairFields.forEach(e => {
         this.repairCheckFields.forEach(k => {
-          if (repairData['repair_user_' + e.state + '_' + k.value]) {
+          if (this.repairData['repair_user_' + e.state + '_' + k.value]) {
             const dataItem = {}
             dataItem.title = e.title
             dataItem.repairContent = k.label // 维修内容
-            dataItem.userName = repairData['repair_user_' + e.state + '_' + k.value].label // 维修人员
+            dataItem.userName = this.repairData['repair_user_' + e.state + '_' + k.value].label // 维修人员
             dataItem.workTime = ''
             dataItem.memo = ''
             dataItem.field = e.state
-            if (repairData['repair_time_' + e.state + '_' + k.value]) {
-              dataItem.workTime = repairData['repair_time_' + e.state + '_' + k.value]// 工时
+            if (this.repairData['repair_time_' + e.state + '_' + k.value]) {
+              dataItem.workTime = this.repairData['repair_time_' + e.state + '_' + k.value]// 工时
             }
 
             this.ActuatorRepairData.push(dataItem)
@@ -187,16 +199,16 @@ export default {
       })
       this.AccessariesRepairFields.forEach(e => {
         this.repairCheckFields.forEach(k => {
-          if (repairData['repair_user_' + e.state + '_' + k.value]) {
+          if (this.repairData['repair_user_' + e.state + '_' + k.value]) {
             const dataItem = {}
             dataItem.title = e.title
             dataItem.repairContent = k.label // 维修内容
-            dataItem.userName = repairData['repair_user_' + e.state + '_' + k.value].label // 维修人员
+            dataItem.userName = this.repairData['repair_user_' + e.state + '_' + k.value].label // 维修人员
             dataItem.workTime = ''
             dataItem.memo = ''
             dataItem.field = e.state
-            if (repairData['repair_time_' + e.state + '_' + k.value]) {
-              dataItem.workTime = repairData['repair_time_' + e.state + '_' + k.value]// 工时
+            if (this.repairData['repair_time_' + e.state + '_' + k.value]) {
+              dataItem.workTime = this.repairData['repair_time_' + e.state + '_' + k.value]// 工时
             }
 
             this.AccessariesRepairData.push(dataItem)
@@ -212,7 +224,7 @@ export default {
       }
 
       // 查询出评估内容，取评估备注信息
-      queryStepDataOnlyread({ id: repairData.flow_id, current_step: 'Assessment' }).then(res => {
+      queryStepDataOnlyread({ id: this.repairData.flow_id, current_step: 'Assessment' }).then(res => {
         const assessmentData = JSON.parse(res.result.step_data[0].JSON)
 
         this.ValueRepairData.forEach(e => {
@@ -234,7 +246,7 @@ export default {
       this.ValueRepairData = magrinValveRepairData(this.ValueRepairData)
       this.ActuatorRepairData = magrinValveRepairData(this.ActuatorRepairData)
       this.AccessariesRepairData = magrinValveRepairData(this.AccessariesRepairData)
-      this.$refs.uploadImgRead.imgFileList = repairData.uploads
+      this.$refs.uploadImgRead.imgFileList = this.repairData.uploads
     },
     data () {
       return {
@@ -248,7 +260,9 @@ export default {
         repairContentText: '',
         purchasedParts: [],
         stepUser: '',
-        stepDoneDate: ''
+        stepDoneDate: '',
+        repairData: {},
+        stepData: {}
       }
     },
     methods: {

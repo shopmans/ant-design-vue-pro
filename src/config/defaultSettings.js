@@ -23,7 +23,7 @@ export default {
   menu: {
     locale: true
   },
-  title: '赛来科技售后-维修服务管理系统',
+  title: '赛来公司-维修服务管理系统',
   siderText: '',
   pwa: false,
   iconfontUrl: '',

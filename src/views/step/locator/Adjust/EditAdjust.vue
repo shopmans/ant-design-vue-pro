@@ -1,5 +1,10 @@
 <template>
   <page-header-wrapper>
+    <template slot="extra">
+      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+        不适用
+      </a-checkbox>
+    </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
       <a-card title="输入信号">
         <!-- 输入信号 -->
@@ -11,6 +16,7 @@
           >
             <div :key="col">
               <a-input
+                :disabled="not_applicable"
                 v-if="record.editable"
                 style="margin: -5px 0"
                 :value="text"
@@ -24,10 +30,10 @@
           <template slot="operation" slot-scope="text, record">
             <div class="editable-row-operations">
               <span v-if="record.editable">
-                <a @click="() => saveInputSignal(record.key)">保存</a>
+                <a :disabled="not_applicable" @click="() => saveInputSignal(record.key)">保存</a>
               </span>
               <span v-else>
-                <a @click="() => editInputSignal(record.key)">编辑</a>
+                <a :disabled="not_applicable" @click="() => editInputSignal(record.key)">编辑</a>
               </span>
             </div>
           </template>
@@ -46,6 +52,7 @@
           >
             <div :key="col">
               <a-input
+                :disabled="not_applicable"
                 v-if="record.editable"
                 style="margin: -5px 0"
                 :value="text"
@@ -59,10 +66,10 @@
           <template slot="operation" slot-scope="text, record">
             <div class="editable-row-operations">
               <span v-if="record.editable">
-                <a @click="() => saveDeadBand(record.key)">保存</a>
+                <a :disabled="not_applicable" @click="() => saveDeadBand(record.key)">保存</a>
               </span>
               <span v-else>
-                <a @click="() => editDeadBand(record.key)">编辑</a>
+                <a :disabled="not_applicable" @click="() => editDeadBand(record.key)">编辑</a>
               </span>
             </div>
           </template>
@@ -71,13 +78,14 @@
           <a-col :span="6">
             <a-form-item label="全开到全关(s)">
               <a-input
+                :disabled="not_applicable"
                 style="width:200px;"
                 :min="0"
                 v-decorator="[
                   'localtor_adjust_deadband_open_to_close',
                   {rules: []}
                 ]">
-                <a-select v-decorator="[ 'localtor_adjust_deadband_open_to_close_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+                <a-select v-decorator="[ 'localtor_adjust_deadband_open_to_close_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                   <a-select-option value="1">
                     Min
                   </a-select-option>
@@ -91,13 +99,14 @@
           <a-col :span="6">
             <a-form-item label="全关到全开(s)">
               <a-input
+                :disabled="not_applicable"
                 style="width:200px;"
                 :min="0"
                 v-decorator="[
                   'localtor_adjust_deadband_close_to_open',
                   {rules: []}
                 ]">
-                <a-select v-decorator="[ 'localtor_adjust_deadband_close_to_open_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+                <a-select v-decorator="[ 'localtor_adjust_deadband_close_to_open_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                   <a-select-option value="1">
                     Min
                   </a-select-option>
@@ -111,6 +120,7 @@
           <a-col :span="6">
             <a-form-item label="线性">
               <a-input
+                :disabled="not_applicable"
                 style="width:200px;"
                 v-decorator="[
                   'localtor_adjust_deadband_linearity',
@@ -121,6 +131,7 @@
           <a-col :span="6">
             <a-form-item label="回差">
               <a-input
+                :disabled="not_applicable"
                 style="width:200px;"
                 v-decorator="[
                   'localtor_adjust_deadband_hysteresis',
@@ -136,18 +147,18 @@
       <a-card title="结论">
         <!-- 结论 -->
         <a-form-item label="结论">
-          <a-textarea :rows="5" v-decorator="['localtor_adjust_conclustion',{rules: []}]" />
+          <a-textarea :disabled="not_applicable" :rows="5" v-decorator="['localtor_adjust_conclustion',{rules: []}]" />
         </a-form-item>
       </a-card>
 
       <br>
-
       <!-- 工时 -->
       <a-card title="工时" :headStyle="{fontWeight:'bold'}" >
         <a-row :gutter="16">
           <a-col :span="8">
             <a-form-item label="工时(min)">
               <a-input-number
+                :disabled="not_applicable"
                 style="width:100%;"
                 :min="0"
                 v-decorator="[
@@ -165,7 +176,7 @@
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
         <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
-        <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
+        <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
     </a-form>
@@ -174,11 +185,11 @@
 
     <!-- 文件上传 -->
     <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <UploadImg ref="uploadImg" :QueueType="3" :isMobile="isMobile" />
+      <UploadImg :disableAll="not_applicable" ref="uploadImg" :queueType="'3'" :isMobile="isMobile" />
     </a-card>
 
     <!-- 工单详细 -->
-    <stepAllDetailModel ref="stepAllDetailModel" />
+    <stepAllDetailModel ref="stepAllDetailModel" :currenStep="currentStep" :flowId="flowID" />
   </page-header-wrapper>
 </template>
 
@@ -212,7 +223,8 @@ export default {
         inputSignalColumns: getInputSignalColumns(),
         inputSignalData: getInputSignalData(),
         deadBandColumns: getDeadBandColumns(),
-        deadBandData: getDeadBandData()
+        deadBandData: getDeadBandData(),
+        not_applicable: false
       }
     },
     methods: {
@@ -226,16 +238,10 @@ export default {
             values.uploads = this.$refs.uploadImg.imgFileList
             values.inputSignalData = this.inputSignalData
             values.deadBandData = this.deadBandData
+            values.not_applicable = this.not_applicable
 
             saveStepPublic(values).then(res => {
-              // 清空数据
-              this.$store.commit('SET_STEP_EDIT_DATA', null)
-              // 刷新表格
-              this.$router.push({ path: '/step/steplist' })
               this.$message.info('保存成功')
-
-              // 重置表单数据
-              this.form.resetFields()
             })
           }
         })
@@ -315,6 +321,9 @@ export default {
           target[column] = value
           this.deadBandData = newData
         }
+      },
+      naChange (e) {
+        this.not_applicable = e.target.checked
       }
     },
     mounted () {
@@ -335,6 +344,7 @@ export default {
         if (this.adjustData.deadBandData) {
             this.deadBandData = this.adjustData.deadBandData
         }
+        this.not_applicable = this.adjustData.not_applicable
       }
     }
 }

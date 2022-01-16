@@ -4,7 +4,7 @@
       <a-descriptions title="">
         <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
         <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
-        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+        <a-descriptions-item label="总工时">{{ stepData.work_time_all }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
     <br>
@@ -12,7 +12,7 @@
       <a-row :gutter="16">
         <a-col :span="9">
           <a-descriptions title="阀痤测试" :column="1">
-            <a-descriptions-item label="阀座泄漏测试标准">{{ getValveSeatLeakTestUnit(baseValveData.valve_seat_leak_test) }}</a-descriptions-item>
+            <a-descriptions-item label="泄漏测试标准">{{ baseValveData.valve_seat_leak_test }}</a-descriptions-item>
             <a-descriptions-item label="泄漏测试介质">{{ getValveTestMediumUnit(baseValveData.valve_leak_test_medium) }}</a-descriptions-item>
             <a-descriptions-item label="泄漏标准测试压力">{{ getValveHydrostaticTestValueUnitText(baseValveData.valve_leak_test_std_pressed, baseValveData.valve_leak_test_std_pressed_unit) }}</a-descriptions-item>
             <a-descriptions-item label="泄漏等级">
@@ -42,7 +42,7 @@
         </a-col>
         <a-col :span="9">
           <a-descriptions title="水压测试" :column="1">
-            <a-descriptions-item label="水压测试标准">{{ getValveTestStdUnit(baseValveData.valve_test_std) }}</a-descriptions-item>
+            <a-descriptions-item label="水压测试标准">{{ baseValveData.valve_test_std }}</a-descriptions-item>
             <a-descriptions-item label="水压测试介质">
               {{ getValveTestMediumUnit(baseValveData.valve_test_medium) }}
             </a-descriptions-item>
@@ -50,7 +50,7 @@
               {{ getValveHydrostaticTestValueUnitText(baseValveData.valve_hydrostatic_test_value, baseValveData.valve_hydrostatic_test_value_unit) }}
             </a-descriptions-item>
             <a-descriptions-item label="水压压力等级">
-              {{ getValveWaterPressureLevelUnit(baseValveData.valve_pressure_level) }}
+              {{ baseValveData.valve_pressure_level }}
             </a-descriptions-item>
             <a-descriptions-item label="水压测试时间">
               {{ baseValveData.valve_hydrostatic_test_time ? baseValveData.valve_hydrostatic_test_time + " " + getValveHydrostaticTestTimeUnit(baseValveData.valve_hydrostatic_test_time_unit) : "" }}
@@ -94,7 +94,7 @@
       </a-row>
       <br>
       <a-row :gutter="16">
-        <a-descriptions title="工时(分钟)">
+        <a-descriptions title="工时(min)">
           <a-descriptions-item>
             {{ leakPressureData.leak_pressure_test_total_minute }}
           </a-descriptions-item>
@@ -102,7 +102,18 @@
       </a-row>
     </a-card>
 
-    <br><br>
+    <br>
+    <a-card title="适用" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="不适用" v-if="leakPressureData.not_applicable">
+          是
+        </a-descriptions-item>
+        <a-descriptions-item label="不适用" v-if="!leakPressureData.not_applicable">
+          否
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
 
     <a-card :bordered="false" title="上传图片">
       <UploadImgRead ref="uploadImgRead" />
@@ -126,6 +137,7 @@ export default {
       this.$message.warning('当前流程没有保存数据')
       return
     }
+    this.stepData = this.$store.state.editStepData.stepEditData
     this.leakPressureData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
     this.$refs.uploadImgRead.imgFileList = this.leakPressureData.uploads
     this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
@@ -158,7 +170,8 @@ export default {
         baseValveData: {},
         leakPressureData: {},
         stepUser: '',
-        stepDoneDate: ''
+        stepDoneDate: '',
+        stepData: {}
       }
     }
 }

@@ -4,6 +4,7 @@
       <a-descriptions title="">
         <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
         <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="总工时">{{ finalCheckData.work_time }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
     <br>
@@ -63,7 +64,28 @@
       </template>
     </a-card>
 
-    <br><br>
+    <br>
+    <a-card title="工时" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="工时(min)">
+          {{ finalCheckData.work_time }}
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
+    <br>
+    <a-card title="适用" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="不适用" v-if="finalCheckData.not_applicable">
+          是
+        </a-descriptions-item>
+        <a-descriptions-item label="不适用" v-if="!finalCheckData.not_applicable">
+          否
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
+    <br>
 
     <a-card :bordered="false" title="上传图片">
       <UploadImgRead ref="uploadImgRead" />

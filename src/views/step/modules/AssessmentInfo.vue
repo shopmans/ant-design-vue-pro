@@ -4,6 +4,7 @@
       <a-descriptions title="">
         <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
         <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="总工时">{{ stepData.work_time_all }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
     <br>
@@ -11,12 +12,12 @@
       <a-tab-pane key="1" tab="阀门评估" :forceRender="true" v-if="ValveAS">
         <a-card>
           <a-row :gutter="16">
-            <a-col class="gutter-row" :span="4">
+            <a-col class="gutter-row" :span="6">
               <div class="gutter-box">
                 <a-divider>状态</a-divider>
               </div>
             </a-col>
-            <a-col class="gutter-row" :span="20">
+            <a-col class="gutter-row" :span="18">
               <div class="gutter-box">
                 <a-divider>维修动作</a-divider>
               </div>
@@ -29,25 +30,27 @@
             <template v-if="assessmentData[field.state + '_state']">
               <!-- 字段信息 -->
               <a-row :gutter="16" :key="assessmentData[field]">
-                {{ field.title }}
+                <a-col :span="6" :offset="1">
+                  {{ field.title }}
+                </a-col>
               </a-row>
               <a-row :gutter="16" :key="assessmentData[field]">
                 <!-- ####  状态列  #### -->
-                <a-col :span="4">
+                <a-col :span="6" :offset="1" >
                   <template>
-                    {{ getAssessmentUnit(assessmentData[field.state + '_state']) }}
+                    {{ getValvaAssessmentUnit(field.state, assessmentData[field.state + '_state']) }}
                   </template>
                 </a-col>
                 <!-- ####  评估列  #### -->
-                <a-col :span="14">
-                  <template v-for="check in repairCheckFields">
+                <a-col :span="9">
+                  <template v-for="check in getValvaRepairCheckFields(field.state)">
                     <!-- 首先判断repair值是否存在 -->
                     <template v-if="assessmentData[field.state + '_repair'] && assessmentData[field.state + '_repair'].indexOf(check.value) >= 0">
-                      <a-badge status="success" :key="check.label" style="margin-left:15px;" :offset="[-1,5]">{{ check.label }}</a-badge>
+                      <a-badge :key="check.label" style="margin-left:15px;" :offset="[-1,5]">{{ check.label }}</a-badge>
                     </template>
-                    <template v-else>
+                    <!-- <template v-else>
                       <a-badge :key="check.label" style="margin-left:15px;">{{ check.label }}</a-badge>
-                    </template>
+                    </template> -->
                   </template>
                 </a-col>
                 <!-- 备注列 -->
@@ -66,12 +69,12 @@
       <a-tab-pane key="2" tab="执行机构评估" :forceRender="true" v-if="ActuatorAS">
         <a-card>
           <a-row :gutter="16">
-            <a-col class="gutter-row" :span="4">
+            <a-col class="gutter-row" :span="6">
               <div class="gutter-box">
                 <a-divider>状态</a-divider>
               </div>
             </a-col>
-            <a-col class="gutter-row" :span="20">
+            <a-col class="gutter-row" :span="18">
               <div class="gutter-box">
                 <a-divider>维修动作</a-divider>
               </div>
@@ -83,25 +86,27 @@
             <template v-if="assessmentData[field.state + '_state']">
               <!-- 字段信息 -->
               <a-row :gutter="16" :key="assessmentData[field]">
-                {{ field.title }}
+                <a-col :span="6" :offset="1">
+                  {{ field.title }}
+                </a-col>
               </a-row>
               <a-row :gutter="16" :key="assessmentData[field]">
                 <!-- ####  状态列  #### -->
-                <a-col :span="4">
+                <a-col :span="6" :offset="1">
                   <template>
-                    {{ getAssessmentUnit(assessmentData[field.state + '_state']) }}
+                    {{ getActuatorAssessmentUnit(field.state, assessmentData[field.state + '_state']) }}
                   </template>
                 </a-col>
                 <!-- ####  评估列  #### -->
-                <a-col :span="14">
-                  <template v-for="check in repairCheckFields">
+                <a-col :span="9">
+                  <template v-for="check in getActuatorRepairCheckFields(field.state)">
                     <!-- 首先判断repair值是否存在 -->
                     <template v-if="assessmentData[field.state + '_repair'] && assessmentData[field.state + '_repair'].indexOf(check.value) >= 0">
-                      <a-badge status="success" :key="check.label" style="margin-left:15px;" :offset="[-1,5]">{{ check.label }}</a-badge>
+                      <a-badge :key="check.label" style="margin-left:15px;" :offset="[-1,5]">{{ check.label }}</a-badge>
                     </template>
-                    <template v-else>
+                    <!-- <template v-else>
                       <a-badge :key="check.label" style="margin-left:15px;">{{ check.label }}</a-badge>
-                    </template>
+                    </template> -->
                   </template>
                 </a-col>
                 <!-- 备注列 -->
@@ -117,15 +122,15 @@
       </a-tab-pane>
 
       <!-- ==========================================  附件评估 -->
-      <a-tab-pane key="3" tab="附件功能测试" :forceRender="true" v-if="AccessoryAS">
+      <a-tab-pane key="3" tab="附件评估" :forceRender="true" v-if="AccessoryAS">
         <a-card>
           <a-row :gutter="16">
-            <a-col class="gutter-row" :span="4">
+            <a-col class="gutter-row" :span="6">
               <div class="gutter-box">
                 <a-divider>状态</a-divider>
               </div>
             </a-col>
-            <a-col class="gutter-row" :span="20">
+            <a-col class="gutter-row" :span="18">
               <div class="gutter-box">
                 <a-divider>维修动作</a-divider>
               </div>
@@ -137,24 +142,23 @@
             <template v-if="assessmentData[field.state + '_state']">
               <!-- 字段信息 -->
               <a-row :gutter="16" :key="assessmentData[field]">
-                {{ field.title }}
+                <a-col :span="6" :offset="1">
+                  {{ field.title }}
+                </a-col>
               </a-row>
               <a-row :gutter="16" :key="assessmentData[field]">
                 <!-- ####  状态列  #### -->
-                <a-col :lg="4">
+                <a-col :span="6" :offset="1">
                   <template>
-                    {{ getAssessmentUnit(assessmentData[field.state + '_state']) }}
+                    {{ getOtherAssessmentUnit(field.state, assessmentData[field.state + '_state']) }}
                   </template>
                 </a-col>
                 <!-- ####  评估列  #### -->
-                <a-col :lg="14">
-                  <template v-for="check in repairCheckFields">
+                <a-col :lg="9">
+                  <template v-for="check in getOtherRepairCheckFields(field.state)">
                     <!-- 首先判断repair值是否存在 -->
                     <template v-if="assessmentData[field.state + '_repair'] && assessmentData[field.state + '_repair'].indexOf(check.value) >= 0">
-                      <a-badge status="success" :key="check.label" style="margin-left:15px;" :offset="[-1,5]">{{ check.label }}</a-badge>
-                    </template>
-                    <template v-else>
-                      <a-badge :key="check.label" style="margin-left:15px;">{{ check.label }}</a-badge>
+                      <a-badge :key="check.label" style="margin-left:15px;" :offset="[-1,5]">{{ check.label }}</a-badge>
                     </template>
                   </template>
                 </a-col>
@@ -199,7 +203,30 @@
       ></a-table>
     </a-card>
 
-    <br><br>
+    <br>
+
+    <a-card title="工时" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="工时(min)">
+          {{ assessmentData.work_time }}
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
+    <br>
+
+    <a-card title="适用" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="不适用" v-if="assessmentData.not_applicable">
+          是
+        </a-descriptions-item>
+        <a-descriptions-item label="不适用" v-if="!assessmentData.not_applicable">
+          否
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
+    <br>
 
     <!-- 上传文件 -->
     <a-card :bordered="false" title="上传图片">
@@ -210,19 +237,24 @@
 </template>
 
 <script>
-import { getValveASFields, getActuatorASFields, getAccessariesASFields, getRepairCheckBoxOptions, getAssessmentUnit,
-getAssessmentCheckOrRepairUnit } from '@/api/assessment'
+import { getValveASFields, getActuatorASFields, getAccessariesASFields, getRepairCheckBoxOptions, getActuatorAssessmentUnit,
+getAssessmentCheckOrRepairUnit, getActuatorRepairCheckFields, getValvaAssessmentUnit, getValvaRepairCheckFields,
+getOtherAssessmentUnit, getOtherRepairCheckFields } from '@/api/assessment'
 import UploadImgRead from '../modules/UploadImgRead'
-import { getSelectRepairData } from '@/api/preRepairTest'
-import { getColumnsPurchased, getStepUser, formatDateYMD } from '@/api/step'
+import { getColumnsPurchased, getStepUser, formatDateYMD, queryStepData } from '@/api/step'
 
 export default {
     components: {
         UploadImgRead
     },
     methods: {
-      getAssessmentUnit,
+      getActuatorAssessmentUnit,
       getAssessmentCheckOrRepairUnit,
+      getActuatorRepairCheckFields,
+      getValvaAssessmentUnit,
+      getValvaRepairCheckFields,
+      getOtherAssessmentUnit,
+      getOtherRepairCheckFields,
       getColumnsPurchasedArray () {
         // 删除“操作”列
         var tmpObj = getColumnsPurchased()
@@ -245,6 +277,7 @@ export default {
         this.$message.warning('当前流程没有保存数据')
         return
       }
+      this.stepData = this.$store.state.editStepData.stepEditData
       this.assessmentData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
       this.$refs.uploadImgRead.imgFileList = this.assessmentData.uploads
       this.purchasedParts = this.assessmentData.purchased_parts
@@ -253,55 +286,64 @@ export default {
 
       // 获取引用数据（维修前测试选择的维修东东）
       // 先选择了维修什么才需要评估
-      getSelectRepairData({ FlowID: this.assessmentData.flow_id }).then(res => {
-          // 阀门 "1"
-          // 执行机构 "2"
-          // 阀门+执行机构 "3"
-          // 阀门+执行机构+附件 "4"
-          // 零部件 "5"
-          // 执行机构+附件 "6"
-          switch (res.select_repair) { // 与 baseInfo 选择的维修部件下拉列表一致
-              case '1': { // 阀门维修
-                  this.ValveAS = true
-                  break
-              }
-              case '2': { // 执行机构维修
-                  this.ActuatorAS = true
-                  break
-              }
-              case '3': { // 阀门+执行机构
-                  this.ValveAS = true
-                  this.ActuatorAS = true
-                  break
-              }
-              case '4': { // 阀门+执行机构+附件
-                  this.ValveAS = true
-                  this.ActuatorAS = true
-                  this.AccessoryAS = true
-                  break
-              }
-              case '6': { // 执行机构+附件
-                  this.AccessoryAS = true
-                  this.ActuatorAS = true
-                  break
-              }
+      queryStepData({ id: this.assessmentData.flow_id, current_step: '(start)' }).then(res => {
+        res.result.step_data.forEach(stepItem => {
+          switch (stepItem.DataNum) {
+            case 1: // 基本信息
+              this.baseInfo = JSON.parse(stepItem.JSON)
+              break
           }
+        })
+        // 阀门 "1"
+        // 执行机构 "2"
+        // 阀门+执行机构 "3"
+        // 阀门+执行机构+附件 "4"
+        // 零部件 "5"
+        // 执行机构+附件 "6"
+        switch (this.baseInfo.repair_part) { // 与 baseInfo 选择的维修部件下拉列表一致
+          case '1': { // 阀门维修
+            this.ValveAS = true
+            break
+          }
+          case '2': { // 执行机构维修
+            this.ActuatorAS = true
+            break
+          }
+          case '3': { // 阀门+执行机构
+            this.ValveAS = true
+            this.ActuatorAS = true
+            break
+          }
+          case '4': { // 阀门+执行机构+附件
+            this.ValveAS = true
+            this.ActuatorAS = true
+            this.AccessoryAS = true
+            break
+          }
+          case '6': { // 执行机构+附件
+            this.AccessoryAS = true
+            this.ActuatorAS = true
+            break
+          }
+        }
       })
     },
     data () {
-        return {
-            assessmentData: {},
-            ValveASFields: getValveASFields(),
-            ActuatorASFields: getActuatorASFields(),
-            Accessaries: getAccessariesASFields(),
-            repairCheckFields: getRepairCheckBoxOptions(),
-            AccessoryAS: false,
-            ActuatorAS: false,
-            ValveAS: false,
-            purchasedParts: [],
-            stepUser: '',
-            stepDoneDate: ''
-        }
+      return {
+        assessmentData: {},
+        ValveASFields: getValveASFields(),
+        ActuatorASFields: getActuatorASFields(),
+        Accessaries: getAccessariesASFields(),
+        repairCheckFields: getRepairCheckBoxOptions(),
+        AccessoryAS: false,
+        ActuatorAS: false,
+        ValveAS: false,
+        purchasedParts: [],
+        stepUser: '',
+        stepDoneDate: '',
+        stepData: {},
+        baseInfo: {}
+      }
     }
 }
 </script>

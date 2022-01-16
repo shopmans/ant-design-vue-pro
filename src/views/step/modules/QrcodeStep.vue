@@ -11,7 +11,12 @@
               <div v-if="customerName2.length > 0" style="margin-left:105px;">{{ customerName2 }}</div>
               <div v-if="customerName3.length > 0" style="margin-left:105px;">{{ customerName3 }}</div>
             </div>
-            <div style="font-weight:bold;font-size:24px;color:blank;">位号:{{ tag }}</div>
+            <template v-if="tag !== 'N/A'">
+              <div style="font-weight:bold;font-size:24px;color:blank;">位号:{{ tag }}</div>
+            </template>
+            <template v-else>
+              <div style="font-weight:bold;font-size:24px;color:blank;">序列号:{{ serial }}</div>
+            </template>
             <div style="font-weight:bold;font-size:24px;color:blank;">阀体型号:{{ valveModel }}</div>
             <div style="font-weight:bold;font-size:24px;color:blank;">阀体尺寸:{{ valveSize }}</div>
             <div style="font-weight:bold;font-size:24px;color:blank;">执行机构型号:{{ actuModel }}</div>
@@ -54,6 +59,7 @@ export default {
         this.flowId = this.$store.state.editStepData.stepEditData.flow_id
 
         this.tag = 'N/A'
+        this.serial = 'N/A'
         this.workOrder = 'N/A'
         this.customerName = 'N/A'
         this.valveModel = 'N/A'
@@ -66,6 +72,7 @@ export default {
                 case 1: // baseInfo
                     const baseInfo = JSON.parse(e.JSON)
                     this.tag = baseInfo.tag.length <= 0 ? 'N/A' : baseInfo.tag
+                    this.serial = baseInfo.valve_serial.length <= 0 ? 'N/A' : baseInfo.valve_serial
                     this.workOrder = baseInfo.work_order_serial.length <= 0 ? 'N/A' : baseInfo.work_order_serial
                     this.customerName = this.$store.state.editStepData.stepEditData.project.customer_name
                     if (this.customerName.length > 16) {

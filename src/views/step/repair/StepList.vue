@@ -10,8 +10,8 @@
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
-              <a-form-item :label="$t('menu.project.view.table.column.projectNumber')">
-                <a-input v-model="queryParam.project_serial" placeholder=""/>
+              <a-form-item :label="$t('menu.workOrder.repair.workOrderList.title.workordernumber')">
+                <a-input v-model="queryParam.work_order" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
@@ -25,7 +25,7 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <span class="table-page-search-submitButtons" >
-                <a-button type="primary" @click="$refs.table.refresh(true)">{{ $t('menu.project.view.query.query') }}</a-button>
+                <a-button type="primary" @click="startQuery">{{ $t('menu.project.view.query.query') }}</a-button>
                 <a-button style="margin-left: 8px" @click="resetQuery">{{ $t('menu.project.view.query.reset') }}</a-button>
               </span>
             </a-col>
@@ -33,17 +33,19 @@
         </a-form>
       </div>
 
-      <div class="table-operator">
+      <!-- <div class="table-operator">
         <a-button type="primary" icon="plus" @click="handleAdd">{{ $t('menu.project.view.newproject') }}</a-button>
-      </div>
+      </div> -->
 
+      <!-- ////////////////////////////////////////////////////// 打开工单 -->
       <s-table
         ref="table"
         size="default"
         rowKey="id"
         :columns="columns"
         :data="loadData"
-        showPagination="auto"
+        v-if="optOpen"
+        :pagination="paginationOpt"
       >
         <span slot="date" slot-scope="text">
           {{ text | formatDate }}
@@ -58,7 +60,7 @@
           <template>
             <a @click="handleDescrption(record)">{{ $t('menu.project.view.action.detail') }}</a>
             <a-divider type="vertical" />
-            <span v-if="record.current_step==='Assessment' || record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</span>
+            <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</span>
             <a v-else @click="handleDispatchUser(record)">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</a>
             <a-divider type="vertical" />
             <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.execution') }}</span>
@@ -73,15 +75,11 @@
               <a-menu-item>
                 <a @click="adjustFlow(record)">{{ $t('menu.workOrder.workOrderList.flow') }}</a>
               </a-menu-item>
-              <!-- v-if="$auth('table.disable')" -->
-              <a-menu-item >
-                <a @click="printStep(record)">{{ $t('menu.project.view.action.print') }}</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="deleteStep(record)">{{ $t('menu.project.view.action.delete') }}</a>
-              </a-menu-item>
               <a-menu-item>
                 <a @click="report(record)">{{ $t('menu.project.view.action.report') }}</a>
+              </a-menu-item>
+              <a-menu-item >
+                <a @click="printStep(record)">{{ $t('menu.project.view.action.print') }}</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -91,15 +89,96 @@
         </template>
       </s-table>
 
-      <DispatchUserDialog
-        ref="dispatchUser"
-        :visible="visible"
-        :flowID="flowID"
-        :currentStep="currentStep"
-        @cancel="handleCancel"
-        @ok="handleCancel"
-      />
+      <!-- ////////////////////////////////////////////////////// 删除工单 -->
+      <s-table
+        ref="table"
+        size="default"
+        rowKey="id"
+        :columns="columns"
+        :data="loadData"
+        v-if="optDelete"
+        :pagination="paginationOpt"
+      >
+        <span slot="date" slot-scope="text">
+          {{ text | formatDate }}
+        </span>
+        <span slot="state" slot-scope="text">
+          <a-badge :status="text | statusTypeFilter" :text="$t(statusMap[text].text)" />
+        </span>
+        <span slot="current_step" slot-scope="text">
+          {{ $t(currentStepMap[text].text) }}
+        </span>
+        <span slot="action" slot-scope="text, record">
+          <a @click="deleteStep(record)">{{ $t('menu.project.view.action.delete') }}</a>
+        </span>
+        <template v-for="(item, index) in columns" :slot="item.slotName">
+          <span :key="index">{{ $t(item.slotName) }}</span>
+        </template>
+      </s-table>
+
+      <!-- ////////////////////////////////////////////////////// 导出 -->
+      <s-table
+        ref="table"
+        size="default"
+        rowKey="id"
+        :columns="columns"
+        :data="loadData"
+        v-if="optExport"
+        :pagination="paginationOpt"
+      >
+        <span slot="date" slot-scope="text">
+          {{ text | formatDate }}
+        </span>
+        <span slot="state" slot-scope="text">
+          <a-badge :status="text | statusTypeFilter" :text="$t(statusMap[text].text)" />
+        </span>
+        <span slot="current_step" slot-scope="text">
+          {{ $t(currentStepMap[text].text) }}
+        </span>
+        <span slot="action" slot-scope="">
+          导出
+        </span>
+        <template v-for="(item, index) in columns" :slot="item.slotName">
+          <span :key="index">{{ $t(item.slotName) }}</span>
+        </template>
+      </s-table>
+
+      <!-- ////////////////////////////////////////////////////// 报表 -->
+      <s-table
+        ref="table"
+        size="default"
+        rowKey="id"
+        :columns="columns"
+        :data="loadData"
+        v-if="optReport"
+        :pagination="paginationOpt"
+      >
+        <span slot="date" slot-scope="text">
+          {{ text | formatDate }}
+        </span>
+        <span slot="state" slot-scope="text">
+          <a-badge :status="text | statusTypeFilter" :text="$t(statusMap[text].text)" />
+        </span>
+        <span slot="current_step" slot-scope="text">
+          {{ $t(currentStepMap[text].text) }}
+        </span>
+        <span slot="action" slot-scope="text, record">
+          <a @click="report(record)">{{ $t('menu.project.view.action.report') }}</a>
+        </span>
+        <template v-for="(item, index) in columns" :slot="item.slotName">
+          <span :key="index">{{ $t(item.slotName) }}</span>
+        </template>
+      </s-table>
     </a-card>
+
+    <DispatchUserDialog
+      ref="dispatchUser"
+      :visible="visible"
+      :flowID="flowID"
+      :currentStep="currentStep"
+      @cancel="handleCancel"
+      @ok="handleCancel"
+    />
 
     <stepAllDetailModel
       @ok="() => { this.stepDetailvisible = false }"
@@ -229,13 +308,33 @@ export default {
       mdl: null,
       // 查询参数
       queryParam: {},
+      orderList: [], // 工单数据列表
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
-        return getStepList(requestParameters)
-          .then(res => {
-            return res.result
-          })
+        return getStepList(requestParameters).then(res => {
+          return res.result
+        })
+      },
+      paginationOpt: {
+        defaultCurrent: 1, // 默认当前页数
+        defaultPageSize: 10, // 默认当前页显示数据的大小
+        total: 0, // 总数，必须先有
+        showSizeChanger: true,
+        showQuickJumper: true,
+        pageSizeOptions: ['10', '20', '30', '50'],
+        showTotal: (total) => `共 ${total} 条`, // 显示总数
+        onShowSizeChange: (current, pageSize) => {
+          this.paginationOpt.defaultCurrent = 1
+          this.paginationOpt.defaultPageSize = pageSize
+          this.$refs.table.refresh(true)
+        },
+        // 改变每页数量时更新显示
+        onChange: (current111, size) => {
+          this.paginationOpt.defaultCurrent = current111
+          this.paginationOpt.defaultPageSize = size
+          this.$refs.table.refresh(true)
+        }
       },
       statusMap: statusMap,
       currentStepMap: currentStepMap,
@@ -247,7 +346,34 @@ export default {
       selectValue: '',
       visibleQrcode: false,
       visibleReport: false,
-      reportRecord: {}
+      reportRecord: {},
+      optDelete: false,
+      optOpen: false,
+      optReport: false,
+      optExport: false
+    }
+  },
+  mounted () {
+    this.optOpen = false
+    this.optDelete = false
+    this.optReport = false
+    this.optExport = false
+
+    // 打开工单
+    if (this.$route.meta.opt === 'open') {
+      this.optOpen = true
+    }
+    // 删除工单
+    if (this.$route.meta.opt === 'delete') {
+      this.optDelete = true
+    }
+    // 报表
+    if (this.$route.meta.opt === 'report') {
+      this.optReport = true
+    }
+    // 导出
+    if (this.$route.meta.opt === 'export') {
+      this.optExport = true
     }
   },
   filters: {
@@ -287,13 +413,19 @@ export default {
       this.$store.commit('SET_UPLOAD_MD5', [])
       this.$router.push({ path: '/step/newstep' })
     },
+    startQuery () {
+      this.$store.commit('SET_CUR_PAGE_NO', 0)
+      this.$store.commit('SET_CUR_PAGE_SIZE', 10)
+      this.$refs.table.refresh(true)
+    },
     resetQuery () {
-        this.queryParam = {}
-        this.$refs.table.refresh(true)
+      this.$store.commit('SET_CUR_PAGE_NO', 0)
+      this.$store.commit('SET_CUR_PAGE_SIZE', 10)
+      this.queryParam = {}
+      this.$refs.table.refresh(true)
     },
     handleEdit (record) {
       stepEdit(record).then(res => {
-        console.log(res)
         this.$store.commit('SET_UPLOAD_MD5', [])
         this.$store.commit('SET_STEP_EDIT_DATA', res.result)
         this.$router.push({ path: '/step/' + res.result.path })
@@ -386,8 +518,6 @@ export default {
         this.visible = true
       })
     }
-  },
-  mounted () {
   }
 }
 </script>

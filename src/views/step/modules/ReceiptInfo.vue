@@ -4,13 +4,14 @@
       <a-descriptions title="">
         <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
         <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="工时(min)">{{ receiptData.work_time }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
     <br>
     <a-card :bordered="false">
       <a-descriptions title="收货">
         <a-descriptions-item label="收货日期">{{ receiptData.receipt_date | moment }}</a-descriptions-item>
-        <a-descriptions-item label="序号">{{ receiptData.receipt_valve_factory_no }}</a-descriptions-item>
+        <a-descriptions-item label="序号">{{ baseInfoData.serial_number }}</a-descriptions-item>
         <a-descriptions-item label="出入厂单据号码">{{ receiptData.receipt_valve_factory_no }}</a-descriptions-item>
         <a-descriptions-item label="工单号">{{ baseInfoData.work_order_serial }}</a-descriptions-item>
         <a-descriptions-item label="合同号">{{ projectData.contract_serial }}</a-descriptions-item>
@@ -38,13 +39,34 @@
         </a-table>
       </a-descriptions>
     </a-card>
+    <br>
+    <a-card title="适用" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="不适用" v-if="receiptData.not_applicable">
+          是
+        </a-descriptions-item>
+        <a-descriptions-item label="不适用" v-if="!receiptData.not_applicable">
+          否
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
+    <br>
+    <!-- 上传图片 -->
+    <a-card :bordered="false" title="上传图片">
+      <UploadImgRead ref="uploadImgRead" />
+    </a-card>
   </div>
 </template>
 
 <script>
 import { queryStepDataOnlyread, getReceiptPurchasedConfirm, getStepUser, formatDateYMD } from '@/api/step'
+import UploadImgRead from '../modules/UploadImgRead'
 
 export default {
+  components: {
+      UploadImgRead
+  },
   data () {
     return {
         // 已购清单表
@@ -69,6 +91,7 @@ export default {
     this.receiptData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
     this.stepUser = getStepUser(stepData.users)
     this.stepDoneDate = formatDateYMD(stepData.step_done_date)
+    this.$refs.uploadImgRead.imgFileList = this.receiptData.uploads
 
     queryStepDataOnlyread({ id: stepData.flow_id, current_step: '(start)' }).then(res => {
       res.result.step_data.forEach(e => {

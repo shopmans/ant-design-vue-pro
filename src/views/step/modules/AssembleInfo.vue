@@ -4,7 +4,7 @@
       <a-descriptions title="">
         <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
         <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
-        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+        <a-descriptions-item label="总工时">{{ stepData.work_time_all }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
     <br>
@@ -34,7 +34,7 @@
         <a-col :span="8">
           <a-descriptions>
             <a-descriptions-item>
-              工时(分钟): {{ assembleData.assemble_valve_total_minute }}
+              工时(min): {{ assembleData.assemble_valve_total_minute }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
@@ -83,7 +83,7 @@
         <a-col :span="8">
           <a-descriptions>
             <a-descriptions-item>
-              Bench Set测试是否合格: {{ getYesNoSwitchUnit(assembleData.valve_assemble_benchset_is_success) }}
+              Bench Set测试是否合格: {{ getYesNoNAUnit(assembleData.valve_assemble_benchset_is_success) }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
@@ -92,7 +92,7 @@
         <a-col :span="8">
           <a-descriptions>
             <a-descriptions-item>
-              工时(分钟): {{ assembleData.assemble_actuator_total_minute }}
+              工时(min): {{ assembleData.assemble_actuator_total_minute }}
             </a-descriptions-item>
           </a-descriptions>
         </a-col>
@@ -105,8 +105,17 @@
         </a-col>
       </a-row>
     </a-card>
-    <br><br>
-
+    <a-card title="适用" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="不适用" v-if="assembleData.not_applicable">
+          是
+        </a-descriptions-item>
+        <a-descriptions-item label="不适用" v-if="!assembleData.not_applicable">
+          否
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <a-card :bordered="false" title="上传图片">
       <UploadImgRead ref="uploadImgRead" />
     </a-card>
@@ -118,7 +127,7 @@ import UploadImgRead from '../modules/UploadImgRead'
 import { queryStepDataOnlyread, getValveCoverBoltTorqueUnit, getValveCoverBoltMaterialUnit, getValveSizeUnit,
 getValveSeatLeakTestUnit, getActuSpringSetPressureUnit, getActuCoverBoltToolItemUnit, getValveHydrostaticTestValueUnitText,
 getYesNoSwitchUnit, getActuCoverBoltToolItemUnitTextNA, getValveCoverBoltTorqueUnitText, getValveSizeUnitTextNA,
-getStepUser, formatDateYMD } from '@/api/step'
+getStepUser, formatDateYMD, getYesNoNAUnit } from '@/api/step'
 
 export default {
   components: {
@@ -129,6 +138,7 @@ export default {
       this.$message.warning('当前流程没有保存数据')
       return
     }
+    this.stepData = this.$store.state.editStepData.stepEditData
     this.assembleData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
     this.$refs.uploadImgRead.imgFileList = this.assembleData.uploads
     this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
@@ -188,7 +198,8 @@ export default {
       assembleActuatorContent: '',
       assembleAccessoryContent: '',
       stepUser: '',
-      stepDoneDate: ''
+      stepDoneDate: '',
+      stepData: {}
     }
   },
   methods: {
@@ -203,6 +214,7 @@ export default {
     getActuCoverBoltToolItemUnitTextNA,
     getValveCoverBoltTorqueUnitText,
     getValveSizeUnitTextNA,
+    getYesNoNAUnit,
     getValveSeatBoltTorque () {
         if (!this.baseData.valve_seat_bolt_torque || this.baseData.valve_seat_bolt_torque.length <= 0) {
           return 'N/A'

@@ -1,6 +1,10 @@
 <template>
   <page-header-wrapper>
     <baseInfo />
+    <br>
+    <div style="float:right">
+      <a-button type="primary" @click="cancelDetail">取消</a-button>
+    </div>
   </page-header-wrapper>
 </template>
 
@@ -10,6 +14,11 @@ import baseInfo from '../../modules/StepBaseInfo'
 export default {
   components: {
     baseInfo
+  },
+  methods: {
+      cancelDetail () {
+        this.$router.back(-1)
+    }
   }
 }
 </script>

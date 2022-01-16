@@ -17,7 +17,6 @@ const permission = {
   },
   actions: {
     GenerateRoutes ({ commit }, data) {
-      debugger
       return new Promise(resolve => {
         const { token } = data
         generatorDynamicRouter(token).then(routers => {

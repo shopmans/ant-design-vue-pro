@@ -92,22 +92,6 @@ export default {
             this.form.resetFields()
             this.$message.info('密码更改成功')
           })
-
-          // values.flow_id = this.flowID
-          // values.current_step = this.currentStep
-          // values.save_user_id = this.$store.state.user.info.id
-          // values.uploads = this.$refs.uploadImg.imgFileList
-
-          // saveAssembleData(values).then(res => {
-          //   // 清空数据
-          //   this.$store.commit('SET_STEP_EDIT_DATA', null)
-          //   // 刷新表格
-          //   this.$router.push({ path: '/step/steplist' })
-          //   this.$message.info('保存成功')
-
-          //   // 重置表单数据
-          //   this.form.resetFields()
-          // })
         }
       })
     },

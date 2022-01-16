@@ -1,21 +1,26 @@
 <template>
   <page-header-wrapper>
+    <template slot="extra">
+      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+        不适用
+      </a-checkbox>
+    </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
       <a-card title="维修内容">
         <!-- 维修内容 -->
         <a-form-item label="维修内容">
-          <a-textarea :rows="5" v-decorator="['localtor_repair_content',{rules: []}]" />
+          <a-textarea :disabled="not_applicable" :rows="5" v-decorator="['localtor_repair_content',{rules: []}]" />
         </a-form-item>
       </a-card>
 
       <br>
-
       <!-- 工时 -->
       <a-card title="工时" :headStyle="{fontWeight:'bold'}" >
         <a-row :gutter="16">
           <a-col :span="8">
             <a-form-item label="工时(min)">
               <a-input-number
+                :disabled="not_applicable"
                 style="width:100%;"
                 :min="0"
                 v-decorator="[
@@ -33,7 +38,7 @@
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
         <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
-        <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
+        <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
     </a-form>
@@ -42,11 +47,11 @@
 
     <!-- 文件上传 -->
     <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <UploadImg ref="uploadImg" :QueueType="3" :isMobile="isMobile" />
+      <UploadImg :disableAll="not_applicable" ref="uploadImg" :queueType="'3'" :isMobile="isMobile" />
     </a-card>
 
     <!-- 工单详细 -->
-    <stepAllDetailModel ref="stepAllDetailModel" />
+    <stepAllDetailModel ref="stepAllDetailModel" :currenStep="currentStep" :flowId="flowID" />
   </page-header-wrapper>
 </template>
 
@@ -73,7 +78,8 @@ export default {
         form: this.$form.createForm(this),
         flowID: '',
         currentStep: '',
-        repairData: {}
+        repairData: {},
+        not_applicable: false
       }
     },
     methods: {
@@ -86,16 +92,10 @@ export default {
             values.save_user_id = this.$store.state.user.info.id
             values.uploads = this.$refs.uploadImg.imgFileList
             values.purchased_parts = this.dataPurchased
+            values.not_applicable = this.not_applicable
 
             saveStepPublic(values).then(res => {
-              // 清空数据
-              this.$store.commit('SET_STEP_EDIT_DATA', null)
-              // 刷新表格
-              this.$router.push({ path: '/step/steplist' })
               this.$message.info('保存成功')
-
-              // 重置表单数据
-              this.form.resetFields()
             })
           }
         })
@@ -121,6 +121,9 @@ export default {
       },
       cancelSubmit () {
         this.$router.push({ path: '/step/steplist' })
+      },
+      naChange (e) {
+        this.not_applicable = e.target.checked
       }
     },
     mounted () {
@@ -135,6 +138,7 @@ export default {
         if (this.repairData.uploads) {
             this.$refs.uploadImg.imgFileList = this.repairData.uploads
         }
+        this.not_applicable = this.repairData.not_applicable
       }
     }
 }

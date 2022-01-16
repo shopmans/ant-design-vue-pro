@@ -79,6 +79,7 @@ export default {
   created () {
     const routes = this.mainMenu.find(item => item.path === '/')
     this.menus = (routes && routes.children) || []
+
     // 处理侧栏收起状态
     this.$watch('collapsed', () => {
       this.$store.commit(SIDEBAR_TYPE, this.collapsed)
@@ -86,6 +87,8 @@ export default {
     this.$watch('isMobile', () => {
       this.$store.commit(TOGGLE_MOBILE_TYPE, this.isMobile)
     })
+  },
+  watch: {
   },
   mounted () {
     const userAgent = navigator.userAgent

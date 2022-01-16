@@ -2,14 +2,11 @@
   <div id="userLayout" :class="['user-layout-wrapper', isMobile && 'mobile']">
     <div class="container">
       <div class="top">
-        <div class="header">
-          <a href="/">
-            <img src="~@/assets/logo.svg" class="logo" alt="logo">
-            <span class="title">赛来科技</span>
-          </a>
-        </div>
+        <img src="~@/assets/sino.png" class="logo" alt="logo" style="width:150px;">
+      </div>
+      <div class="top">
         <div class="desc">
-          售后-维修服务管理系统
+          维修服务管理系统
         </div>
       </div>
 

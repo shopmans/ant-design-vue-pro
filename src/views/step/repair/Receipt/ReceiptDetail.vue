@@ -15,7 +15,7 @@ export default {
   },
   methods: {
       cancelDetail () {
-        this.$router.push({ path: '/step/steplist' })
+        this.$router.back(-1)
     }
   }
 }

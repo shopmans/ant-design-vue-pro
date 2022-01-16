@@ -8,7 +8,11 @@ import request from '@/utils/request'
     valveTestReportImgSave: '/save-valve-test-use-report-img',
     locatorTestReportImgSave: '/save-locator-test-use-report-img',
     valveRepairProcess: '/get-valve-repair-process-report',
-    rotateReportImage: '/rotate-image'
+    rotateReportImage: '/rotate-image',
+    deleteTempReport: '/delete/temp/report',
+    saveRepairReportConfig: '/repair/save-report-config',
+    saveLocatorReportConfig: '/repair/save-locator-config',
+    saveTestReportConfig: '/repair/save-test-config'
   }
 
   export function getvalveRepairProcessReport (parameter) {
@@ -44,36 +48,67 @@ import request from '@/utils/request'
     })
   }
 
-  export function saveUseReportImg (parameter) {
+  export function saveUseReportImg (parameter, type) {
     return request({
-      url: reportApi.useReportImgSave,
+      url: reportApi.useReportImgSave + '/' + type,
       method: 'post',
-      data: parameter,
-      responseType: 'blob'
+      data: parameter
+      // responseType: 'blob'
     })
   }
 
-  export function saveUseReportImgFotValveTest (parameter) {
+  export function saveUseReportImgFotValveTest (parameter, type) {
     return request({
-      url: reportApi.valveTestReportImgSave,
+      url: reportApi.valveTestReportImgSave + '/' + type,
       method: 'post',
-      data: parameter,
-      responseType: 'blob'
+      data: parameter
+      // responseType: 'blob'
     })
   }
 
-  export function saveUseReportImgFotLocatorTest (parameter) {
+  export function saveUseReportImgFotLocatorTest (parameter, type) {
     return request({
-      url: reportApi.locatorTestReportImgSave,
+      url: reportApi.locatorTestReportImgSave + '/' + type,
       method: 'post',
-      data: parameter,
-      responseType: 'blob'
+      data: parameter
+      // responseType: 'blob'
     })
   }
 
   export function rotateReportImage (parameter) {
     return request({
       url: reportApi.rotateReportImage,
+      method: 'post',
+      data: parameter
+    })
+  }
+
+  export function deleteTmpReportFile (filename) {
+    return request({
+      url: reportApi.deleteTempReport + '/' + filename,
+      method: 'get'
+    })
+  }
+
+  export function saveReportImgConfig (parameter) {
+    return request({
+      url: reportApi.saveRepairReportConfig,
+      method: 'post',
+      data: parameter
+    })
+  }
+
+  export function saveLocatorReportImgConfig (parameter) {
+    return request({
+      url: reportApi.saveLocatorReportConfig,
+      method: 'post',
+      data: parameter
+    })
+  }
+
+  export function saveTestReportConfig (parameter) {
+    return request({
+      url: reportApi.saveTestReportConfig,
       method: 'post',
       data: parameter
     })

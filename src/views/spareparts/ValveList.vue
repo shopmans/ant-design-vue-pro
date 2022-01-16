@@ -24,19 +24,20 @@
         </a-form>
       </div>
 
-      <div class="table-operator">
-        <a-button icon="plus" @click="handleAdd">{{ $t('menu.project.view.newproject') }}</a-button>
+      <div class="table-operator" v-if="optImport">
         <a-upload accept=".xls,.xlsx" :before-upload="importExcel" :show-upload-list="false" ><a-button type="primary" icon="plus">{{ $t('menu.spare_parts.excel_import') }}</a-button></a-upload>
       </div>
 
+      <!-- 导入 -->
       <s-table
         ref="table"
         rowKey="ID"
         size="default"
         :columns="columns"
         :data="loadData"
-        showPagination="auto"
         :scroll="{ x: 4300 }"
+        v-if="optImport"
+        :pagination="paginationOpt"
       >
         <template v-for="(item, index) in columns" :slot="item.slotName">
           <span :key="index">{{ $t(item.slotName) }}</span>
@@ -50,6 +51,30 @@
             <a-popconfirm :title="$t('menu.user.manager.action.delete.confirm')" @confirm="deleteRecord(record)">
               <a>{{ $t('menu.project.view.action.delete') }}</a>
             </a-popconfirm>
+          </template>
+        </span>
+        <span slot="Date" slot-scope="text">
+          {{ text | format }}
+        </span>
+      </s-table>
+
+      <!-- 查询 -->
+      <s-table
+        ref="table"
+        rowKey="ID"
+        size="default"
+        :columns="columns"
+        :data="loadData"
+        :scroll="{ x: 4300 }"
+        v-if="optQuery"
+        :pagination="paginationOpt"
+      >
+        <template v-for="(item, index) in columns" :slot="item.slotName">
+          <span :key="index">{{ $t(item.slotName) }}</span>
+        </template>
+        <span slot="action" slot-scope="text, record">
+          <template>
+            <a @click="handleDescrption(record)">{{ $t('menu.project.view.action.detail') }}</a>
           </template>
         </span>
         <span slot="Date" slot-scope="text">
@@ -420,6 +445,19 @@ export default {
     STable,
     XLSX
   },
+  mounted () {
+    this.optImport = false
+    this.optQuery = false
+
+    // 查询
+    if (this.$route.meta.opt === 'import') {
+      this.optImport = true
+    }
+    // 导入
+    if (this.$route.meta.opt === 'query') {
+      this.optQuery = true
+    }
+  },
   data () {
     return {
       description: '列表使用场景：后台管理中的权限管理以及角色管理，可用于基于 RBAC 设计的角色权限控制，颗粒度细到每一个操作类型。',
@@ -437,6 +475,26 @@ export default {
             return res.result
         })
       },
+      paginationOpt: {
+        defaultCurrent: 1, // 默认当前页数
+        defaultPageSize: 10, // 默认当前页显示数据的大小
+        total: 0, // 总数，必须先有
+        showSizeChanger: true,
+        showQuickJumper: true,
+        pageSizeOptions: ['10', '20', '30', '50'],
+        showTotal: (total) => `共 ${total} 条`, // 显示总数
+        onShowSizeChange: (current, pageSize) => {
+          this.paginationOpt.defaultCurrent = 1
+          this.paginationOpt.defaultPageSize = pageSize
+          this.$refs.table.refresh(true)
+        },
+        // 改变每页数量时更新显示
+        onChange: (current, size) => {
+          this.paginationOpt.defaultCurrent = current
+          this.paginationOpt.defaultPageSize = size
+          this.$refs.table.refresh(true)
+        }
+      },
       // 高级搜索 展开/关闭
       advanced: false,
       // 查询参数
@@ -445,7 +503,9 @@ export default {
       position: position,
       columns: columns,
       userModelTitle: '',
-      showDescrptionDat: {}
+      showDescrptionDat: {},
+      optImport: false,
+      optQuery: false
     }
   },
   filters: {

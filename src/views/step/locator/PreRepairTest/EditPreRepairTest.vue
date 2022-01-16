@@ -1,5 +1,10 @@
 <template>
   <page-header-wrapper>
+    <template slot="extra">
+      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+        不适用
+      </a-checkbox>
+    </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
       <!-- 硬件检查 -->
       <a-card title="硬件检查" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
@@ -7,7 +12,7 @@
           <a-col class="gutter-row" :span="6">
             <div class="gutter-box">
               <a-form-item label="定位器铭牌是否齐全">
-                <a-radio-group v-decorator="['hardware_check_locator_nameplate', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_nameplate', { }]">
                   <a-radio :value="1">
                     是
                   </a-radio>
@@ -21,7 +26,7 @@
           <a-col class="gutter-row" :span="6">
             <div class="gutter-box">
               <a-form-item label="定位器等级标签是否齐全">
-                <a-radio-group v-decorator="['hardware_check_locator_grade_label', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_grade_label', { }]">
                   <a-radio :value="1">
                     是
                   </a-radio>
@@ -35,7 +40,7 @@
           <a-col class="gutter-row" :span="6">
             <div class="gutter-box">
               <a-form-item label="定位器外观是否损坏">
-                <a-radio-group v-decorator="['hardware_check_locator_exterior', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_exterior', { }]">
                   <a-radio :value="1">
                     是
                   </a-radio>
@@ -49,7 +54,7 @@
           <a-col class="gutter-row" :span="6">
             <div class="gutter-box">
               <a-form-item label="定位器是否存在污迹">
-                <a-radio-group v-decorator="['hardware_check_locator_smudge', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_smudge', { }]">
                   <a-radio :value="1">
                     是
                   </a-radio>
@@ -63,7 +68,7 @@
           <a-col class="gutter-row" :span="6">
             <div class="gutter-box">
               <a-form-item label="压力表量程">
-                <a-radio-group v-decorator="['hardware_check_locator_pressure_gauge_range', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_pressure_gauge_range', { }]">
                   <a-radio :value="1">
                     60 PSI
                   </a-radio>
@@ -77,7 +82,7 @@
           <a-col class="gutter-row" :span="6">
             <div class="gutter-box">
               <a-form-item label="压力表是否损坏">
-                <a-radio-group v-decorator="['hardware_check_locator_pressure_gauge_yesno', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_pressure_gauge_yesno', { }]">
                   <a-radio :value="1">
                     是
                   </a-radio>
@@ -91,7 +96,7 @@
           <a-col class="gutter-row" :span="6">
             <div class="gutter-box">
               <a-form-item label="放大器类型">
-                <a-radio-group v-decorator="['hardware_check_locator_amplifier_type', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_amplifier_type', { }]">
                   <a-radio :value="1">
                     A
                   </a-radio>
@@ -111,6 +116,7 @@
             <div class="gutter-box">
               <a-form-item label="接线端子电压 4mA">
                 <a-input-number
+                  :disabled="not_applicable"
                   style="width: 100%"
                   v-decorator="[
                     'hardware_check_locator_terminal_voltage_4ma', {}
@@ -122,6 +128,7 @@
             <div class="gutter-box">
               <a-form-item label="接线端子电压 20mA">
                 <a-input-number
+                  :disabled="not_applicable"
                   style="width: 100%"
                   v-decorator="[
                     'hardware_check_locator_terminal_voltage_20ma', {}
@@ -133,6 +140,7 @@
             <div class="gutter-box">
               <a-form-item label="PWB生产代码">
                 <a-input
+                  :disabled="not_applicable"
                   v-decorator="[
                     'hardware_check_locator_pwb_production_code', {}
                   ]" />
@@ -143,6 +151,7 @@
             <div class="gutter-box">
               <a-form-item label="I/P生产代码">
                 <a-input
+                  :disabled="not_applicable"
                   v-decorator="[
                     'hardware_check_locator_ip_production_code', {}
                   ]" />
@@ -161,6 +170,7 @@
             <div class="gutter-box">
               <a-form-item label="固件版本号">
                 <a-input
+                  :disabled="not_applicable"
                   v-decorator="[
                     'hardware_check_locator_fireware_ver', {}
                   ]" />
@@ -171,6 +181,7 @@
             <div class="gutter-box">
               <a-form-item label="HART位号">
                 <a-input
+                  :disabled="not_applicable"
                   v-decorator="[
                     'hardware_check_locator_hart_tag', {}
                   ]" />
@@ -181,6 +192,7 @@
             <div class="gutter-box">
               <a-form-item label="仪表序列号">
                 <a-input
+                  :disabled="not_applicable"
                   v-decorator="[
                     'hardware_check_locator_instrument_serial', {}
                   ]" />
@@ -190,7 +202,7 @@
           <a-col class="gutter-row" :span="6">
             <div class="gutter-box">
               <a-form-item label="收到时控制模式">
-                <a-radio-group v-decorator="['hardware_check_locator_received_control_mode', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_received_control_mode', { }]">
                   <a-radio :value="1">
                     Analog
                   </a-radio>
@@ -207,7 +219,7 @@
           <a-col class="gutter-row" :span="6">
             <div class="gutter-box">
               <a-form-item label="仪表模式">
-                <a-radio-group v-decorator="['hardware_check_locator_instrument_model', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_instrument_model', { }]">
                   <a-radio :value="1">
                     In Service
                   </a-radio>
@@ -220,7 +232,7 @@
           </a-col>
           <a-col class="gutter-row" :span="6">
             <a-form-item label="执行机构类型">
-              <a-radio-group v-decorator="['hardware_check_locator_actuator_type', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_actuator_type', { }]">
                 <a-radio :value="1">
                   弹簧薄膜
                 </a-radio>
@@ -239,6 +251,7 @@
           <a-col class="gutter-row" :span="6">
             <a-form-item label="零信号状态">
               <a-input
+                :disabled="not_applicable"
                 v-decorator="[
                   'hardware_check_locator_zero_signal_state', {}
                 ]" />
@@ -247,6 +260,7 @@
           <a-col class="gutter-row" :span="6">
             <a-form-item label="阀门类型">
               <a-input
+                :disabled="not_applicable"
                 v-decorator="[
                   'hardware_check_locator_valve_type', {}
                 ]" />
@@ -255,6 +269,7 @@
           <a-col class="gutter-row" :span="6">
             <a-form-item label="行程/压力选择">
               <a-input
+                :disabled="not_applicable"
                 v-decorator="[
                   'hardware_check_locator_stroke_pressure_selection', {}
                 ]" />
@@ -263,6 +278,7 @@
           <a-col class="gutter-row" :span="6">
             <a-form-item label="行程传感器方向">
               <a-input
+                :disabled="not_applicable"
                 v-decorator="[
                   'hardware_check_locator_stroke_sensor_direction', {}
                 ]" />
@@ -271,6 +287,7 @@
           <a-col class="gutter-row" :span="6">
             <a-form-item label="输入特性">
               <a-input
+                :disabled="not_applicable"
                 v-decorator="[
                   'hardware_check_locator_input_characteristics', {}
                 ]" />
@@ -279,6 +296,7 @@
           <a-col class="gutter-row" :span="6">
             <a-form-item label="增益设定">
               <a-input
+                :disabled="not_applicable"
                 v-decorator="[
                   'hardware_check_locator_gain_setting', {}
                 ]" />
@@ -293,7 +311,7 @@
           <a-divider>接线盒</a-divider>
           <a-col :span="6">
             <a-form-item label="接线端子电阻">
-              <a-radio-group v-decorator="['hardware_check_locator_terminal_resistance', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_terminal_resistance', { }]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -305,7 +323,7 @@
           </a-col>
           <a-col :span="18">
             <a-form-item label="是否存在水迹或灰尘">
-              <a-radio-group v-decorator="['hardware_check_locator_terminal_resistance_water', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_terminal_resistance_water', { }]">
                 <a-radio :value="1">
                   是
                 </a-radio>
@@ -318,7 +336,7 @@
           <a-divider>I/P</a-divider>
           <a-col :span="6">
             <a-form-item label="动作是否正常">
-              <a-radio-group v-decorator="['hardware_check_locator_ip_active', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_ip_active', { }]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -330,7 +348,7 @@
           </a-col>
           <a-col :span="18">
             <a-form-item label="是否存在水迹或灰尘">
-              <a-radio-group v-decorator="['hardware_check_locator_ip_active_water', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_ip_active_water', { }]">
                 <a-radio :value="1">
                   是
                 </a-radio>
@@ -343,7 +361,7 @@
           <a-divider>Relay</a-divider>
           <a-col :span="6">
             <a-form-item label="动作是否正常">
-              <a-radio-group v-decorator="['hardware_check_locator_relay_active', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_relay_active', { }]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -355,7 +373,7 @@
           </a-col>
           <a-col :span="18">
             <a-form-item label="是否存在水迹或灰尘">
-              <a-radio-group v-decorator="['hardware_check_locator_relay_active_water', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_relay_active_water', { }]">
                 <a-radio :value="1">
                   是
                 </a-radio>
@@ -368,7 +386,7 @@
           <a-divider>PWB</a-divider>
           <a-col :span="6">
             <a-form-item label="动作是否正常">
-              <a-radio-group v-decorator="['hardware_check_locator_pwb_active', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_pwb_active', { }]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -380,7 +398,7 @@
           </a-col>
           <a-col :span="18">
             <a-form-item label="是否存在水迹或灰尘">
-              <a-radio-group v-decorator="['hardware_check_locator_pwb_active_water', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_pwb_active_water', { }]">
                 <a-radio :value="1">
                   是
                 </a-radio>
@@ -393,7 +411,7 @@
           <a-divider>模块基座和后壳体</a-divider>
           <a-col :span="6">
             <a-form-item label="密封件是否正常">
-              <a-radio-group v-decorator="['hardware_check_locator_base_shell_seal', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_base_shell_seal', { }]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -405,7 +423,7 @@
           </a-col>
           <a-col :span="18">
             <a-form-item label="是否存在水迹或灰尘">
-              <a-radio-group v-decorator="['hardware_check_locator_base_shell_seal_water', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_base_shell_seal_water', { }]">
                 <a-radio :value="1">
                   是
                 </a-radio>
@@ -417,7 +435,7 @@
           </a-col>
           <a-col :span="6">
             <a-form-item label="气源接口是否正常">
-              <a-radio-group v-decorator="['hardware_check_locator_air_connection', { }]">
+              <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_air_connection', { }]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -438,6 +456,7 @@
           <a-col :span="8">
             <a-form-item label="工时(min)">
               <a-input-number
+                :disabled="not_applicable"
                 style="width:100%;"
                 :min="0"
                 v-decorator="[
@@ -452,20 +471,20 @@
       <br>
       <!-- 文件上传 -->
       <a-card :title="$t('menu.workOrder.upload.img')" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <UploadImg ref="uploadImg" :QueueType="3" :isMobile="isMobile" />
+        <UploadImg :disableAll="not_applicable" ref="uploadImg" :queueType="'3'" :isMobile="isMobile" />
       </a-card>
 
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
         <a-button style="margin-left: 8px" @click="cancelSubmit" >取消</a-button>
-        <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
+        <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
     </a-form>
 
     <!-- 工单详细 -->
-    <stepAllDetailModel ref="stepAllDetailModel" />
+    <stepAllDetailModel ref="stepAllDetailModel" :currenStep="currentStep" :flowId="flowID" />
   </page-header-wrapper>
 </template>
 
@@ -509,6 +528,7 @@ export default {
           if (installIAData.uploads) {
               this.$refs.uploadImg.imgFileList = installIAData.uploads
           }
+          this.not_applicable = installIAData.not_applicable
         })
       }
     },
@@ -521,15 +541,10 @@ export default {
           values.current_step = this.currentStep
           values.intofc_user_id = this.$store.state.user.info.id
           values.uploads = this.$refs.uploadImg.imgFileList
+          values.not_applicable = this.not_applicable
 
           saveStepPublic(values).then(res => {
-            // 清空数据
-            this.$store.commit('SET_STEP_EDIT_DATA', null)
-            // 刷新表格
-            this.$router.push({ path: '/step/steplist' })
             this.$message.info('保存成功')
-            // 重置表单数据
-            this.form.resetFields()
           })
         }
       })
@@ -541,28 +556,32 @@ export default {
         this.$refs.stepAllDetailModel.showSetpDetailData(this.flowID, this.currentStep)
     },
     handleStepDone () {
-        const letThis = this
-        this.$confirm({
-            title: '结束流程',
-            content: '确定要结束流程？',
-            okText: '确认',
-            cancelText: '取消',
-            onOk () {
-            stepDone({ id: letThis.flowID, current_step: letThis.currentStep }).then(res => {
-                // 刷新表格
-                letThis.$message.info('结束流程成功')
-                letThis.$router.push({ path: '/step/steplist' })
-            })
-            }
+      const letThis = this
+      this.$confirm({
+        title: '结束流程',
+        content: '确定要结束流程？',
+        okText: '确认',
+        cancelText: '取消',
+        onOk () {
+        stepDone({ id: letThis.flowID, current_step: letThis.currentStep }).then(res => {
+          // 刷新表格
+          letThis.$message.info('结束流程成功')
+          letThis.$router.push({ path: '/step/steplist' })
         })
+        }
+      })
+    },
+    naChange (e) {
+      this.not_applicable = e.target.checked
     }
   },
   data () {
-      return {
-          form: this.$form.createForm(this),
-          flowID: '',
-          currentStep: ''
-      }
+    return {
+      form: this.$form.createForm(this),
+      flowID: '',
+      currentStep: '',
+      not_applicable: false
+    }
   }
 }
 </script>

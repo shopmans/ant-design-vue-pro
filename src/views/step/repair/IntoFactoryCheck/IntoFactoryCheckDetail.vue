@@ -2,7 +2,9 @@
   <page-header-wrapper>
     <intoFactoryInfo />
     <br>
-    <a-button type="primary" @click="cancelDetail">取消</a-button>
+    <div style="float:right;">
+      <a-button type="primary" @click="cancelDetail">取消</a-button>
+    </div>
   </page-header-wrapper>
 </template>
 
@@ -15,7 +17,7 @@ export default {
   },
   methods: {
       cancelDetail () {
-        this.$router.push({ path: '/step/steplist' })
+        this.$router.back(-1)
       }
   }
 }

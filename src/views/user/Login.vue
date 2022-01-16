@@ -8,10 +8,20 @@
       @submit="handleSubmit"
     >
       <a-alert v-if="isLoginError" type="error" showIcon style="margin-bottom: 24px;" message="账户或密码错误" />
+
+      <a-form-item>
+        <a-select v-decorator="[ 'workOrderType', {rules: [{ required: true, message: '请选择工单类型' }] }]">
+          <a-select-option value="1">阀门检测及维修</a-select-option>
+          <a-select-option value="2">安全阀校验及维修</a-select-option>
+          <a-select-option value="3">售后服务</a-select-option>
+        </a-select>
+      </a-form-item>
+
       <a-form-item>
         <a-input
           size="large"
           type="text"
+          placeholder="姓名"
           v-decorator="[
             'username',
             {rules: [{ required: true, message: '请输入帐户名' }], validateTrigger: 'change'}
@@ -24,6 +34,7 @@
       <a-form-item>
         <a-input-password
           size="large"
+          placeholder="密码"
           v-decorator="[
             'password',
             {rules: [{ required: true, message: '请输入密码' }], validateTrigger: 'blur'}
@@ -31,14 +42,6 @@
         >
           <a-icon slot="prefix" type="lock" :style="{ color: 'rgba(0,0,0,.25)' }"/>
         </a-input-password>
-      </a-form-item>
-
-      <a-form-item>
-        <a-select v-decorator="[ 'workOrderType', {rules: [{ required: true, message: '请选择工单类型' }] }]">
-          <a-select-option value="1">阀门检测及维修</a-select-option>
-          <a-select-option value="2">安全阀校验及维修</a-select-option>
-          <a-select-option value="3">售后服务</a-select-option>
-        </a-select>
       </a-form-item>
 
       <!-- <a-form-item>
@@ -53,7 +56,7 @@
           class="login-button"
           :loading="state.loginBtn"
           :disabled="state.loginBtn"
-        >确定</a-button>
+        >登录</a-button>
       </a-form-item>
     </a-form>
 

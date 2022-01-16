@@ -1,56 +1,86 @@
 <template>
   <page-header-wrapper>
+    <template slot="extra">
+      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+        不适用
+      </a-checkbox>
+    </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
-      <ValveTearDown v-if="ValveTD" />
-      <ActuatorTearDown v-if="ActuatorTD" />
-      <AccessoryTearDown v-if="AccessoryTD" />
-
+      <a-tabs default-active-key="1" @change="tabChange">
+        <a-tab-pane key="1" tab="阀门拆解" :forceRender="true" v-if="ValveTD">
+          <valveTearDown
+            ref="valveTearDown"
+            v-if="ValveTD"
+            :flowID="flow_id"
+            :currentStep="current_step"
+            :disableAll="disableAll_1"
+            :isMobile="isMobile"
+            @valveNa="valveNa" />
+        </a-tab-pane>
+        <a-tab-pane key="2" tab="执行机构拆解" :forceRender="true" v-if="ActuatorTD">
+          <actuatorTearDown
+            ref="actuatorTearDown"
+            v-if="ActuatorTD"
+            :flowID="flow_id"
+            :currentStep="current_step"
+            :disableAll="disableAll_2"
+            :isMobile="isMobile"
+            @actuatorNa="actuatorNa" />
+        </a-tab-pane>
+        <a-tab-pane key="3" tab="附件折解" :forceRender="true" v-if="AccessoryTD">
+          <accessoryTearDown
+            ref="accessoryTearDown"
+            v-if="AccessoryTD"
+            :flowID="flow_id"
+            :currentStep="current_step"
+            :disableAll="disableAll_3"
+            :isMobile="isMobile"
+            @accessoryNa="accessoryNa" />
+        </a-tab-pane>
+      </a-tabs>
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
-        <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
-        <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
+        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >取消</a-button>
+        <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
-
-      <!-- 文件上传 -->
-      <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <UploadImg ref="uploadImg" :QueueType="3" :is-mobile="isMobile" />
-      </a-card>
     </a-form>
 
-    <stepAllDetailModel ref="stepAllDetailModel" />
+    <stepAllDetailModel ref="stepAllDetailModel" :currenStep="current_step" :flowId="flow_id" />
 
   </page-header-wrapper>
 </template>
 
 <script>
+  import moment from 'moment'
   import FooterToolBar from '@/components/FooterToolbar'
   import { baseMixin } from '@/store/app-mixin'
   import { saveTearDown } from '@/api/tearDown'
-  import AccessoryTearDown from './AccessoryTearDown'
-  import ActuatorTearDown from './ActuatorTearDown'
-  import ValveTearDown from './ValveTearDown'
-  import { stepDone } from '@/api/step'
+  import accessoryTearDown from './AccessoryTearDown'
+  import actuatorTearDown from './ActuatorTearDown'
+  import valveTearDown from './ValveTearDown'
+  import { stepDone, queryStepData } from '@/api/step'
   import pick from 'lodash.pick'
-  import UploadImg from '../../modules/UploadImg'
-  import { getSelectRepairData } from '@/api/preRepairTest'
+  import uploadImg from '../../modules/UploadImg'
   import stepDetail from '../../modules/StepBaseInfo'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
 
   const tearDonwFields = ['teardown_valve_total_minute', 'teardown_actuator_total_minute', 'teardown_accessory_total_minute',
-  'teardown_valve_content', 'teardown_actuator_content', 'teardown_accessory_content']
+  'teardown_valve_content', 'teardown_actuator_content', 'teardown_accessory_content', 'not_applicable', 'teardown_actuator_date',
+  'teardown_valve_date', 'teardown_accessory_date', 'teardown_valve_not_applicable', 'teardown_actuator_not_applicable',
+  'teardown_accessory_not_applicable']
 
   export default {
     name: 'TearDown',
     mixins: [baseMixin],
     components: {
-      AccessoryTearDown,
-      ActuatorTearDown,
-      ValveTearDown,
+      accessoryTearDown,
+      actuatorTearDown,
+      valveTearDown,
       FooterToolBar,
       baseMixin,
-      UploadImg,
+      uploadImg,
       stepDetail,
       stepAllDetailModel
     },
@@ -62,7 +92,17 @@
         ValveTD: false,
         flow_id: '',
         current_step: '',
-        baseInfoData: null
+        baseInfoData: null,
+        showDispatchUser: false,
+        not_applicable: false,
+        baseInfo: {},
+        valueNaValue: false,
+        actuatorNaValue: false,
+        accessoryNaValue: false,
+        disableAll_1: false,
+        disableAll_2: false,
+        disableAll_3: false,
+        currentImgFlag: '1'
       }
     },
     methods: {
@@ -73,22 +113,42 @@
             values.flow_id = this.flow_id
             values.current_step = this.current_step
             values.perrepair_user_id = this.$store.state.user.info.id
-            values.uploads = this.$refs.uploadImg.imgFileList
-            saveTearDown(values).then(res => {
-              // 清空数据
-              this.$store.commit('SET_STEP_EDIT_DATA', null)
-              // 刷新表格
-              this.$router.push({ path: '/step/steplist' })
-              this.$message.info('保存成功')
+            values.not_applicable = this.not_applicable
+            values.teardown_valve_not_applicable = this.disableAll_1
+            values.teardown_actuator_not_applicable = this.disableAll_2
+            values.teardown_accessory_not_applicable = this.disableAll_3
 
-              // 重置表单数据
-              this.form.resetFields()
+            var tmpUpload = []
+            // 阀门拆解
+            if (this.$refs.valveTearDown) {
+              this.$refs.valveTearDown.getUploadImgData().forEach(e => {
+                tmpUpload.push(e)
+              })
+            }
+            // 执行机构拆解
+            if (this.$refs.valveTearDown) {
+              this.$refs.actuatorTearDown.getUploadImgData().forEach(e => {
+                tmpUpload.push(e)
+              })
+            }
+            // 附件折解
+            if (this.$refs.accessoryTearDown) {
+              this.$refs.accessoryTearDown.getUploadImgData().forEach(e => {
+                tmpUpload.push(e)
+              })
+            }
+            values.uploads = tmpUpload
+
+            saveTearDown(values).then(res => {
+              this.$message.info('保存成功')
+              // eslint-disable-next-line no-undef
+              callFlutterBacktoList.postMessage('save_step_ok') // 告诉移动端vue页面本流程已经保存成功
             })
           }
         })
       },
       cancelSubmit () {
-        this.$router.push({ path: '/step/steplist' })
+        this.$router.back(-1)
       },
       handleStepDetail () {
         this.$refs.stepAllDetailModel.showSetpDetailData(this.flow_id, this.current_step)
@@ -102,12 +162,91 @@
           cancelText: '取消',
           onOk () {
             stepDone({ id: letThis.flow_id, current_step: letThis.current_step }).then(res => {
-                // 刷新表格
-                letThis.$message.info('结束流程成功')
-                letThis.$router.push({ path: '/step/steplist' })
+              // 刷新表格
+              letThis.$message.info('结束流程成功')
+              letThis.$router.push({ path: '/step/steplist' })
             })
           }
         })
+      },
+      refreshUploads () {
+        queryStepData({ id: this.flow_id, current_step: this.current_step }).then(res => {
+          if (res.result.step_data && res.result.step_data.length > 0) {
+            const tmpData = JSON.parse(res.result.step_data[0].JSON)
+            this.refreshImageList(tmpData.uploads)
+            this.$message.info('上传照片成功')
+          }
+        })
+      },
+      getCurrentImgFlag () {
+        return this.currentImgFlag
+      },
+      naChange (e) {
+        this.not_applicable = e.target.checked
+        if (this.not_applicable) {
+          this.disableAll_1 = true
+          this.disableAll_2 = true
+          this.disableAll_3 = true
+        } else {
+          this.disableAll_1 = false
+          this.disableAll_2 = false
+          this.disableAll_3 = false
+        }
+      },
+      tabChange (activeKey) {
+        this.currentImgFlag = activeKey
+      },
+      valveNa (e) {
+        this.disableAll_1 = e.target.checked
+        this.checkDiskableAll()
+      },
+      actuatorNa (e) {
+        this.disableAll_2 = e.target.checked
+        this.checkDiskableAll()
+      },
+      accessoryNa (e) {
+        this.disableAll_3 = e.target.checked
+        this.checkDiskableAll()
+      },
+      checkDiskableAll () {
+        if (this.disableAll_1 && this.disableAll_2 && this.disableAll_3) {
+          this.not_applicable = true
+        } else {
+          this.not_applicable = false
+        }
+      },
+      refreshImageList (uploadFiles) {
+        var imgList1 = []
+        var imgList2 = []
+        var imgList3 = []
+        uploadFiles.forEach(e => {
+          if (e.flag === '1') {
+            imgList1.push(e)
+          }
+        })
+        uploadFiles.forEach(e => {
+          if (e.flag === '2') {
+            imgList2.push(e)
+          }
+        })
+        uploadFiles.forEach(e => {
+          if (e.flag === '3') {
+            imgList3.push(e)
+          }
+        })
+
+        setTimeout(() => {
+          tearDonwFields.forEach(v => this.form.getFieldDecorator(v))
+          if (this.$refs.valveTearDown) {
+            this.$refs.valveTearDown.setUploadImgData(imgList1)
+          }
+          if (this.$refs.actuatorTearDown) {
+            this.$refs.actuatorTearDown.setUploadImgData(imgList2)
+          }
+          if (this.$refs.accessoryTearDown) {
+            this.$refs.accessoryTearDown.setUploadImgData(imgList3)
+          }
+        }, 0)
       }
     },
     mounted () {
@@ -117,16 +256,28 @@
       const editData = this.$store.state.editStepData.stepEditData
       this.flow_id = editData.flow_id
       this.current_step = editData.current_step
+      this.showDispatchUser = true
+      // 供flutter刷新上传文件列表
+      window.refreshUploads = this.refreshUploads
+      window.getCurrentImgFlag = this.getCurrentImgFlag
 
       // 获取引用数据（维修前测试选择的维修东东）
-      getSelectRepairData({ FlowID: this.flow_id }).then(res => {
+      queryStepData({ id: this.flow_id, current_step: '(start)' }).then(res => {
+        res.result.step_data.forEach(stepItem => {
+          switch (stepItem.DataNum) {
+            case 1: // 基本信息
+              this.baseInfo = JSON.parse(stepItem.JSON)
+              break
+          }
+        })
+
         // 阀门 "1"
         // 执行机构 "2"
         // 阀门+执行机构 "3"
         // 阀门+执行机构+附件 "4"
         // 零部件 "5"
         // 执行机构+附件 "6"
-        switch (res.select_repair) { // 与 baseInfo 选择的维修部件下拉列表一致
+        switch (this.baseInfo.repair_part) { // 与 baseInfo 选择的维修部件下拉列表一致
           case '1': { // 阀门维修
             this.ValveTD = true
             break
@@ -155,8 +306,35 @@
 
         if (editData.step_data.length > 0) {
           const uploadFiles = JSON.parse(editData.step_data[0].JSON)
+
+          if (!uploadFiles.teardown_valve_date || uploadFiles.teardown_valve_date.indexOf('0001-') >= 0) {
+            uploadFiles.teardown_valve_date = moment()
+          }
+          if (!uploadFiles.teardown_actuator_date || uploadFiles.teardown_actuator_date.indexOf('0001-') >= 0) {
+            uploadFiles.teardown_actuator_date = moment()
+          }
+          if (!uploadFiles.teardown_accessory_date || uploadFiles.teardown_accessory_date.indexOf('0001-') >= 0) {
+            uploadFiles.teardown_accessory_date = moment()
+          }
+
           this.form.setFieldsValue(pick(uploadFiles, tearDonwFields))
-          this.$refs.uploadImg.imgFileList = uploadFiles.uploads
+          if (uploadFiles.not_applicable) {
+            this.not_applicable = uploadFiles.not_applicable
+          }
+          if (uploadFiles.teardown_valve_not_applicable) {
+            this.disableAll_1 = uploadFiles.teardown_valve_not_applicable
+          }
+          if (uploadFiles.teardown_actuator_not_applicable) {
+            this.disableAll_2 = uploadFiles.teardown_actuator_not_applicable
+          }
+          if (uploadFiles.teardown_accessory_not_applicable) {
+            this.disableAll_3 = uploadFiles.teardown_accessory_not_applicable
+          }
+          this.refreshImageList(uploadFiles.uploads)
+        } else {
+          this.form.setFieldsValue(pick({ teardown_valve_date: moment() }, tearDonwFields))
+          this.form.setFieldsValue(pick({ teardown_actuator_date: moment() }, tearDonwFields))
+          this.form.setFieldsValue(pick({ teardown_accessory_date: moment() }, tearDonwFields))
         }
       })
     }

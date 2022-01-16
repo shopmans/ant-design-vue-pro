@@ -17,7 +17,10 @@ const stepApi = {
   delSetpUsers: '/del-setp-users',
   getFlowStepLog: '/flow-step-log',
   changeFlow: '/change-flow',
-  genWorkSerial: '/gen-work-serial'
+  genWorkSerial: '/gen-work-serial',
+  executorUserList: '/getexecutor/list',
+  executorUserAdd: '/getexecutor/add',
+  executorUserDelete: '/getexecutor/delete'
 }
 
 export function saveStepPublic (parameter) {
@@ -149,9 +152,9 @@ export function changeFlow (parameter) {
   })
 }
 
-export function getWorkSerialSerial () {
+export function getWorkSerialSerial (value) {
   return request({
-    url: stepApi.genWorkSerial + '/workorder',
+    url: stepApi.genWorkSerial + '/workorderglodorder/' + value,
     method: 'get'
   })
 }
@@ -274,6 +277,9 @@ export function getCurrentStepMap () {
     'IntoFactoryCheck': {
       text: 'app.flow.repair.intoFactoryCheck'
     },
+    'PreRepairDiag': {
+      text: 'app.flow.repair.preRepairDiag'
+    },
     'PreRepairTest': {
       text: 'app.flow.repair.preRepairTest'
     },
@@ -301,6 +307,9 @@ export function getCurrentStepMap () {
     'Adjust': {
       text: 'app.flow.repair.adjust'
     },
+    'AfterRepairDiag': {
+      text: 'app.flow.repair.afterRepairDiag'
+    },
     'RepairConfirm': {
       text: 'app.flow.repair.RepairConfirm'
     },
@@ -308,7 +317,7 @@ export function getCurrentStepMap () {
       text: 'app.flow.repair.finalCheck'
     },
     'PackingDelivery': {
-      text: '装箱发货'
+      text: 'app.flow.repair.packingDelivery'
     },
     'OnSiteInstall': {
       text: '现场安装'
@@ -349,6 +358,9 @@ export function repairFlowStepValue (val) {
     case 'IntoFactoryCheck': {
       return 10
     }
+    case 'PreRepairDiag': {
+      return 14
+    }
     case 'PreRepairTest': {
       return 15
     }
@@ -375,6 +387,9 @@ export function repairFlowStepValue (val) {
     }
     case 'Adjust': {
       return 55
+    }
+    case 'AfterRepairDiag': {
+      return 56
     }
     case 'RepairConfirm': {
       return 60
@@ -422,6 +437,9 @@ export function getCurrentStepDetailSwitchMap () {
     'IntoFactoryCheck': {
       switch: false
     },
+    'PreRepairDiag': {
+      switch: false
+    },
     'PreRepairTest': {
       switch: false
     },
@@ -447,6 +465,9 @@ export function getCurrentStepDetailSwitchMap () {
       switch: false
     },
     'Adjust': {
+      switch: false
+    },
+    'AfterRepairDiag': {
       switch: false
     },
     'RepairConfirm': {
@@ -489,17 +510,57 @@ export function getActuHandwheel (val) {
       return '顶装'
     case '2':
       return '侧装'
+    case '3':
+      return '1076'
+    case '4':
+      return '1077'
+    case '5':
+      return '1078'
+    case '6':
+      return 'Integral'
+    case '7':
+      return 'Side Mount'
+    case '8':
+      return 'Top Mount'
+    case '9':
+      return 'None'
+    case '10':
+      return 'Other'
     default:
       return ''
   }
 }
 
+// 行程
+export function getActuInstallTravel (val) {
+  switch (val) {
+    case '1':
+      return 'in, '
+    case '2':
+      return 'mm'
+    case '3':
+      return 'deg'
+    default:
+      return ''
+  }
+}
+
+export function getActuInstallTravelUnit (val, unitValue) {
+  if (val) {
+    return val + ' ' + getActuInstallTravel(unitValue)
+  }
+
+  return ''
+}
+
 export function getValveSizeUnit (val) {
   switch (val) {
     case '1':
-      return 'inch'
+      return 'Inch'
     case '2':
-      return 'mm'
+      return 'Mm'
+    case '3':
+      return 'N/A'
     default:
       return ''
   }
@@ -507,7 +568,7 @@ export function getValveSizeUnit (val) {
 
 export function getUnit2ValveSizeValue (val) {
   switch (val) {
-    case 'inch':
+    case 'Inch':
       return '1'
     case 'mm':
       return '2'
@@ -532,9 +593,9 @@ export function getTestOrRepairUnit (val) {
 export function getValveTravelUnit (val) {
   switch (val) {
     case '1':
-      return 'inch'
+      return 'Inch'
     case '2':
-      return 'mm'
+      return 'Mm'
     case '3':
         return '°'
     default:
@@ -543,6 +604,9 @@ export function getValveTravelUnit (val) {
 }
 
 export function getUnit2ValveTravelValue (val) {
+  if (!val) {
+    return
+  }
   if (val.indexOf('-') >= 0) {
     return [val.split('-')[1], '3']
   }
@@ -556,6 +620,7 @@ export function getUnit2ValveTravelValue (val) {
   return ''
 }
 
+// 阀门材质
 export function getValveMaterialUnit (val) {
   switch (val) {
     case '1':
@@ -571,9 +636,9 @@ export function getValveMaterialUnit (val) {
     case '6':
       return 'SST'
     case '7':
-      return 'C3FM'
+      return 'CF3M'
     case '8':
-      return 'C8FM'
+      return 'CF8M'
     case '9':
       return 'Cast'
     case '10':
@@ -581,9 +646,11 @@ export function getValveMaterialUnit (val) {
     case '11':
       return 'A216 WCB'
     case '12':
-      return 'None'
+      return 'Other'
     case '13':
       return 'Carbon Steel'
+    case '14':
+      return 'CG8M'
     default:
       return ''
   }
@@ -604,9 +671,9 @@ export function getUnit2ValveMaterialValue (val) {
       return '5'
     case 'SST':
       return '6'
-    case 'C3FM':
+    case 'CF3M':
       return '7'
-    case 'C8FM':
+    case 'CF8M':
       return '8'
     case 'CAST':
       return '9'
@@ -679,6 +746,9 @@ export function getValvePressureLevelUnit (val) {
 
 // 表格attchement解析
 export function getUnit2AttchementValue (val) {
+  if (!val) {
+    return
+  }
   const tmpValueArray = val.replace(' ', '').split(';')
 
   if (tmpValueArray.length === 2) {
@@ -748,6 +818,8 @@ export function getValveHydrostaticTestValueUnit (val) {
       return 'BAR'
     case '3':
       return 'MPa'
+    case '4':
+      return 'KPa'
     default:
       return ''
   }
@@ -760,7 +832,11 @@ export function getValveLeakTestValueUnit (val) {
     case '2':
       return 'ml/min'
     case '3':
-      return 'bubbles/min'
+      return 'bbl/min'
+    case '4':
+      return 'cc/min'
+    case '5':
+      return 'L/min'
     default:
       return ''
   }
@@ -784,6 +860,9 @@ export function getActuSpringSetPressureUnit (val) {
 }
 
 export function getUnit2ActuSpringSetPressureValue (val) {
+  if (!val) {
+    return
+  }
   const tmpValue = val.toUpperCase()
   if (tmpValue.indexOf('PSIG') >= 0) {
     return [tmpValue.replace('PSIG', '').trim(), '1']
@@ -879,7 +958,7 @@ export function getUnit2ValveConnectModelValue (val) {
   }
 }
 
-// 阀座泄漏测试标准
+// 泄漏测试标准
 export function getValveSeatLeakTestUnit (val) {
   switch (val) {
     case '1':
@@ -951,6 +1030,8 @@ export function getUnit2ValveFillConfigValue (val) {
 
 export function getValveLeakLevel (val) {
   switch (val) {
+    case '6':
+      return 'Class I'
     case '1':
       return 'Class Ⅱ'
     case '2':
@@ -961,6 +1042,10 @@ export function getValveLeakLevel (val) {
       return 'Class Ⅴ'
     case '5':
       return 'Class Ⅵ'
+    case '7':
+      return 'N/A'
+    case '8':
+      return 'Other'
     default:
       return ''
   }
@@ -983,6 +1068,7 @@ export function getUnit2ValveLeakLevelValue (val) {
   }
 }
 
+//  阀内件特
 export function getValveFlowChar (val) {
   switch (val) {
     case '1':
@@ -995,6 +1081,38 @@ export function getValveFlowChar (val) {
       return '修正等百分比'
     case '5':
       return '定制'
+      case '6':
+        return '修正线性'
+        case '7':
+        return 'Anti-Cav'
+        case '8':
+        return 'Cavitrol III'
+        case '9':
+        return 'Cavitrol IV'
+        case '10':
+        return 'M-Flat'
+        case '11':
+        return 'M-Flow'
+        case '12':
+        return 'M-Flute'
+        case '13':
+        return 'M-Form'
+              case '14':
+        return 'Micro Notch'
+              case '15':
+        return 'Noise Atten'
+              case '16':
+        return 'Notchflo'
+              case '17':
+        return 'Whisper I'
+              case '18':
+        return 'Whisper III'
+              case '19':
+        return 'Whisperflo'
+              case '20':
+        return 'N/A'
+              case '21':
+        return 'Other'
     default:
       return ''
   }
@@ -1029,15 +1147,20 @@ export function getSlaveLocatorBrandUnit (val) {
 export function getActuTypeUnit (val) {
   switch (val) {
     case '1':
-      return '弹簧薄膜'
+      return '旋转式-弹簧薄膜'
     case '2':
-      return '齿轮齿条'
+      return '旋转式-气缸'
     case '3':
-      return '拔叉'
-    case '4':
-      return '其它'
+      return '旋转式-齿轮齿条'
     case '5':
-      return '旋转'
+      return '旋转式-拨叉'
+    case '6':
+      return '直行程-弹簧薄膜'
+    case '7':
+      return '直行程-气缸'
+    case '4':
+        return '其它'
+
     default:
       return ''
   }
@@ -1057,9 +1180,15 @@ export function getSlaveStandardOutputUnit (val) {
 export function getActuUseModeUnit (val) {
   switch (val) {
     case '1':
-      return '单作用'
+      return '正作用'
     case '2':
+      return '反作用'
+    case '3':
       return '双作用'
+    case '4':
+      return '分程正作用'
+    case '5':
+      return '分程反作用'
     default:
       return ''
   }
@@ -1094,6 +1223,8 @@ export function getActuInstallPointUnit (val) {
       return '右手3位(RH3)'
     case '8':
       return '右手4位(RH4)'
+    case '9':
+      return 'N/A'
     default:
       return ''
   }
@@ -1175,18 +1306,23 @@ export function getUnit2ValveWaterPressureLevelValve (val) {
   }
 }
 
+// 阀类型
 export function getValveTypeUnit (val) {
   switch (val) {
     case '1':
-      return 'GLOBE balanced'
+      return 'Globe Balanced'
     case '2':
-      return 'GLOBE unbalanced'
+      return 'Globe Unbalanced'
     case '3':
       return 'Butterfly'
     case '4':
       return 'Ball'
     case '5':
       return 'Others'
+    case '6':
+      return 'Angle Balanced'
+    case '7':
+      return 'Angle UNBalanced'
     default:
       return ''
   }
@@ -1254,6 +1390,32 @@ export function getSlaveLocatorActionmodeUnit (val) {
       return '反作用'
     case '3':
       return '双作用'
+    case '4':
+      return '分程正作用'
+    case '5':
+      return '分程反作用'
+    default:
+      return ''
+  }
+}
+
+// 定位器等级
+export function getSlaveLocatorLevalUnit (val) {
+  switch (val) {
+    case '1':
+      return 'AC'
+    case '2':
+      return 'HC'
+    case '3':
+      return 'AD'
+    case '4':
+      return 'PD'
+    case '5':
+      return 'SIS'
+    case '6':
+      return 'ODV'
+    case '7':
+      return 'N/A'
     default:
       return ''
   }
@@ -1266,6 +1428,12 @@ export function getControlModelUnit (val) {
       return '调节阀'
     case '2':
       return '开关阀'
+    case '3':
+      return 'GGC'
+    case '4':
+      return '仪表'
+    case '5':
+      return '调压器'
     default:
       return ''
   }
@@ -1279,6 +1447,22 @@ export function getYesNoSwitchUnit (val) {
     case 2:
     case '2':
       return '否'
+    default:
+      return ''
+  }
+}
+
+export function getYesNoNAUnit (val) {
+  switch (val) {
+    case 1:
+    case '1':
+      return '是'
+    case 2:
+    case '2':
+      return '否'
+    case 3:
+    case '3':
+      return 'N/A'
     default:
       return ''
   }
@@ -1326,6 +1510,19 @@ export function getNESwitchUnit (val) {
     case 2:
     case '2':
       return '异常'
+    default:
+      return ''
+  }
+}
+
+export function getHGUnit (val) {
+  switch (val) {
+    case 1:
+    case '1':
+      return '合格'
+    case 2:
+    case '2':
+      return '不合格'
     default:
       return ''
   }
@@ -1430,11 +1627,28 @@ export function getProcessMediumUnit (val) {
     case '27' : { return '甲烷' }
     case '28' : { return '乙烷' }
     case '29' : { return '丙烷' }
+    case '30' : { return '回收油' }
+    case '31' : { return '油浆' }
+    case '32' : { return '分馏油' }
+    case '33' : { return '循环油浆' }
+    case '34' : { return '渣油加氢' }
+    case '35' : { return '尾油' }
+    case '36' : { return '混合原料油' }
+    case '37' : { return '产品油浆' }
+    case '38' : { return '稳定汽油' }
+    case '39' : { return '吸收塔底油' }
+    case '40' : { return '吸收油' }
+    case '41' : { return '解吸气' }
+    case '42' : { return '水蒸气' }
+    case '43' : { return '液化气' }
+    case '44' : { return '污水' }
+    case '45' : { return '其它' }
     default:
       return ''
   }
 }
 
+// 阀芯/阀球/蝶板材质
 export function getValveCoreBallBettleflyUnit (val) {
   switch (val) {
     case 1:
@@ -1455,13 +1669,40 @@ export function getValveCoreBallBettleflyUnit (val) {
     case 6:
     case '6':
       return 'CF8M'
-
+    case 7:
+    case '7':
+      return 'R30006'
+    case 8:
+    case '8':
+      return 'S20910'
+      case 9:
+    case '9':
+      return '440C SST'
+      case 10:
+        case '10':
+          return '347SST/CoCr-A'
+          case 11:
+    case '11':
+      return 'N07718'
+      case 12:
+    case '12':
+      return 'S21800'
+      case 13:
+    case '13':
+      return 'R31600'
+    case '14':
+        return 'CG8M'
+        case '15':
+        return 'CORA-A'
     default:
       return ''
   }
 }
 
 export function getUnit2ValveCoreBallBettleflyValue (val) {
+  if (!val) {
+    return
+  }
   const tmpVal = val.toUpperCase()
   if (tmpVal.indexOf('COCR-A') >= 0 || tmpVal.indexOf('COCR-6')) {
     return '2'
@@ -1506,6 +1747,33 @@ export function getValveSetRingUnit (val) {
     case 5:
     case '5':
       return '316SST'
+    case 6:
+    case '6':
+      return 'COCR-A'
+    case 7:
+    case '7':
+      return '60% RESTRICTED'
+    case 8:
+    case '8':
+      return '40% RESTRICTED'
+    case 9:
+    case '9':
+      return 'S31600/COCR-A'
+    case 10:
+    case '10':
+      return 'S32500 SST'
+    case 11:
+    case '11':
+          return 'S44004 SST'
+    case 12:
+    case '12':
+      return '347SST/CoCr-A'
+    case 13:
+    case '13':
+      return 'NOVEX S31600 NITRIDED'
+    case 14:
+    case '14':
+      return 'PTFE'
     default:
       return ''
   }
@@ -1523,6 +1791,35 @@ export function getValveCageRetainingRingUnit (val) {
     case 3:
     case '3':
       return 'Carbon Steel'
+    case 4:
+    case '4':
+      return 'R30006'
+      case 5:
+    case '5':
+      return 'CB7Cu-1 SST'
+      case 6:
+        case '6':
+          return '347SST/CRCT'
+          case 7:
+    case '7':
+      return 'S32550 SST'
+      case 8:
+    case '8':
+      return '316H SST'
+      case 9:
+    case '9':
+      return 'S31600'
+
+    //   case 10:
+    // case '10':
+    //   return 'R30006'
+    //   case 11:
+    // case '11':
+    //   return 'R30006'
+    //   case 12:
+    // case '12':
+    //   return 'R30006'
+
     default:
       return ''
   }
@@ -1560,6 +1857,9 @@ export function getValveSpacer (val) {
     case 3:
     case '3':
       return 'Graphite/ Spiral wound gasket'
+    case 4:
+    case '4':
+      return '316SST'
     default:
       return ''
   }
@@ -1644,6 +1944,23 @@ export function getValveSizeUnitTextNA (val, unitValue) {
 }
 
 // /////////////////////////////////////// 处理备品数据
+
+// 带回位号
+// export function takeValveTag (data, that) {
+//   that.form.resetFields(['tag'])
+
+//   if (data.tag) {
+
+//     if (data.tag.toLowerCase().indexOf('inch') >= 0 && getUnit2ValveSizeValue('inch')) {
+//       data.valve_size = data.size.replace('inch', '')
+//       data.valve_size_unit = getUnit2ValveSizeValue('inch')
+//     } else if (data.size.toLowerCase().indexOf('mm') >= 0 && getUnit2ValveSizeValue('mm')) {
+//       data.valve_size = data.size.replace('inch', '')
+//       data.valve_size_unit = getUnit2ValveSizeValue('mm')
+//     }
+//   }
+// }
+
 export function takeValveSize (data, that) { // 带回阀尺寸
   that.form.resetFields(['valve_size', 'valve_size_unit'])
 
@@ -1659,6 +1976,10 @@ export function takeValveSize (data, that) { // 带回阀尺寸
 }
 
 export function takeValveMaterial (data, that) { // 带回阀材质
+  if (!data.hasOwnProperty('body_material')) {
+    return
+  }
+
   that.form.resetFields(['valve_material'])
 
   const selectValue = getUnit2ValveMaterialValue(data.body_material.toUpperCase())
@@ -1701,7 +2022,7 @@ export function takeValveValveCoreBallBettlefly (data, that) { // 带回阀杆�
 }
 
 export function takeActuator (data, that) { // 带回执行机购
-  that.form.resetFields(['actu_model', 'actu_size', 'actu_size_unit'])
+  that.form.resetFields(['actu_model', 'actu_size', 'actu_size_unit', 'actuator_serial'])
 
   if (data.actuator) {
     const actuatorModel = data.actuator.split('/')[0]
@@ -1713,10 +2034,17 @@ export function takeActuator (data, that) { // 带回执行机购
     if (actuatorSize) {
       data.actu_size = actuatorSize
     }
+    if (data.valve_serial) {
+      data.actuator_serial = data.valve_serial
+    }
   }
 }
 
 export function takeSpoolMaterial (data, that) { // 带回阀芯/阀球/蝶板材质
+  if (!data.hasOwnProperty('spool_material')) {
+    return
+  }
+
   that.form.resetFields(['valve_core_ball_bettlefly'])
 
   const selectValue = getUnit2ValveCoreBallBettleflyValue(data.spool_material)
@@ -1785,13 +2113,14 @@ export function takeBenchset (data, that) { // bench set
 }
 
 export function takeAttachment (data, that) { // 附件
-  that.form.resetFields(['slave_filter_valve_model', 'slave_locator_model', 'slave_retaining_valve_model'])
+  that.form.resetFields(['slave_filter_valve_model', 'slave_locator_model', 'slave_retaining_valve_model', 'slave_locator_serial'])
 
   const selectValue = getUnit2AttchementValue(data.attachment)
   if (selectValue) {
     data.slave_locator_model = selectValue[0]
     data.slave_retaining_valve_model = selectValue[1]
     data.slave_filter_valve_model = selectValue[2]
+    data.slave_locator_serial = data.valve_serial
   }
 }
 
@@ -1808,7 +2137,8 @@ export function getStepValveFields () {
   'valve_leak_test_time', 'valve_leak_test_time_unit', 'valve_travel', 'valve_travel_unit', 'valve_lv', 'valve_test_medium',
   'valve_flow_input', 'valve_leak_test_medium', 'valve_leak_test_std_pressed', 'valve_leak_test_std_pressed_unit', 'valve_test_std',
   'valve_connect_model', 'valve_core_ball_bettlefly', 'valve_cage_retaining_ring', 'valve_set_ring', 'valve_village_bearing',
-  'valve_spacer', 'valve_stem_axis', 'valve_serial_switch']
+  'valve_spacer', 'valve_stem_axis', 'valve_serial_switch', 'valve_set_ring_switch', 'valve_village_bearing_switch',
+  'valve_core_ball_bettlefly_switch', 'valve_cage_retaining_ring_switch']
 }
 
 export function getStepActuatorFields () {
@@ -1816,11 +2146,12 @@ export function getStepActuatorFields () {
   'actu_spring_set_pressure', 'actu_failure', 'actu_install_point', 'actu_cover_bolt_tool', 'actu_cover_bolt_torque',
   'actu_cover_bolt_material', 'actu_cover_bolt_size', 'actu_use_mode', 'actu_model', 'actu_spring_set_pressure_unit',
   'actu_cover_bolt_tool_unit', 'actu_cover_bolt_tool_item', 'actu_cover_bolt_torque_unit', 'actu_cover_bolt_size_unit',
-  'actu_size_unit', 'actu_air_pressed', 'actu_air_pressed_unit', 'actu_install_bracket', 'actu_install_directore', 'actu_handwheel']
+  'actu_size_unit', 'actu_air_pressed', 'actu_air_pressed_unit', 'actu_install_bracket', 'actu_install_directore', 'actu_handwheel',
+'actu_install_travel', 'actu_install_travel_unit']
 }
 
 export function getStepSlaveFields () {
-  return ['id', 'date', 'slave_locator_brand', 'slave_locator_model', 'slave_input_signal_scope', 'slave_standard_output',
+  return ['id', 'date', 'slave_locator_brand', 'slave_locator_model', 'slave_locator_leval', 'slave_input_signal_scope', 'slave_standard_output',
   'slave_filter_valve_brand', 'slave_filter_valve_model', 'slave_elect_valve_brand1', 'slave_elect_valve_model1', 'slave_elect_valve_vol1',
   'slave_elect_valve_active1', 'slave_elect_valve_brand2', 'slave_elect_valve_model2', 'slave_elect_valve_vol2', 'slave_elect_valve_active2',
   'slave_elect_valve_brand3', 'slave_elect_valve_model3', 'slave_elect_valve_vol3', 'slave_elect_valve_active3',
@@ -1830,13 +2161,190 @@ export function getStepSlaveFields () {
 }
 
 export function getStepBaseFields () {
-  return ['id', 'date', 'work_order_serial', 'type', 'tag',
+  return ['id', 'date', 'work_order_serial', 'type', 'tag', 'base_inf_finaluser',
   'estimate', 'return_part', 'repair_part', 'disassembly', 'receipt_date', 'serial_number',
-  'requirst_done_date', 'project_serial', 'serial', 'content', 'receipt_number', 'purchased_part_list', 'control_model', 'process_medium']
+  'requirst_done_date', 'project_serial', 'serial', 'valve_serial', 'content', 'receipt_number',
+  'purchased_part_list', 'control_model', 'process_medium', 'factory_branch', 'base_device', 'batch_number',
+  'spec_app', 'stepbase_workerdone_date', 'stepbase_total_minute']
 }
 
 export function getStepPartsFields () {
   return ['valve_part_type']
+}
+
+export function getValvaBanner () {
+  return ['Fisher', 'Baumann', 'Arca', 'Bray', 'Cameron', 'Cci', 'Copes', 'Crane', 'Edwards', 'Fasani', 'Flowserve', 'Gulde', 'Jamesbury', 'Jordan', 'Keystone', 'Ktm', 'Leslie', 'Masoneilan', 'Metso', 'Mogas', 'Neles', 'Neway', 'Orbit', 'Pacific', 'Samson', 'Saunders', 'Sempell', 'Spirax Sarco', 'Vanessa']
+}
+
+export function getValveMaterial () {
+  return ['Wcb', 'Wcc', 'Wc5', 'Wc6', 'Wc9', 'Sst', 'Cf3m', 'Cf8m', 'Cast', 'Iron', 'A216 Wcb', 'Carbon Steel', 'Cg8m', 'Other']
+}
+
+export function getValvePressureList () {
+  return ['CL150', 'CL300', 'CL600', 'CL900', 'CL1500', 'CL2500', 'CL3000', 'CL6000', 'PN6', 'PN10', 'PN16', 'PN20', 'PN25', 'PN40', 'PN50', 'PN64', 'PN100', 'PN150', 'PN250', 'PN420']
+}
+
+export function getValveFlowList () {
+  return ['向上', '向下', '正向', '反向', '双向', '其它']
+}
+
+// 过滤器和减压阀
+export function getOtherFilterBegulator () {
+  return ['良好', '损坏', '缺失', 'N/A']
+}
+
+export function getValveFillInputList () {
+  return ['High Seal Graphite', 'Chesterton Comp', 'Chesterton Graph', 'Dbl PTFE V-Ring', 'Enviro Duplex', 'Enviro Graph', 'Enviro PTFE', 'Enviro ULF Graph', 'Kalrez', 'Low Emissions', 'PTFE Comp', 'PTFE V-ring', 'N/A', 'Other', 'GRAPHITE SINGLE']
+}
+
+// 泄漏等级
+export function getValveLeakLevelList () {
+  return ['Class Ⅱ', 'Class Ⅲ', 'Class Ⅳ', 'Class Ⅴ', 'Class Ⅵ', 'Class I', 'N/A', 'Other']
+}
+
+export function getValveCoreBallBettlefly () {
+  return ['S31600', 'S41600', 'S31600/CORA-A', 'S44004', 'CF3M', 'CF8M', 'R30006', 'S20910', '440C SST', '347SST/CoCr-A', 'N07718', 'S21800', 'R31600', 'CG8M', 'CORA-A']
+}
+
+export function getValveStemAxis () {
+  return ['S31600', 'S17400', 'S20910', '17-4PH']
+}
+
+export function getValveCageRetainingRing () {
+  return ['S31600/CORA-A', 'S17400', 'Carbon Steel', 'R30006', 'CB7Cu-1 SST', '347SST/CRCT', 'S32550 SST', '316H SST', 'S31600']
+}
+
+export function getValveSetRing () {
+  return ['S31600', 'S41600', 'S42000', 'R30006', '316SST', 'COCR-A', 'COCR-A, 40% RESTRICTED', 'S31600/COCR-A', 'S32500 SST', 'S44004 SST', '347SST/CoCr-A', 'NOVEX S31600 NITRIDED', 'PTFE']
+}
+
+export function getValveVillageBearing () {
+  return ['S31600', 'R30006', 'PEEK', '316/NITRIDED']
+}
+
+export function getValveSpacerData () {
+  return ['Graphite', 'Spiral wound gasket', 'Graphite/ Spiral wound gasket', '316SST']
+}
+
+export function getValveCoverBoltMaterial () {
+  return ['SST(不锈钢)', 'B7(碳钢)', 'B8(碳钢)']
+}
+
+export function scsc () {
+  return ['ccccccc', 'ccccccc', 'ccccccc', 'ccccccc', 'ccccccc', 'ccccccc', 'ccccccc', 'ccccccc', 'ccccccc', 'ccccccc', 'ccccccc']
+}
+
+export function getValveLeakTestInputList () {
+  return ['API598', 'FCI70-2', 'FGS4L5', 'FGS4L6']
+}
+
+export function getValveStdTestInputList () {
+  return ['API598', 'FGS4LI']
+}
+
+export function getSalveLocaModList () {
+  return ['3570', '3580', '3582', '3582i', '3610', '3610J', '3610JP', '3611JP', '3620JP', '3621JP', '3622', '3661', '3710', '3720', 'DV2000', 'DVC6000f', 'DVC6010', 'DVC6020', 'DVC6030', 'DVC6200', 'DVC6200f', 'DVC6200P', 'Other']
+}
+
+// 其它附件
+export function getOtherSlaveData () {
+  return [
+    {
+      key: '1',
+      title: '气动放大器',
+      description: ''
+    },
+    {
+      key: '2',
+      title: '快排',
+      description: ''
+    },
+    {
+      key: '3',
+      title: '减压阀',
+      description: ''
+    },
+    {
+      key: '4',
+      title: '过滤器',
+      description: ''
+    },
+    {
+      key: '5',
+      title: '电气转换器',
+      description: ''
+    },
+    {
+      key: '6',
+      title: '位置变送器',
+      description: ''
+    }
+  ]
+}
+
+// 工艺价质列表
+export function getProcessMediumList () {
+  return ['水', '锅炉给水', '空气', '蒸汽', '氮气', '天然气', '氢气', '氧气', '氯气', '热高分油', '冷高分油', '酸水', '碱液', '氯甲烷', '导热油', '原油', '富胺液', '凝液', '液氨', '黑水', '灰水', '合成气', '甲醇', '乙醇', '乙二醇', '碳氢化合物', '甲烷', '乙烷', '丙烷', '回收油', '油浆', '分馏油', '循环油浆', '渣油加氢', '尾油', '混合原料油', '产品油浆', '稳定汽油', '吸收塔底油', '吸收油', '解吸气', '水蒸气', '液化气', '污水', '其它']
+}
+
+// 阀类型
+export function getValveTypeList () {
+  return ['Globe Balanced', 'Globe Unbalanced', 'Butterfly', 'Ball', 'Angle Balanced', 'Angle Unbalanced', 'Others']
+}
+
+// 其它附件根据选择显示不同区域
+// desc 内容与 assessment.js 中的 getAccessariesASFields 保持一致
+export function getOtherSlaveSelectArea () {
+  return [
+    {
+      key: '1',
+      title: '定位器',
+      description: '',
+      desc: 'accessaries_positioner'
+    },
+    {
+      key: '2',
+      title: '过滤减压阀',
+      description: '',
+      desc: 'accessaries_airset'
+    },
+    {
+      key: '3',
+      title: '电磁阀',
+      description: '',
+      desc: 'accessaries_solenoid'
+    },
+    {
+      key: '4',
+      title: '位置开关',
+      description: '',
+      desc: 'accessaries_limitswitch'
+    },
+    {
+      key: '5',
+      title: '保位/切换阀',
+      description: '',
+      desc: 'accessaries_lockup_trip_valve'
+    },
+    {
+      key: '6',
+      title: '其它附件',
+      description: '',
+      desc: 'accessaries_other'
+    }
+  ]
+}
+
+export function getOtherSlaveText (key) {
+  switch (key) {
+    case '1': return '气动放大器'
+    case '2': return '快排'
+    case '3': return '减压阀'
+    case '4': return '过滤器'
+    case '5': return '电气转换器'
+    case '6': return '位置变送器'
+    default: return ''
+  }
 }
 
 // 返回执行人姓名字符串
@@ -1851,12 +2359,127 @@ export function getStepUser (data) {
 }
 
 export function formatDateYMDHMS (date) {
+  if (!date) {
+    return
+  }
   return moment(date).zone('+08:00').format('YYYY-MM-DD HH:mm:ss')
 }
 
 export function formatDateYMD (date) {
+  if (!date) {
+    return
+  }
   if (date.indexOf('0001-01') >= 0) {
     return 'N/A'
   }
   return moment(date).zone('+08:00').format('YYYY-MM-DD')
+}
+
+export function formatDateYMDZone (date, zone) {
+  if (!date) {
+    return
+  }
+  if (date.indexOf('0001-01') >= 0) {
+    return 'N/A'
+  }
+  return moment(date).zone(zone).format('YYYY-MM-DD')
+}
+
+export function formatDateYMDNull (date) {
+  if (!date) {
+    return
+  }
+  if (date.indexOf('0001-') >= 0 || date.indexOf('1970-') >= 0) {
+    return ''
+  }
+  return moment(date).zone('+08:00').format('YYYY-MM-DD')
+}
+
+export function formatDateYMDZoneNull (date, zone) {
+  if (!date) {
+    return
+  }
+  if (date.indexOf('0001-01') >= 0 || date.indexOf('1970-') >= 0) {
+    return ''
+  }
+  return moment(date).zone(zone).format('YYYY-MM-DD')
+}
+
+export function BaseFillerColumns () {
+  return ['base_filler_no', 'base_filler_1', 'base_filler_2', 'base_filler_3']
+}
+
+export function newBaseFillerColumns (key) {
+  return {
+    key: key + '',
+    base_filler_no: '',
+    base_filler_1: '',
+    base_filler_2: '',
+    base_filler_3: '',
+    editable: true,
+    isNew: true
+  }
+}
+
+export function BaseFillerColumnNames () {
+  return [
+    {
+      title: '序号',
+      dataIndex: 'base_filler_no',
+      key: 'base_filler_no',
+      width: '10%',
+      scopedSlots: { customRender: 'base_filler_no' }
+    },
+    {
+      title: '名称1',
+      dataIndex: 'base_filler_1',
+      key: 'base_filler_1',
+      width: '25%',
+      scopedSlots: { customRender: 'base_filler_1' }
+    },
+    {
+      title: '名称2',
+      dataIndex: 'base_filler_2',
+      key: 'base_filler_2',
+      width: '25%',
+      scopedSlots: { customRender: 'base_filler_2' }
+    },
+    {
+      title: '名称3',
+      dataIndex: 'base_filler_3',
+      key: 'base_filler_3',
+      width: '25%',
+      scopedSlots: { customRender: 'base_filler_3' }
+    },
+    {
+      title: '操作',
+      key: 'action',
+      width: '15%',
+      scopedSlots: { customRender: 'operation' }
+    }
+  ]
+}
+
+export function getExecutorUserList (data) {
+  return request({
+    url: stepApi.executorUserList,
+    method: 'post',
+    data: data
+  })
+}
+
+export function addExecutorUsers (data) {
+  return request({
+    url: stepApi.executorUserAdd,
+    method: 'post',
+    data: data
+  })
+}
+
+export function delExecutorUsers (data) {
+  return request({
+    url: stepApi.executorUserDelete,
+    method: 'post',
+    data: data
+  })
 }

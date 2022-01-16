@@ -4,7 +4,7 @@
       <a-descriptions title="">
         <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
         <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
-        <a-descriptions-item label="总工时">待汇总</a-descriptions-item>
+        <a-descriptions-item label="总工时">{{ stepData.work_time_all }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
     <br>
@@ -12,7 +12,7 @@
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-descriptions title="">
-            <a-descriptions-item label="工时(分钟)">{{ TearDownData.teardown_valve_total_minute }}</a-descriptions-item>
+            <a-descriptions-item label="工时(min)">{{ TearDownData.teardown_valve_total_minute }}</a-descriptions-item>
           </a-descriptions>
         </a-col>
       </a-row>
@@ -29,7 +29,7 @@
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-descriptions title="">
-            <a-descriptions-item label="工时(分钟)">{{ TearDownData.teardown_actuator_total_minute }}</a-descriptions-item>
+            <a-descriptions-item label="工时(min)">{{ TearDownData.teardown_actuator_total_minute }}</a-descriptions-item>
           </a-descriptions>
         </a-col>
       </a-row>
@@ -46,7 +46,7 @@
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-descriptions title="">
-            <a-descriptions-item label="工时(分钟)">{{ TearDownData.teardown_accessory_total_minute }}</a-descriptions-item>
+            <a-descriptions-item label="工时(min)">{{ TearDownData.teardown_accessory_total_minute }}</a-descriptions-item>
           </a-descriptions>
         </a-col>
       </a-row>
@@ -58,7 +58,17 @@
         </a-col>
       </a-row>
     </a-card>
-    <br><br>
+    <a-card title="适用" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="不适用" v-if="TearDownData.not_applicable">
+          是
+        </a-descriptions-item>
+        <a-descriptions-item label="不适用" v-if="!TearDownData.not_applicable">
+          否
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+    <br>
     <a-card :bordered="false" title="上传图片">
       <UploadImgRead ref="uploadImgRead" />
     </a-card>
@@ -66,9 +76,8 @@
 </template>
 
 <script>
-import { getSelectRepairData } from '@/api/preRepairTest'
 import UploadImgRead from '../modules/UploadImgRead'
-import { getStepUser, formatDateYMD } from '@/api/step'
+import { getStepUser, formatDateYMD, queryStepData } from '@/api/step'
 
 export default {
     components: {
@@ -82,7 +91,9 @@ export default {
         TearDownData: {},
         SeatLeakTestStdValue: '',
         stepUser: '',
-        stepDoneDate: ''
+        stepDoneDate: '',
+        stepData: {},
+        baseInfo: {}
       }
     },
     mounted () {
@@ -91,17 +102,25 @@ export default {
         return
       }
       // 修改数据
+      this.stepData = this.$store.state.editStepData.stepEditData
       this.TearDownData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
-      getSelectRepairData({ FlowID: this.$store.state.editStepData.stepEditData.flow_id }).then(res => {
-      this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
-      this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
+      queryStepData({ id: this.$store.state.editStepData.stepEditData.flow_id, current_step: '(start)' }).then(res => {
+        res.result.step_data.forEach(stepItem => {
+          switch (stepItem.DataNum) {
+            case 1: // 基本信息
+              this.baseInfo = JSON.parse(stepItem.JSON)
+              break
+          }
+        })
+        this.stepUser = getStepUser(this.$store.state.editStepData.stepEditData.users)
+        this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
         // 阀门 "1"
         // 执行机构 "2"
         // 阀门+执行机构 "3"
         // 阀门+执行机构+附件 "4"
         // 零部件 "5"
         // 执行机构+附件 "6"
-        switch (res.select_repair) { // 与 baseInfo 选择的维修部件下拉列表一致
+        switch (this.baseInfo.repair_part) { // 与 baseInfo 选择的维修部件下拉列表一致
           case '1': { // 阀门维修
             this.ValveTD = true
             break

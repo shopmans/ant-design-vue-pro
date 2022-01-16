@@ -3,11 +3,11 @@
     <a-card title="维修工单基本信息" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <!-- 行1 -->
       <a-row class="form-row" :gutter="16">
+        <a-divider orientation="left">1</a-divider>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="工程编号">
             <a-select
-              label-in-value
               ref="projectSelect"
               :disabled="selectDisabled"
               show-search
@@ -20,9 +20,15 @@
               v-decorator="[ 'project_id', {rules: [{ required: true, message: '请输入工程编号'}]} ]"
               v-if="showSerialValue"
             >
-              <a-select-option v-for="d in projectSerialData" :key="d.value">
+              <a-select-option v-for="d in projectSerialData" :value="d.value" :key="d.value">
                 {{ d.text }}
               </a-select-option>
+              <!-- <a-select-option value="2223333">
+                scscscsc
+              </a-select-option>
+              <a-select-option value="497e6388-5266-41a4-80d9-ce6103261ae1">
+                2223333
+              </a-select-option> -->
             </a-select>
             <a-input v-if="!showSerialValue" v-decorator="[ 'project_serial', {rules: [{ }]} ]" disabled></a-input>
           </a-form-item>
@@ -30,7 +36,25 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="工单编号">
-            <a-input v-decorator="[ 'work_order_serial', {rules: [{ message: '请输入工单编号', whitespace: true}]} ]" />
+            <a-input :maxLength="14" v-decorator="[ 'work_order_serial', {rules: [{ message: '请输入工单编号', whitespace: true}]} ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="最终用户">
+            <a-input v-decorator="[ 'base_inf_finaluser', {rules: [{ message: '请输入位号', whitespace: true}]} ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="生产部/分厂">
+            <a-input v-decorator="[ 'factory_branch', {rules: [{whitespace: true}]} ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="装置">
+            <a-input v-decorator="[ 'base_device', {rules: [{whitespace: true}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -40,32 +64,117 @@
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="预估检测费用">
-            <a-input-number
-              style="width:100%;"
-              :min="0"
-              :formatter="value => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-              :parser="value => value.replace(/\￥\s?|(,*)/g, '')"
-              :precision="2"
-              v-decorator="[
-                'estimate',
-                {rules: []}
-              ]" />
+          <a-row>
+            <a-col :span="18">
+              <a-form-item
+                label="阀门序列号">
+                <a-select
+                  ref="valveSelect"
+                  show-search
+                  :default-active-first-option="false"
+                  :show-arrow="false"
+                  :filter-option="false"
+                  :not-found-content="null"
+                  @search="handleValveSearch"
+                  @change="selectValveSerialChange"
+                  v-decorator="[ 'valve_serial', {rules: [{ message: '请输入阀门序列号'}]} ]"
+                  v-if="showValveSerialValue"
+                >
+                  <a-select-option v-for="d in valveSerialData" :key="d.value">
+                    {{ d.text }}
+                  </a-select-option>
+                </a-select>
+                <a-input v-if="!showValveSerialValue" v-decorator="[ 'valve_serial', {rules: [{ message: '请输入阀门序列号' }]} ]" @change="inputValveSerialChange"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item>
+                <a-switch :checked="switchChecked" v-decorator="[ 'valve_serial_switch', {rules: [{ required: false }]} ]" style="margin-top:45px;margin-left:5px;" @change="valveSerialInputSwitch"></a-switch>
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="批次号">
+            <a-input v-decorator="[ 'batch_number', {rules: [{ message: '', whitespace: true}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="返厂部件">
+            label="设备类型">
             <a-select
               v-decorator="[
+                'control_model',
+                {initialValue: '1', rules: [{ message: '请选择现场拆装'}]}
+              ]"
+              :allowClear="true" >
+              <a-select-option value="1">调节阀</a-select-option>
+              <a-select-option value="2">开关阀</a-select-option>
+              <a-select-option value="3">Ggc</a-select-option>
+              <a-select-option value="4">仪表</a-select-option>
+              <a-select-option value="5">调压器</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item label="工艺介质">
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'process_medium',
+                  {initialValue: '', rules: [{ message: '请输入工艺介质'}]}
+                ]"
+                style="width: 65%" />
+              <a-select style="width: 35%" @change="selectProcessMediumChange" :allowClear="true">
+                <a-select-option v-for="item in processMediumList" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="特殊应用">
+            <a-select
+              @change="repairSelectChange"
+              v-decorator="[
+                'spec_app',
+                {initialValue: '', rules: []}
+              ]"
+              :allowClear="true" >
+              <a-select-option value="1">氧阀</a-select-option>
+              <a-select-option value="2">放空阀</a-select-option>
+              <a-select-option value="3">防喘振阀</a-select-option>
+              <a-select-option value="4">PDS阀</a-select-option>
+              <a-select-option value="5">三偏心</a-select-option>
+              <a-select-option value="6">锁渣阀</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <br>
+      <br>
+      <a-row :gutter="16">
+        <a-divider orientation="left">2</a-divider>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="返厂部件">
+            <a-select
+              @change="repairSelectChange"
+              v-decorator="[
                 'return_part',
-                {rules: [{ message: '请选择返厂部件'}]}
-              ]" >
+                {initialValue: '4', rules: [{required: true, message: '请选择返厂部件'}]}
+              ]"
+              :allowClear="true" >
               <a-select-option value="1">阀门</a-select-option>
               <a-select-option value="2">执行机构</a-select-option>
               <a-select-option value="3">阀门+执行机构</a-select-option>
               <a-select-option value="4">阀门+执行机构+附件</a-select-option>
               <a-select-option value="6">执行机构+附件</a-select-option>
+              <a-select-option value="8">附件</a-select-option>
               <a-select-option value="5">零部件</a-select-option>
               <a-select-option value="7">定位器</a-select-option>
             </a-select>
@@ -75,37 +184,20 @@
           <a-form-item
             label="维修部件">
             <a-select
-              @change="repairSelectChange"
               v-decorator="[
                 'repair_part',
-                {rules: [{ required: true, message: '请选择维修部件'}]}
-              ]" >
+                {initialValue: '4', rules: [{ message: '请选择维修部件'}]}
+              ]"
+              :allowClear="true" >
               <a-select-option value="1">阀门</a-select-option>
               <a-select-option value="2">执行机构</a-select-option>
               <a-select-option value="3">阀门+执行机构</a-select-option>
               <a-select-option value="4">阀门+执行机构+附件</a-select-option>
               <a-select-option value="6">执行机构+附件</a-select-option>
+              <a-select-option value="8">附件</a-select-option>
               <a-select-option value="5">零部件</a-select-option>
               <a-select-option value="7">定位器</a-select-option>
             </a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="现场拆装">
-            <a-select
-              v-decorator="[
-                'disassembly',
-                {rules: [{ message: '请选择现场拆装'}]}
-              ]" >
-              <a-select-option value="1">是</a-select-option>
-              <a-select-option value="2">否</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="出入厂单据号码">
-            <a-input v-decorator="[ 'receipt_number', {rules: [{ message: '请输入出入厂单据号码', whitespace: true}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -130,10 +222,16 @@
               ]" />
           </a-form-item>
         </a-col>
+      </a-row>
+
+      <br>
+      <br>
+      <a-row :gutter="16">
+        <a-divider orientation="left">3</a-divider>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="序列号">
-            <a-input v-decorator="[ 'serial', {rules: [{ message: '请输入序列号', whitespace: true}]} ]" />
+            label="出入厂单据号码">
+            <a-input v-decorator="[ 'receipt_number', {rules: [{ message: '请输入出入厂单据号码', whitespace: true}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -142,56 +240,64 @@
             <a-input v-decorator="[ 'serial_number', {rules: [{ message: '请输入序号', whitespace: true}]} ]" />
           </a-form-item>
         </a-col>
+      </a-row>
+
+      <br>
+      <br>
+      <a-row :gutter="16">
+        <a-divider orientation="left">4</a-divider>
         <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="控制方式">
-            <a-select
+          <a-form-item label="预估检测费用">
+            <a-input-number
+              style="width:100%;"
+              :min="0"
+              :formatter="value => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+              :parser="value => value.replace(/\￥\s?|(,*)/g, '')"
+              :precision="2"
               v-decorator="[
-                'control_model',
-                {rules: [{ message: '请选择现场拆装'}]}
-              ]" >
-              <a-select-option value="1">调节阀</a-select-option>
-              <a-select-option value="2">开关阀</a-select-option>
-            </a-select>
+                'estimate',
+                {rules: []}
+              ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="工艺介质">
+          <a-form-item label="现场拆装">
             <a-select
               v-decorator="[
-                'process_medium',
-                {rules: [{ message: '请选择工艺介质'}]}
-              ]" >
-              <a-select-option value="1">水</a-select-option>
-              <a-select-option value="2">锅炉给水</a-select-option>
-              <a-select-option value="3">空气</a-select-option>
-              <a-select-option value="4">蒸汽</a-select-option>
-              <a-select-option value="5">氮气</a-select-option>
-              <a-select-option value="6">天然气</a-select-option>
-              <a-select-option value="7">氢气</a-select-option>
-              <a-select-option value="8">氧气</a-select-option>
-              <a-select-option value="9">氯气</a-select-option>
-              <a-select-option value="10">热高分油</a-select-option>
-              <a-select-option value="11">冷高分油</a-select-option>
-              <a-select-option value="12">酸水</a-select-option>
-              <a-select-option value="13">碱液</a-select-option>
-              <a-select-option value="14">氯甲烷</a-select-option>
-              <a-select-option value="15">导热油</a-select-option>
-              <a-select-option value="16">原油</a-select-option>
-              <a-select-option value="17">富胺液</a-select-option>
-              <a-select-option value="18">凝液</a-select-option>
-              <a-select-option value="19">液氨</a-select-option>
-              <a-select-option value="20">黑水</a-select-option>
-              <a-select-option value="21">灰水</a-select-option>
-              <a-select-option value="22">合成气</a-select-option>
-              <a-select-option value="23">甲醇</a-select-option>
-              <a-select-option value="24">乙醇</a-select-option>
-              <a-select-option value="25">乙二醇</a-select-option>
-              <a-select-option value="26">碳氢化合物</a-select-option>
-              <a-select-option value="27">甲烷</a-select-option>
-              <a-select-option value="28">乙烷</a-select-option>
-              <a-select-option value="29">丙烷</a-select-option>
+                'disassembly',
+                {rules: [{ message: '请选择现场拆装'}]}
+              ]"
+              :allowClear="true" >
+              <a-select-option value="1">是</a-select-option>
+              <a-select-option value="2">否</a-select-option>
             </a-select>
+          </a-form-item>
+        </a-col>
+        <!-- <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="序列号">
+            <a-input v-decorator="[ 'serial', {rules: [{ message: '请输入序列号', whitespace: true}]} ]" />
+          </a-form-item>
+        </a-col> -->
+      </a-row>
+
+      <br>
+      <br>
+      <a-row :gutter="16">
+        <a-divider orientation="left">5</a-divider>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item label="工时(min)">
+            <a-input-number
+              style="width:100%;"
+              v-decorator="[
+                'stepbase_total_minute',
+                {rules: []}
+              ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="6">
+          <a-form-item label="完成日期">
+            <a-date-picker valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['stepbase_workerdone_date', {}]" style="width: 100%" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -258,14 +364,14 @@
                     </span>
                     <span v-else>
                       <a @click="saveRow(record)">保存</a>
-                      <a-divider type="vertical" />
-                      <a @click="cancel(record.key)">取消</a>
                     </span>
                   </template>
                   <span v-else>
                     <a-popconfirm title="是否要删除此行？" @confirm="removeRow(record.key)">
                       <a>删除</a>
                     </a-popconfirm>
+                    <a-divider type="vertical" />
+                    <a @click="editRow(record)">编辑</a>
                   </span>
                 </template>
               </a-table>
@@ -277,8 +383,60 @@
           </a-card>
         </a-col>
       </a-row>
+      <br>
 
-      <br><br>
+      <!-- <a-row class="form-row" :gutter="16">
+        <a-col>
+          <a-card title="填料信息" :headStyle="{fontWeight:'bold'}" >
+            <a-row class="form-row" :gutter="16">
+              <a-table
+                :columns="BaseFillerColumnNames()"
+                :dataSource="baseFillerSource"
+                :pagination="false"
+                :loading="memberLoading"
+              >
+                <template v-for="(col, i) in BaseFillerColumns()" :slot="col" slot-scope="text, record">
+                  <a-input
+                    :key="col"
+                    v-if="record.editable"
+                    style="margin: -5px 0"
+                    :value="text"
+                    :placeholder="BaseFillerColumnNames()[i].title"
+                    @change="e => handleBaseFillerChange(e.target.value, record.key, col)"
+                  />
+                  <template v-else>{{ text }}</template>
+                </template>
+                <template slot="operation" slot-scope="text, record">
+                  <template v-if="record.editable">
+                    <span v-if="record.isNew">
+                      <a @click="saveBaseFillerRow(record)">添加</a>
+                      <a-divider type="vertical" />
+                      <a-popconfirm title="是否要删除此行？" @confirm="removeBaseFillerRow(record.key)">
+                        <a>删除</a>
+                      </a-popconfirm>
+                    </span>
+                    <span v-else>
+                      <a @click="saveBaseFillerRow(record)">保存</a>
+                    </span>
+                  </template>
+                  <span v-else>
+                    <a-popconfirm title="是否要删除此行？" @confirm="removeBaseFillerRow(record.key)">
+                      <a>删除</a>
+                    </a-popconfirm>
+                    <a-divider type="vertical" />
+                    <a @click="editBaseFillerRow(record)">编辑</a>
+                  </span>
+                </template>
+              </a-table>
+              <a-row>
+                <a-col :span="12"><a-button style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus" @click="newBaseFillerPartMember">新增部件</a-button></a-col>
+                <a-col :span="12"><div class="upload-no-inline-block"><a-upload accept=".xls,.xlsx" :before-upload="importBaseFillerExcel" :show-upload-list="false" className=".ant-upload.ant-upload-select"><a-button disabled style="width: 100%; margin-top: 16px; margin-bottom: 8px" type="dashed" icon="plus">Excel导入</a-button></a-upload></div></a-col>
+              </a-row>
+            </a-row>
+          </a-card>
+        </a-col>
+      </a-row>
+      <br><br>-->
 
       <!-- 行3 -->
       <a-row class="form-row" :gutter="16">
@@ -288,6 +446,7 @@
             :multiple="true"
             :file-list="specificationTableFileList"
             @change="specificationTableHandleChange"
+            @preview="clickSerialCardFile"
             :remove="remove"
             :headers="{ QueueType: '1' }"
           >
@@ -300,6 +459,7 @@
             :multiple="true"
             :file-list="serialCardFileList"
             @change="serialCardHandleChange"
+            @preview="clickSerialCardFile"
             :remove="remove"
             :headers="{ QueueType: '2' }"
           >
@@ -309,18 +469,25 @@
       </a-row>
       <div><br><br></div>
     </a-card>
+    <pdfView ref="pdf"></pdfView>
   </div>
 </template>
 
 <script>
 import { fetch } from '@/utils/inputSearch'
-import { getColumnsPurchased, getWorkSerialSerial } from '@/api/step'
+import DispatchUser from '@/views/step/modules/DispatchUser'
+import { getColumnsPurchased, getWorkSerialSerial, getProcessMediumList, BaseFillerColumns, BaseFillerColumnNames, newBaseFillerColumns } from '@/api/step'
+import { getProjectList } from '@/api/project'
 import moment from 'moment'
 import XLSX from 'xlsx'
+import { querySparePartsBySerial } from '@/api/spareParts'
+import pdfView from '@/components/PdfView'
 
 export default {
     components: {
-      XLSX
+      XLSX,
+      pdfView,
+      DispatchUser
     },
     data () {
       return {
@@ -329,14 +496,22 @@ export default {
         projectSerialData: [],
         selectDisabled: false,
         showSerialValue: true,
+        showValveSerialValue: true,
         ss: 'ddf',
         refData1: {},
         refData2: {},
         // 已购清单表
         columnsPurchased: this.getColumnsPurchasedArray(),
         dataPurchased: [],
+        baseFillerSource: [],
         memberLoading: false,
-        newWorkOrder: 1
+        newWorkOrder: 1,
+        valveSerialData: [],
+        switchChecked: false,
+        processMediumList: getProcessMediumList(),
+        selectProjectItem: null,
+        currentStep: '',
+        flowID: ''
       }
     },
     mounted () {
@@ -347,6 +522,11 @@ export default {
         if (baseInfo.valve_purchased_parts) {
           this.dataPurchased = baseInfo.valve_purchased_parts
         }
+        // 填料信息
+        if (baseInfo.base_filler_data) {
+          this.baseFillerSource = baseInfo.base_filler_data
+        }
+
         // 禁用工程序号选择
         this.showSerialValue = false
         // 准备将上传文件信息保存至state
@@ -390,6 +570,9 @@ export default {
     },
     methods: {
       moment,
+      BaseFillerColumns,
+      BaseFillerColumnNames,
+      newBaseFillerColumns,
       repairSelectChange (value) {
           this.$emit('repairSelectChange', value)
       },
@@ -463,6 +646,14 @@ export default {
         })
         this.serialCardFileList = fileList
       },
+      clickSerialCardFile (file) {
+        if (!this.$store.state.app.isMobile) {
+          window.open(file.url, '_blank')
+          return
+        }
+        this.$refs.pdf.show(file.url, file.name)
+        return false
+      },
       remove (file) {
         var stateMD5List = this.$store.state.uploadFileMD5Store.uploadFileMD5
         for (var i = 0; i < stateMD5List.length; i++) {
@@ -476,14 +667,34 @@ export default {
       handleSalesSearch (value) {
         fetch(value, data => (this.projectSerialData = data), this.$t('input.project.search'))
       },
+      setTenProject (data) {
+        this.projectSerialData = data
+      },
       projectSelectChange (value) {
-        let tmpOrder = this.newWorkOrder + ''
-        if (tmpOrder.length === 2) {
-          tmpOrder = '0' + tmpOrder
-        } else if (tmpOrder.length === 1) {
-          tmpOrder = '00' + tmpOrder
-        }
-        this.$emit('projectSelectChange', value.label.trim() + '-' + tmpOrder)
+        // 获取select下拉文本
+        var selectText = ''
+        this.projectSerialData.forEach(e => {
+          if (e.value === value) {
+            selectText = e.text
+          }
+        })
+        // 获取工程编号为标识的全局编号
+        getWorkSerialSerial(selectText).then(res => {
+          this.newWorkOrder = res
+          let tmpOrder = this.newWorkOrder + ''
+          if (tmpOrder.length === 2) {
+            tmpOrder = '0' + tmpOrder
+          } else if (tmpOrder.length === 1) {
+            tmpOrder = '00' + tmpOrder
+          }
+          this.$emit('projectSelectChange', selectText + '-' + tmpOrder)
+        })
+        getProjectList({ id: value }).then(res => {
+          if (res.result.data && res.result.data.length > 0) {
+            const projectData = res.result.data[0]
+            this.$emit('projectSelectChange', '+' + projectData.finally_user)
+          }
+        })
       },
       newPartMember () {
         const length = this.dataPurchased.length
@@ -499,6 +710,7 @@ export default {
           isNew: true
         })
       },
+      // ====================== 已购买备件清单
       handleChange (value, key, column) {
         const newData = [...this.dataPurchased]
         const target = newData.find(item => key === item.key)
@@ -508,16 +720,71 @@ export default {
         }
       },
       saveRow (record) {
+        const editData = [...this.dataPurchased]
         const { key } = record
-        const target = this.dataPurchased.find(item => item.key === key)
-        target.editable = false
-        target.isNew = false
-        this.memberLoading = false
+        const target = editData.find(item => item.key === key)
+        if (target) {
+          target.editable = false
+          target.isNew = false
+          this.dataPurchased = editData
+        }
       },
       removeRow (key) {
         const newData = this.dataPurchased.filter(item => item.key !== key)
         this.dataPurchased = newData
       },
+      editRow (record) {
+        const editData = [...this.dataPurchased]
+        const { key } = record
+        const target = editData.find(item => item.key === key)
+        if (target) {
+          target.editable = true
+          target.isNew = false
+          this.dataPurchased = editData
+        }
+      },
+      // ====================== 填料
+      handleBaseFillerChange (value, key, column) {
+        const newData = [...this.baseFillerSource]
+        const target = newData.find(item => key === item.key)
+        if (target) {
+          target[column] = value
+          this.baseFillerSource = newData
+        }
+      },
+      saveBaseFillerRow (record) {
+        const editData = [...this.baseFillerSource]
+        const { key } = record
+        const target = editData.find(item => item.key === key)
+        if (target) {
+          target.editable = false
+          target.isNew = false
+          this.baseFillerSource = editData
+        }
+      },
+      removeBaseFillerRow (key) {
+        const newData = this.baseFillerSource.filter(item => item.key !== key)
+        this.baseFillerSource = newData
+      },
+      editBaseFillerRow (record) {
+        const editData = [...this.baseFillerSource]
+        const { key } = record
+        const target = editData.find(item => item.key === key)
+        if (target) {
+          target.editable = true
+          target.isNew = false
+          this.baseFillerSource = editData
+        }
+      },
+      newBaseFillerPartMember () {
+        const length = this.baseFillerSource.length
+        const key = length === 0 ? '1' : (parseInt(this.baseFillerSource[length - 1].key) + 1).toString()
+        this.baseFillerSource.push(newBaseFillerColumns(key))
+      },
+      importBaseFillerExcel (file) {
+        this.$message('格式待定')
+      },
+      // ============================== 填料 end
       getColumnsPurchasedArray () {
         return getColumnsPurchased()
       },
@@ -525,6 +792,26 @@ export default {
         // console.log(file)
         this.readExcel(file)
         return false
+      },
+      handleValveSearch (value) {
+        this.valveSerialData.length = 0
+        fetch(value, data => (this.valveSerialData = data), this.$t('input.valve.parts.search'))
+      },
+      selectValveSerialChange (value) {
+        const that = this
+        querySparePartsBySerial({ serial: value }).then(e => {
+          e.valve_model = e.model
+          e.valve_serial = e.serial
+          that.$emit('selectValveSerialChange', e)
+          this.$store.commit('VALVE_SERIAL', value)
+        })
+      },
+      inputValveSerialChange (e) {
+        this.$store.commit('VALVE_SERIAL', e.target.value)
+      },
+      valveSerialInputSwitch (checked) {
+        this.showValveSerialValue = !checked
+        this.switchChecked = checked
       },
       readExcel (file) { // 表格导入
           var that = this
@@ -541,7 +828,7 @@ export default {
                   type: 'binary'
               })
               const wsname = workbook.SheetNames[0] // 取第一张表
-              const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]) // 生成json表格内容
+              const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname], { defval: '' }) // 生成json表格内容
               // console.log(ws)
 
               // 查找件号单元格并取得件号属性名称
@@ -577,36 +864,38 @@ export default {
               console.log(tmpDataItemArray)
 
               // 合并导入数据，以件号为key
-              var keyIndex = 2 // 件号index
+              var nameIndex = 1 // 名称index
+              var numIndex = 7 // 数量index
+              var keyNumIndex = 8 // 件号index
+              var memoIndex = 10 // 备注index
+              var keyIndex = 5 // 零件号码index
               tmpDataItemArray.forEach(item => {
                 // 在已有备件数据中查找相同件号
                 var isFind = false
                 var findIndex = 0
                 for (var i = 0; i < that.dataPurchased.length; i++) {
-                  if (item[keyIndex] === that.dataPurchased[i].purchased_part_key_number) {
+                  if (item[keyIndex] === that.dataPurchased[i].purchased_part_number) {
                     isFind = true
                     findIndex = i
                     break
                   }
                 }
 
-                const memo = typeof item[5] === 'undefined' ? '' : item[5] + ''
-                console.log(memo)
                 if (isFind) {
-                  that.dataPurchased[findIndex].purchased_part_key_number = item[4] + ''
-                  that.dataPurchased[findIndex].purchased_part_number = item[2] + ''
-                  that.dataPurchased[findIndex].purchased_part_name = item[1] + ''
-                  that.dataPurchased[findIndex].purchased_part_qty = item[3] + ''
-                  that.dataPurchased[findIndex].purchased_part_memo = memo
+                  that.dataPurchased[findIndex].purchased_part_key_number = item[keyNumIndex] + '' // 零件号码
+                  that.dataPurchased[findIndex].purchased_part_number = item[keyIndex] + '' // 件号
+                  that.dataPurchased[findIndex].purchased_part_name = item[nameIndex] + '' // 名称
+                  that.dataPurchased[findIndex].purchased_part_qty = item[numIndex] + '' // 数量
+                  that.dataPurchased[findIndex].purchased_part_memo = item[memoIndex]
                 } else {
                   that.dataPurchased.push({
                     key: randomNum(1000, 9999999) + '',
                     purchased_part_no: item[0] + '',
-                    purchased_part_key_number: item[4] + '',
-                    purchased_part_number: item[2] + '',
-                    purchased_part_name: item[1] + '',
-                    purchased_part_qty: item[3] + '',
-                    purchased_part_memo: memo
+                    purchased_part_key_number: item[keyNumIndex] + '',
+                    purchased_part_number: item[keyIndex] + '',
+                    purchased_part_name: item[nameIndex] + '',
+                    purchased_part_qty: item[numIndex] + '',
+                    purchased_part_memo: item[memoIndex]
                   })
                 }
               })
@@ -628,6 +917,9 @@ export default {
             }
           }
           fileReader.readAsBinaryString(file)
+      },
+      selectProcessMediumChange (value) {
+        this.$emit('selectInputChange', { process_medium: value })
       }
     }
 }

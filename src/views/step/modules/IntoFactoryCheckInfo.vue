@@ -4,6 +4,7 @@
       <a-descriptions title="">
         <a-descriptions-item label="执行人">{{ stepUser }}</a-descriptions-item>
         <a-descriptions-item label="结束日期">{{ stepDoneDate }}</a-descriptions-item>
+        <a-descriptions-item label="总工时">{{ stepData.work_time_all }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
     <br>
@@ -22,12 +23,12 @@
       <a-row :gutter="16">
         <a-col class="gutter-row" :span="12">
           <div class="gutter-box">
-            <a-divider><div class="linehight">阀体组件<br>Actuator Assembly</div></a-divider>
+            <a-divider><div class="linehight">阀体组件<br>Body Assembly</div></a-divider>
           </div>
         </a-col>
         <a-col class="gutter-row" :span="12">
           <div class="gutter-box">
-            <a-divider><div class="linehight">定位器<br>Other Accessories</div></a-divider>
+            <a-divider><div class="linehight">定位器<br>Locator</div></a-divider>
           </div>
         </a-col>
       </a-row>
@@ -280,9 +281,35 @@
           </a-descriptions>
         </a-col>
       </a-row>
-      <a-card :bordered="false" title="上传图片">
-        <UploadImgRead ref="uploadImgRead" />
-      </a-card>
+    </a-card>
+
+    <br>
+
+    <a-card title="工时" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="工时(min)">
+          {{ intoFactoryData.work_time }}
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
+    <br>
+
+    <a-card title="适用" :headStyle="{fontWeight:'bold'}">
+      <a-descriptions :column="4">
+        <a-descriptions-item label="不适用" v-if="intoFactoryData.not_applicable">
+          是
+        </a-descriptions-item>
+        <a-descriptions-item label="不适用" v-if="!intoFactoryData.not_applicable">
+          否
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-card>
+
+    <br>
+
+    <a-card :bordered="false" title="上传图片">
+      <UploadImgRead ref="uploadImgRead" />
     </a-card>
   </div>
 </template>
@@ -306,6 +333,7 @@ export default {
   },
   data () {
     return {
+      stepData: {},
       referenceData: {},
       projectData: {},
       workOrderSerial: '',
@@ -337,6 +365,7 @@ export default {
       this.$message.warning('当前流程没有保存数据')
       return
     }
+    this.stepData = this.$store.state.editStepData.stepEditData
     this.projectData = this.$store.state.editStepData.stepEditData.project
     this.intoFactoryData = JSON.parse(this.$store.state.editStepData.stepEditData.step_data[0].JSON)
     if (this.intoFactoryData.uploads) {

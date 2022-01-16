@@ -1,204 +1,221 @@
 <template>
   <page-header-wrapper>
+    <template slot="extra">
+      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+        不适用
+      </a-checkbox>
+    </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
-      <!-- 阀门组装 -->
-      <a-card v-if="valveAB" title="阀门组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <a-row :gutter="16">
-          <a-col :span="8">
-            <a-descriptions title="阀盖">
-              <a-descriptions-item>
-                阀盖螺栓扭矩标准值:  {{ getValveCoverBoltTorqueUnitText(baseData.valve_cover_bolt_torque, baseData.valve_cover_bolt_torque_unit) }}<br>
-                阀盖螺栓材质:  {{ getValveCoverBoltMaterialUnitNA() }}<br>
-                阀盖螺栓尺寸:  {{ getValveSizeUnitTextNA(baseData.valve_cover_bolt_size, baseData.valve_cover_bolt_size_unit) }}<br>
-                阀盖螺栓工具:  {{ getValveSizeUnitTextNA(baseData.valve_cover_bolt_tool, baseData.valve_cover_bolt_tool_unit) }}<br>
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :span="8">
-            <a-descriptions title="阀座">
-              <a-descriptions-item>
-                阀座螺栓扭矩标准值: {{ getValveSeatBoltTorque() }}<br>
-                阀座螺栓工具: {{ getValveSeatBoltTool() }}
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-        </a-row>
-        <a-divider style="margin-bottom: 32px"/>
-        <a-row :gutter="16">
-          <a-col :span="8">
-            <a-form-item>
-              <div class="linehight">工时(分钟)</div>
-              <a-input-number
-                style="width:100%;"
-                :min="0"
-                v-decorator="[
-                  'assemble_valve_total_minute',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
+      <a-tabs default-active-key="1" v-if="!isGetTearDownData" @change="tabChange">
+        <!-- 阀门组装 -->
+        <a-tab-pane key="1" tab="阀门组装" :forceRender="true" v-if="valveAB">
+          <a-card title="阀门组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+            <template slot="extra">
+              <a-checkbox v-model="assemble_valve_not_applicable" @change="valveNaChange">
+                不适用
+              </a-checkbox>
+            </template>
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-descriptions title="阀盖">
+                  <a-descriptions-item>
+                    阀盖螺栓扭矩标准值:  {{ getValveCoverBoltTorqueUnitText(baseData.valve_cover_bolt_torque, baseData.valve_cover_bolt_torque_unit) }}<br>
+                    阀盖螺栓材质:  {{ getValveCoverBoltMaterialUnitNA() }}<br>
+                    阀盖螺栓尺寸:  {{ getValveSizeUnitTextNA(baseData.valve_cover_bolt_size, baseData.valve_cover_bolt_size_unit) }}<br>
+                    阀盖螺栓工具:  {{ getValveSizeUnitTextNA(baseData.valve_cover_bolt_tool, baseData.valve_cover_bolt_tool_unit) }}<br>
+                  </a-descriptions-item>
+                </a-descriptions>
+              </a-col>
+              <a-col :span="8">
+                <a-descriptions title="阀座">
+                  <a-descriptions-item>
+                    阀座螺栓扭矩标准值: {{ getValveSeatBoltTorque() }}<br>
+                    阀座螺栓工具: {{ getValveSeatBoltTool() }}
+                  </a-descriptions-item>
+                </a-descriptions>
+              </a-col>
+            </a-row>
+            <a-divider style="margin-bottom: 32px"/>
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item>
+                  <div class="linehight">工时(min)</div>
+                  <a-input-number
+                    :disabled="assemble_valve_not_applicable"
+                    style="width:100%;"
+                    :min="0"
+                    v-decorator="[
+                      'assemble_valve_total_minute',
+                      {rules: []}
+                    ]" />
+                </a-form-item>
+              </a-col>
+            </a-row>
 
-        <a-row :gutter="16">
-          <a-col :span="23">
-            <a-form-item label="组装内容">
-              <a-textarea
-                rows="6"
-                v-decorator="[
-                  'valve_assemble_content',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-card>
+            <a-row :gutter="16">
+              <a-col :span="23">
+                <a-form-item label="组装内容">
+                  <a-textarea
+                    :disabled="assemble_valve_not_applicable"
+                    rows="6"
+                    v-decorator="[
+                      'valve_assemble_content',
+                      {rules: []}
+                    ]" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-card>
+          <!-- 执行人 -->
+          <br>
+          <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
+            <ExecutorUser :disableAll="assemble_valve_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+          </a-card>
+          <!-- 文件上传 -->
+          <br>
+          <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+            <uploadImg ref="uploadImg1" :disableAll="assemble_valve_not_applicable" :isMobile="isMobile" :queueType="'3'" :flag="'1'" />
+          </a-card>
+        </a-tab-pane>
 
-      <template v-if="isGetTearDownData">拆解数据为空</template>
-      <template v-else><br><br></template>
+        <!-- 执行机构组装 -->
+        <a-tab-pane key="2" tab="执行机构组装" :forceRender="true" v-if="actuatorAB">
+          <a-card title="执行机构组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+            <template slot="extra">
+              <a-checkbox v-model="assemble_actuator_not_applicable" @change="actuatorNaChange">
+                不适用
+              </a-checkbox>
+            </template>
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-descriptions title="">
+                  <a-descriptions-item>
+                    膜盖/缸盖螺栓扭矩标准值:  {{ getValveCoverBoltTorqueUnitTextNA(actuatorData.actu_cover_bolt_torque, actuatorData.actu_cover_bolt_torque_unit) }}<br>
+                    膜盖/缸盖螺栓材质:  {{ getValveCoverBoltMaterialUnit(actuatorData.actu_cover_bolt_material) }}<br>
+                    膜盖/缸盖螺栓尺寸:  {{ getValveSizeUnitTextNA(actuatorData.actu_cover_bolt_size, actuatorData.actu_cover_bolt_size_unit) }}<br>
+                    膜盖/缸盖螺栓工具:  {{ getActuCoverBoltToolItemUnitTextNA(actuatorData.actu_cover_bolt_tool, actuatorData.actu_cover_bolt_tool_unit, actuatorData.actu_cover_bolt_tool_item) }}<br>
+                  </a-descriptions-item>
+                </a-descriptions>
+              </a-col>
+              <a-col :span="8">
+                <a-descriptions title="">
+                  <a-descriptions-item>
+                    弹簧设置压力:  {{ actuatorData.actu_spring_set_pressure + " " + getActuSpringSetPressureUnit(actuatorData.actu_spring_set_pressure_unit) }}<br>
+                    执行机构行程:  {{ getActuInstallTravelUnit(actuatorData.actu_install_travel, actuatorData.actu_install_travel_unit) }}
+                  </a-descriptions-item>
+                </a-descriptions>
+              </a-col>
+            </a-row>
+            <a-divider style="margin-bottom: 32px"/>
+            <a-row :gutter="16">
+              <a-col :lg="6" :md="12" :sm="24">
+                <a-form-item
+                  label="气源压力测试">
+                  <a-input
+                    :disabled="assemble_actuator_not_applicable"
+                    v-decorator="[
+                      'valve_assemble_air_pressed',
+                      {rules: [{ message: '请输入口径'}]}
+                    ]">
+                    <a-select v-decorator="[ 'valve_assemble_air_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+                      <a-select-option value="1">
+                        PSI
+                      </a-select-option>
+                      <a-select-option value="2">
+                        BAR
+                      </a-select-option>
+                      <a-select-option value="3">
+                        MPa
+                      </a-select-option>
+                    </a-select>
+                  </a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :lg="6" :md="12" :sm="24">
+                <a-form-item>
+                  <div class="linehight">气密性测试是否合格</div>
+                  <a-radio-group :disabled="assemble_actuator_not_applicable" v-decorator="['valve_assemble_air_tightness_is_success', { } ]">
+                    <a-radio :value="1">
+                      是
+                    </a-radio>
+                    <a-radio :value="2">
+                      否
+                    </a-radio>
+                  </a-radio-group>
+                </a-form-item>
+              </a-col>
+              <a-col :lg="6" :md="12" :sm="24">
+                <a-form-item>
+                  <div class="linehight">Bench Set测试是否合格</div>
+                  <a-radio-group :disabled="assemble_actuator_not_applicable" v-decorator="['valve_assemble_benchset_is_success', { } ]">
+                    <a-radio :value="1">
+                      是
+                    </a-radio>
+                    <a-radio :value="2">
+                      否
+                    </a-radio>
+                    <a-radio :value="3">
+                      N/A
+                    </a-radio>
+                  </a-radio-group>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item>
+                  <div class="linehight">工时(min)</div>
+                  <a-input-number
+                    :disabled="assemble_actuator_not_applicable"
+                    style="width:100%;"
+                    :min="0"
+                    v-decorator="[
+                      'assemble_actuator_total_minute',
+                      {rules: []}
+                    ]" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="16">
+              <a-col :span="23">
+                <a-form-item label="组装内容">
+                  <a-textarea
+                    :disabled="assemble_actuator_not_applicable"
+                    rows="6"
+                    v-decorator="[
+                      'actuator_assemble_content',
+                      {rules: []}
+                    ]" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-card>
+          <!-- 执行人 -->
+          <br>
+          <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
+            <ExecutorUser :disableAll="assemble_actuator_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
+          </a-card>
+          <!-- 文件上传 -->
+          <br>
+          <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+            <uploadImg ref="uploadImg2" :disableAll="assemble_actuator_not_applicable" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+          </a-card>
+        </a-tab-pane>
+      </a-tabs>
 
-      <!-- 执行机构组装 -->
-      <a-card v-if="actuatorAB" title="执行机构组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <a-row :gutter="16">
-          <a-col :span="8">
-            <a-descriptions title="">
-              <a-descriptions-item>
-                膜盖/缸盖螺栓扭矩标准值:  {{ getValveCoverBoltTorqueUnitTextNA(actuatorData.actu_cover_bolt_torque, actuatorData.actu_cover_bolt_torque_unit) }}<br>
-                膜盖/缸盖螺栓材质:  {{ getValveCoverBoltMaterialUnit(actuatorData.actu_cover_bolt_material) }}<br>
-                膜盖/缸盖螺栓尺寸:  {{ getValveSizeUnitTextNA(actuatorData.actu_cover_bolt_size, actuatorData.actu_cover_bolt_size_unit) }}<br>
-                膜盖/缸盖螺栓工具:  {{ getActuCoverBoltToolItemUnitTextNA(actuatorData.actu_cover_bolt_tool, actuatorData.actu_cover_bolt_tool_unit, actuatorData.actu_cover_bolt_tool_item) }}<br>
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-        </a-row>
-        <a-divider style="margin-bottom: 32px"/>
-        <a-row :gutter="16">
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item
-              label="气源压力测试">
-              <a-input
-                v-decorator="[
-                  'valve_assemble_air_pressed',
-                  {rules: [{ message: '请输入口径'}]}
-                ]">
-                <a-select v-decorator="[ 'valve_assemble_air_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
-                  <a-select-option value="1">
-                    PSI
-                  </a-select-option>
-                  <a-select-option value="2">
-                    BAR
-                  </a-select-option>
-                  <a-select-option value="3">
-                    MPa
-                  </a-select-option>
-                </a-select>
-              </a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item>
-              <div class="linehight">气密性测试是否合格</div>
-              <a-radio-group v-decorator="['valve_assemble_air_tightness_is_success', { } ]">
-                <a-radio :value="1">
-                  是
-                </a-radio>
-                <a-radio :value="2">
-                  否
-                </a-radio>
-              </a-radio-group>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item>
-              <div class="linehight">Bench Set测试是否合格</div>
-              <a-radio-group v-decorator="['valve_assemble_benchset_is_success', { } ]">
-                <a-radio :value="1">
-                  是
-                </a-radio>
-                <a-radio :value="2">
-                  否
-                </a-radio>
-              </a-radio-group>
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="8">
-            <a-form-item>
-              <div class="linehight">工时(分钟)</div>
-              <a-input-number
-                style="width:100%;"
-                :min="0"
-                v-decorator="[
-                  'assemble_actuator_total_minute',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="23">
-            <a-form-item label="组装内容">
-              <a-textarea
-                rows="6"
-                v-decorator="[
-                  'actuator_assemble_content',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-card>
-
-      <br><br>
-
-      <!-- 执行机构组装
-      <a-card v-if="accessoryAB" title="附件组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <a-row :gutter="16">
-          <a-col :span="8">
-            <a-form-item>
-              <div class="linehight">工时(分钟)</div>
-              <a-input-number
-                style="width:100%;"
-                :min="0"
-                v-decorator="[
-                  'assemble_accessory_total_minute',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="23">
-            <a-form-item label="组装内容">
-              <a-textarea
-                rows="6"
-                v-decorator="[
-                  'accessory_assemble_content',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-card> -->
+      <template v-if="isGetTearDownData">拆解数据为空或不适用，直接保存后结束流程</template>
 
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
-        <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
-        <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
+        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >取消</a-button>
+        <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
     </a-form>
 
-    <br><br>
-
-    <!-- 文件上传 -->
-    <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <UploadImg ref="uploadImg" :QueueType="3" :isMobile="isMobile" />
-    </a-card>
-
     <!-- 工单详细 -->
-    <stepAllDetailModel ref="stepAllDetailModel" />
+    <stepAllDetailModel ref="stepAllDetailModel" :currenStep="currentStep" :flowId="flowID" />
 
   </page-header-wrapper>
 </template>
@@ -209,24 +226,27 @@
   import pick from 'lodash.pick'
   import { stepDone, queryStepData, getValveCoverBoltTorqueUnit, getValveCoverBoltMaterialUnit, getValveSizeUnit,
   getValveSeatLeakTestUnit, getActuSpringSetPressureUnit, getActuCoverBoltToolItemUnit, getValveCoverBoltTorqueUnitText, getValveSizeUnitText,
-  getActuCoverBoltToolItemUnitTextNA, getValveCoverBoltTorqueUnitTextNA, getValveSizeUnitTextNA } from '@/api/step'
+  getActuCoverBoltToolItemUnitTextNA, getValveCoverBoltTorqueUnitTextNA, getValveSizeUnitTextNA, getActuInstallTravelUnit } from '@/api/step'
   import { saveAssembleData } from '@/api/assemble'
-  import UploadImg from '../../modules/UploadImg'
+  import uploadImg from '../../modules/UploadImg'
   import stepDetail from '../../modules/StepBaseInfo'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
+  import ExecutorUser from '@/views/step/modules/ExecutorUser'
 
   const assembleFields = ['assemble_valve_total_minute', 'assemble_actuator_total_minute', 'assemble_accessory_total_minute',
   'valve_assemble_content', 'actuator_assemble_content', 'accessory_assemble_content', 'valve_assemble_air_pressed', 'valve_assemble_air_pressed_unit',
-  'valve_assemble_air_tightness_is_success', 'valve_assemble_benchset_is_success']
+  'valve_assemble_air_tightness_is_success', 'valve_assemble_benchset_is_success',
+  'assemble_valve_not_applicable', 'assemble_actuator_not_applicable', 'not_applicable']
 
   export default {
     name: 'Assemble',
     mixins: [baseMixin],
     components: {
       FooterToolBar,
-      UploadImg,
+      uploadImg,
       stepDetail,
-      stepAllDetailModel
+      stepAllDetailModel,
+      ExecutorUser
     },
     methods: {
       getValveCoverBoltTorqueUnit,
@@ -240,6 +260,7 @@
       getActuCoverBoltToolItemUnitTextNA,
       getValveCoverBoltTorqueUnitTextNA,
       getValveSizeUnitTextNA,
+      getActuInstallTravelUnit,
       handleSubmit (e) {
         e.preventDefault()
         this.form.validateFields((err, values) => {
@@ -247,23 +268,35 @@
             values.flow_id = this.flowID
             values.current_step = this.currentStep
             values.save_user_id = this.$store.state.user.info.id
-            values.uploads = this.$refs.uploadImg.imgFileList
+            values.not_applicable = this.not_applicable
+            values.assemble_valve_not_applicable = this.assemble_valve_not_applicable
+            values.assemble_actuator_not_applicable = this.assemble_actuator_not_applicable
+
+            var tmpUpload = []
+            // 阀门组装
+            if (this.$refs.uploadImg1) {
+              this.$refs.uploadImg1.imgFileList.forEach(e => {
+                tmpUpload.push(e)
+              })
+            }
+            // 执行机组装
+            if (this.$refs.uploadImg2) {
+              this.$refs.uploadImg2.imgFileList.forEach(e => {
+                tmpUpload.push(e)
+              })
+            }
+            values.uploads = tmpUpload
 
             saveAssembleData(values).then(res => {
-              // 清空数据
-              this.$store.commit('SET_STEP_EDIT_DATA', null)
-              // 刷新表格
-              this.$router.push({ path: '/step/steplist' })
               this.$message.info('保存成功')
-
-              // 重置表单数据
-              this.form.resetFields()
+              // eslint-disable-next-line no-undef
+              callFlutterBacktoList.postMessage('save_step_ok') // 告诉移动端vue页面本流程已经保存成功
             })
           }
         })
       },
       cancelSubmit () {
-        this.$router.push({ path: '/step/steplist' })
+        this.$router.back(-1)
       },
       handleStepDetail () {
         this.$refs.stepAllDetailModel.showSetpDetailData(this.flowID, this.currentStep)
@@ -303,6 +336,70 @@
         }
 
         return tmpValue
+      },
+      refreshUploads () {
+        queryStepData({ id: this.flowID, current_step: this.currentStep }).then(res => {
+          if (res.result.step_data && res.result.step_data.length > 0) {
+            const tmpData = JSON.parse(res.result.step_data[0].JSON)
+            this.refreshImageList(tmpData.uploads)
+            this.$message.info('上传照片成功')
+          }
+        })
+      },
+      getCurrentImgFlag () {
+        return this.currentImgFlag
+      },
+      naChange (e) {
+        this.not_applicable = e.target.checked
+        if (this.not_applicable) {
+          this.assemble_valve_not_applicable = true
+          this.assemble_actuator_not_applicable = true
+        } else {
+          this.assemble_valve_not_applicable = false
+          this.assemble_actuator_not_applicable = false
+        }
+      },
+      tabChange (activeKey) {
+        this.currentImgFlag = activeKey
+      },
+      valveNaChange (e) {
+        this.assemble_valve_not_applicable = e.target.checked
+        this.checkDiskableAll()
+      },
+      actuatorNaChange (e) {
+        this.assemble_actuator_not_applicable = e.target.checked
+        this.checkDiskableAll()
+      },
+      checkDiskableAll () {
+        if (this.assemble_valve_not_applicable && this.assemble_actuator_not_applicable) {
+          this.not_applicable = true
+        } else {
+          this.not_applicable = false
+        }
+      },
+      refreshImageList (uploadFiles) {
+        var imgList1 = []
+        var imgList2 = []
+        uploadFiles.forEach(e => {
+          if (e.flag === '1') {
+            imgList1.push(e)
+          }
+        })
+        uploadFiles.forEach(e => {
+          if (e.flag === '2') {
+            imgList2.push(e)
+          }
+        })
+
+        setTimeout(() => {
+          assembleFields.forEach(v => this.form.getFieldDecorator(v))
+          if (this.$refs.uploadImg1) {
+            this.$refs.uploadImg1.imgFileList = imgList1
+          }
+          if (this.$refs.uploadImg2) {
+            this.$refs.uploadImg2.imgFileList = imgList2
+          }
+        }, 0)
       }
     },
     mounted () {
@@ -311,11 +408,15 @@
       const editData = this.$store.state.editStepData.stepEditData
       this.flowID = editData.flow_id
       this.currentStep = editData.current_step
+      // 供flutter刷新上传文件列表
+      window.refreshUploads = this.refreshUploads
+      window.getCurrentImgFlag = this.getCurrentImgFlag
+      var uploadFiles = null
 
       if (editData.step_data.length > 0) {
-        const uploadFiles = JSON.parse(editData.step_data[0].JSON)
+        uploadFiles = JSON.parse(editData.step_data[0].JSON)
         this.form.setFieldsValue(pick(uploadFiles, assembleFields))
-        this.$refs.uploadImg.imgFileList = uploadFiles.uploads
+        this.not_applicable = uploadFiles.not_applicable
       }
 
       // 根据拆解的工时》0的结果决定组装显示内容
@@ -326,9 +427,17 @@
         }
         this.tearDownData = JSON.parse(res.result.step_data[0].JSON)
 
-        this.valveAB = this.tearDownData.teardown_valve_total_minute && this.tearDownData.teardown_valve_total_minute > 0
-        this.actuatorAB = this.tearDownData.teardown_actuator_total_minute && this.tearDownData.teardown_actuator_total_minute > 0
-        this.accessoryAB = this.tearDownData.teardown_accessory_total_minute && this.tearDownData.teardown_accessory_total_minute > 0
+        if (this.tearDownData.teardown_valve_not_applicable && this.tearDownData.teardown_valve_not_applicable) {
+          this.valveAB = false
+        }
+        if (this.tearDownData.teardown_actuator_not_applicable && this.tearDownData.teardown_actuator_not_applicable) {
+          this.actuatorAB = false
+        }
+        this.accessoryAB = false // this.tearDownData.teardown_accessory_total_minute && this.tearDownData.teardown_accessory_total_minute > 0
+
+        if (!this.valveAB && !this.accessoryAB) {
+          this.isGetTearDownData = true
+        }
 
         queryStepData({ id: this.flowID, current_step: '(start)' }).then(res => {
           res.result.step_data.forEach(stepItem => {
@@ -344,51 +453,21 @@
                 break
             }
           })
+
+          if (uploadFiles !== null) {
+            this.assemble_valve_not_applicable = uploadFiles.assemble_valve_not_applicable
+            this.assemble_actuator_not_applicable = uploadFiles.assemble_actuator_not_applicable
+            this.refreshImageList(uploadFiles.uploads)
+          }
         })
       })
-
-      // // 获取引用数据（维修前测试选择的维修东东）
-      // getSelectRepairData({ FlowID: this.flowID }).then(res => {
-      //   // 阀门 "1"
-      //   // 执行机构 "2"
-      //   // 阀门+执行机构 "3"
-      //   // 阀门+执行机构+附件 "4"
-      //   // 零部件 "5"
-      //   // 执行机构+附件 "6"
-      //   switch (res.select_repair) { // 与 baseInfo 选择的维修部件下拉列表一致
-      //     case '1': { // 阀门维修
-      //       this.valveAB = true
-      //       break
-      //     }
-      //     case '2': { // 执行机构维修
-      //       this.actuatorAB = true
-      //       break
-      //     }
-      //     case '3': { // 阀门+执行机构
-      //       this.valveAB = true
-      //       this.actuatorAB = true
-      //       break
-      //     }
-      //     case '4': { // 阀门+执行机构+附件
-      //       this.valveAB = true
-      //       this.actuatorAB = true
-      //       this.accessoryAB = true
-      //       break
-      //     }
-      //     case '6': { // 执行机构+附件
-      //       this.accessoryAB = true
-      //       this.actuatorAB = true
-      //       break
-      //     }
-      //   }
-      // })
     },
     data () {
       return {
         form: this.$form.createForm(this),
-        accessoryAB: false,
-        actuatorAB: false,
-        valveAB: false,
+        accessoryAB: true,
+        actuatorAB: true,
+        valveAB: true,
         flowID: '',
         currentStep: '',
         baseInfoData: null,
@@ -397,7 +476,11 @@
         actuatorData: {},
         accessorData: {},
         tearDownData: {},
-        isGetTearDownData: false
+        isGetTearDownData: false,
+        not_applicable: false,
+        assemble_valve_not_applicable: false,
+        assemble_actuator_not_applicable: false,
+        currentImgFlag: '1'
       }
     }
   }

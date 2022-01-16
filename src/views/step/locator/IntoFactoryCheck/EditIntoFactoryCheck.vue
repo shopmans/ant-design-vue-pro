@@ -1,5 +1,10 @@
 <template>
   <page-header-wrapper>
+    <template slot="extra">
+      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+        不适用
+      </a-checkbox>
+    </template>
     <a-card title="入厂检查表 Receivd Condition Checklist" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-descriptions title="基本信息" :column="4">
         <a-descriptions-item label="工单号">{{ refData1.work_order_serial }}</a-descriptions-item>
@@ -22,7 +27,7 @@
             <div class="gutter-box">
               <a-form-item>
                 <div class="linehight">壳体裂纹<br>Cracks on Casing</div>
-                <a-radio-group v-decorator="['intofc_cracks_on_casing_yesno', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['intofc_cracks_on_casing_yesno', { }]">
                   <a-radio :value="1">
                     是
                   </a-radio>
@@ -37,7 +42,7 @@
             <div class="gutter-box">
               <a-form-item>
                 <div class="linehight">备注<br>Remark</div>
-                <a-input v-decorator="[ 'intofc_cracks_on_casing_memo', {rules: []} ]" />
+                <a-input :disabled="not_applicable" v-decorator="[ 'intofc_cracks_on_casing_memo', {rules: []} ]" />
               </a-form-item>
             </div>
           </a-col>
@@ -45,7 +50,7 @@
             <div class="gutter-box">
               <a-form-item>
                 <div class="linehight">铭牌/标识完整<br>Nameplate Correct</div>
-                <a-radio-group v-decorator="['intofc_nameplate_logo_yesno', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['intofc_nameplate_logo_yesno', { }]">
                   <a-radio :value="1">
                     是
                   </a-radio>
@@ -60,7 +65,7 @@
             <div class="gutter-box">
               <a-form-item>
                 <div class="linehight">备注<br>Remark</div>
-                <a-input v-decorator="[ 'intofc_nameplate_logo_memo', {rules: []} ]" />
+                <a-input :disabled="not_applicable" v-decorator="[ 'intofc_nameplate_logo_memo', {rules: []} ]" />
               </a-form-item>
             </div>
           </a-col>
@@ -70,7 +75,7 @@
             <div class="gutter-box">
               <a-form-item>
                 <div class="linehight">压力表完好<br>Gauge</div>
-                <a-radio-group v-decorator="['intofc_gauge_yesno', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['intofc_gauge_yesno', { }]">
                   <a-radio :value="1">
                     是
                   </a-radio>
@@ -85,7 +90,7 @@
             <div class="gutter-box">
               <a-form-item>
                 <div class="linehight">备注<br>Remark</div>
-                <a-input v-decorator="[ 'intofc_gauge_memo', {rules: []} ]" />
+                <a-input :disabled="not_applicable" v-decorator="[ 'intofc_gauge_memo', {rules: []} ]" />
               </a-form-item>
             </div>
           </a-col>
@@ -93,7 +98,7 @@
             <div class="gutter-box">
               <a-form-item>
                 <div class="linehight">螺钉完好<br>Bolts</div>
-                <a-radio-group v-decorator="['intofc_bolts_yesno', { }]">
+                <a-radio-group :disabled="not_applicable" v-decorator="['intofc_bolts_yesno', { }]">
                   <a-radio :value="1">
                     是
                   </a-radio>
@@ -108,7 +113,7 @@
             <div class="gutter-box">
               <a-form-item>
                 <div class="linehight">备注<br>Remark</div>
-                <a-input v-decorator="[ 'intofc_bolts_memo', {rules: []} ]" />
+                <a-input :disabled="not_applicable" v-decorator="[ 'intofc_bolts_memo', {rules: []} ]" />
               </a-form-item>
             </div>
           </a-col>
@@ -119,6 +124,7 @@
           <a-col :span="8">
             <a-form-item label="工时(min)">
               <a-input-number
+                :disabled="not_applicable"
                 style="width:100%;"
                 :min="0"
                 v-decorator="[
@@ -134,6 +140,7 @@
         <!-- headers 3代表图片 -->
         <div class="clearfix">
           <a-upload
+            :disabled="not_applicable"
             name="file"
             action="/api/base-info-upload"
             list-type="picture-card"
@@ -151,21 +158,20 @@
             </div>
           </a-upload>
           <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
-            <img alt="example" style="width: 100%" :src="previewImage" />
+            <img :disabled="not_applicable" alt="example" style="width: 100%" :src="previewImage" />
           </a-modal>
         </div>
 
         <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
           <a-button htmlType="submit" type="primary">保存</a-button>
           <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
-          <a-button style="margin-left: 38px" @click="handleStepDetail">工单详细</a-button>
+          <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
           <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
         </footer-tool-bar>
       </a-form>
     </a-card>
 
-    <stepAllDetailModel
-      ref="stepAllDetailModel" />
+    <stepAllDetailModel ref="stepAllDetailModel" :flowId="flow_id" :currenStep="current_step" />
 
   </page-header-wrapper>
 </template>
@@ -228,7 +234,8 @@ export default {
       refData1: {},
       valveRefData: {},
       actuRefData: {},
-      projectData: {}
+      projectData: {},
+      not_applicable: false
     }
   },
   mounted () {
@@ -248,6 +255,7 @@ export default {
         if (intoFactoryData.uploads) {
           this.imgFileList = intoFactoryData.uploads
         }
+        this.not_applicable = intoFactoryData.not_applicable
       }
 
       res.result.step_data.forEach(e => {
@@ -265,21 +273,6 @@ export default {
         }
       })
     })
-
-    // // 查询引用数据
-    // getReferenceIntoFactoryCheck({ FlowID: this.flow_id }).then(res => {
-    //   this.refData1 = JSON.parse(res.data[0])
-
-    //   this.form.setFieldsValue(pick(editData.project, intoFactoryFields))
-    //   // 入厂检查数据
-    //   if (editData.step_data.length > 0) {
-    //     const infoFactoryData = JSON.parse(editData.step_data[0].JSON)
-    //     this.form.setFieldsValue(pick(infoFactoryData, intoFactoryFields))
-    //     if (infoFactoryData.uploads) {
-    //       this.imgFileList = infoFactoryData.uploads
-    //     }
-    //   }
-    // })
   },
   methods: {
     getValveSizeUnitText,
@@ -291,15 +284,10 @@ export default {
           values.current_step = this.current_step
           values.intofc_user_id = this.$store.state.user.info.id
           values.uploads = this.imgFileList
+          values.not_applicable = this.not_applicable
 
           saveIntoFactoryCheck(values).then(res => {
-            // 清空数据
-            this.$store.commit('SET_STEP_EDIT_DATA', null)
-            // 刷新表格
-            this.$router.push({ path: '/step/steplist' })
             this.$message.info('保存成功')
-            // 重置表单数据
-            this.form.resetFields()
           })
         }
       })
@@ -369,6 +357,9 @@ export default {
         this.$message.error('只能上传图片文件!')
       }
       return isJpgOrPng
+    },
+    naChange (e) {
+      this.not_applicable = e.target.checked
     }
   }
 }
