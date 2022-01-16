@@ -45,7 +45,7 @@
             </a-row>
             <a-divider></a-divider>
             <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-              <ExecutorUser :disableAll="disableAll_1" :flowID="flow_id" :currentStep="current_step" :flag="'5'" />
+              <dispatchUser :disableAll="disableAll_1" :flowID="flow_id" :currentStep="current_step" :flag="'5'" />
             </a-card>
             <a-row>
               <a-col :span="8">
@@ -234,7 +234,7 @@
             </a-row>
             <a-divider style="margin-bottom: 32px"/>
             <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-              <ExecutorUser ref="dddd" :disableAll="disableAll_4" :flowID="flow_id" :currentStep="current_step" :flag="'4'" />
+              <dispatchUser :disableAll="disableAll_4" :flowID="flow_id" :currentStep="current_step" :flag="'4'" />
             </a-card>
             <a-row :gutter="16">
               <a-col :span="8">
@@ -365,8 +365,7 @@
   import stepDetail from '../../modules/StepBaseInfo'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
   import moment from 'moment'
-  import DispatchUser from '@/views/step/modules/DispatchUser'
-  import ExecutorUser from '@/views/step/modules/ExecutorUser'
+  import dispatchUser from '@/views/step/modules/DispatchUser'
 
   const intoPreRepairFields = ['seat_leak_test_is_success', 'seat_leak_test_real_value', 'seat_leak_test_total_minute',
   'actuator_leak_test_is_success', 'actuator_leak_test_total_minute', 'accessory_locator_is_success', 'accessory_test_filter_reducing_valve_is_success',
@@ -399,8 +398,7 @@
       uploadImg,
       stepDetail,
       stepAllDetailModel,
-      DispatchUser,
-      ExecutorUser
+      dispatchUser
     },
     data () {
       return {
@@ -732,29 +730,31 @@
             uploadFiles.prerepair_test_date = moment()
           }
 
-          this.form.setFieldsValue(pick(uploadFiles, intoPreRepairFields))
-          this.not_applicable = uploadFiles.not_applicable
-          // 适用check加载
-          if (uploadFiles.water_press_test_not_applicable === '1') {
-            this.water_not_applicable = true
-            this.disableAll_4 = true
-          }
-          if (uploadFiles.action_test_not_applicable === '1') {
-            this.action_not_applicable = true
-            this.disableAll_1 = true
-          }
-          if (uploadFiles.accessory_test_not_applicable === '1') {
-            this.disableAll_2 = true
-          }
-          if (uploadFiles.valve_leak_test_not_applicable === '1') {
-            this.disableAll_3 = true
-          }
-          if (uploadFiles.actuator_leak_test_not_applicable === '1') {
-            this.disableAll_5 = true
-          }
+          if (uploadFiles) {
+            this.form.setFieldsValue(pick(uploadFiles, intoPreRepairFields))
+            this.not_applicable = uploadFiles.not_applicable
+            // 适用check加载
+            if (uploadFiles.water_press_test_not_applicable === '1') {
+              this.water_not_applicable = true
+              this.disableAll_4 = true
+            }
+            if (uploadFiles.action_test_not_applicable === '1') {
+              this.action_not_applicable = true
+              this.disableAll_1 = true
+            }
+            if (uploadFiles.accessory_test_not_applicable === '1') {
+              this.disableAll_2 = true
+            }
+            if (uploadFiles.valve_leak_test_not_applicable === '1') {
+              this.disableAll_3 = true
+            }
+            if (uploadFiles.actuator_leak_test_not_applicable === '1') {
+              this.disableAll_5 = true
+            }
 
-          // 加载上传图片
-          this.refreshImageList(uploadFiles)
+            // 加载上传图片
+            this.refreshImageList(uploadFiles)
+          }
         }
       })
     }

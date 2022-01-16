@@ -669,8 +669,14 @@
       </footer-tool-bar>
     </a-form>
 
-    <br><br>
+    <template v-if="valveControlModel">
+      <br>
+      <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+        <dispatchUser :disableAll="not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+      </a-card>
+    </template>
 
+    <br>
     <!-- 文件上传 -->
     <a-card :title="$t('menu.workOrder.upload.img')" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <UploadImg :disableAll="not_applicable" ref="uploadImg" :queueType="'3'" :isMobile="isMobile" />
@@ -691,6 +697,7 @@
   import UploadImg from '../../modules/UploadImg'
   import stepDetail from '../../modules/StepBaseInfo'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
+  import dispatchUser from '@/views/step/modules/DispatchUser'
 
   const adjustFields = ['adjust_total_minute', 'adjust_on_off_open_close', 'adjust_control_valve_conclustion',
   'adjust_deadband_open_to_close', 'adjust_deadband_close_to_open', 'adjust_deadband_linearity', 'adjust_deadband_hysteresis',
@@ -712,7 +719,8 @@
       FooterToolBar,
       UploadImg,
       stepDetail,
-      stepAllDetailModel
+      stepAllDetailModel,
+      dispatchUser
     },
     mounted () {
       adjustFields.forEach(v => this.form.getFieldDecorator(v))

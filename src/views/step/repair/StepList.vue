@@ -60,9 +60,9 @@
           <template>
             <a @click="handleDescrption(record)">{{ $t('menu.project.view.action.detail') }}</a>
             <a-divider type="vertical" />
-            <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</span>
+            <!-- <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</span>
             <a v-else @click="handleDispatchUser(record)">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</a>
-            <a-divider type="vertical" />
+            <a-divider type="vertical" /> -->
             <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.execution') }}</span>
             <a v-else @click="handleEdit(record)">{{ $t('menu.workOrder.repair.workOrderList.action.execution') }}</a>
           </template>

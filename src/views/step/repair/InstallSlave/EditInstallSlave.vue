@@ -44,7 +44,7 @@
           <!-- 执行人 -->
           <br>
           <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <ExecutorUser :disableAll="install_slave_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+            <dispatchUser :disableAll="install_slave_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
           </a-card>
           <!-- 文件上传 -->
           <br>
@@ -88,7 +88,7 @@
           </a-card>
           <br>
           <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <ExecutorUser :disableAll="air_source_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
+            <dispatchUser :disableAll="air_source_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
           </a-card>
           <!-- 文件上传 -->
           <br>
@@ -122,7 +122,7 @@
   import UploadImg from '../../modules/UploadImg'
   import stepDetail from '../../modules/StepBaseInfo'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
-  import ExecutorUser from '@/views/step/modules/ExecutorUser'
+  import dispatchUser from '@/views/step/modules/DispatchUser'
   import moment from 'moment'
 
   const installAccessoryFields = ['install_slave_total_minute', 'install_slave_date', 'install_source_date', 'install_source_total_minute',
@@ -136,7 +136,7 @@
       UploadImg,
       stepDetail,
       stepAllDetailModel,
-      ExecutorUser
+      dispatchUser
     },
     methods: {
       getValveSizeUnitText,
@@ -298,11 +298,13 @@
             installIAData.install_source_date = moment()
           }
 
-          this.form.setFieldsValue(pick(installIAData, installAccessoryFields))
-          this.not_applicable = installIAData.not_applicable
-          this.install_slave_not_applicable = installIAData.install_slave_not_applicable
-          this.air_source_not_applicable = installIAData.air_source_not_applicable
-          this.refreshImageList(installIAData.uploads)
+          if (installIAData) {
+            this.form.setFieldsValue(pick(installIAData, installAccessoryFields))
+            this.not_applicable = installIAData.not_applicable
+            this.install_slave_not_applicable = installIAData.install_slave_not_applicable
+            this.air_source_not_applicable = installIAData.air_source_not_applicable
+            this.refreshImageList(installIAData.uploads)
+          }
         })
       }
     },

@@ -87,7 +87,7 @@
 
       <br>
       <a-card v-if="flowID" title="派员" :headStyle="{fontWeight:'bold'}">
-        <ExecutorUser :disableAll="not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'"/>
+        <dispatchUser :disableAll="not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'"/>
       </a-card>
 
       <!-- 页脚 -->
@@ -120,7 +120,7 @@
   import uploadImg from '../../modules/UploadImg'
   import stepDetail from '../../modules/StepBaseInfo'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
-  import ExecutorUser from '@/views/step/modules/ExecutorUser'
+  import dispatchUser from '@/views/step/modules/DispatchUser'
 
   const installActuatorFields = ['install_actuator_total_minute', 'install_actuator_valve_real_travel', 'install_actuator_valve_real_travel_unit',
   'install_actuator_valve_real_fail_point', 'not_applicable', 'install_actuator_memo']
@@ -133,7 +133,7 @@
       uploadImg,
       stepDetail,
       stepAllDetailModel,
-      ExecutorUser
+      dispatchUser
     },
     methods: {
       getValveSizeUnitText,

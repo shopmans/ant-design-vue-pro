@@ -46,7 +46,7 @@
       </a-form-item>
       <br>
       <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-        <ExecutorUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'3'" />
+        <dispatchUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'3'" />
       </a-card>
     </a-card>
     <!-- 文件上传 -->
@@ -58,12 +58,12 @@
 </template>
 
 <script>
-import ExecutorUser from '../../modules/ExecutorUser'
+import dispatchUser from '../../modules/DispatchUser'
 import uploadImg from '../../modules/UploadImg'
 
 export default {
   components: {
-    ExecutorUser,
+    dispatchUser,
     uploadImg
   },
   props: {
@@ -91,9 +91,11 @@ export default {
   },
   mounted () {
     const editData = this.$store.state.editStepData.stepEditData
-    const data = JSON.parse(editData.step_data[0].JSON)
-    if (data.teardown_accessory_not_applicable) {
-      this.local_not_applicable = true
+    if (editData.step_data.length > 0) {
+      const data = JSON.parse(editData.step_data[0].JSON)
+      if (data.teardown_accessory_not_applicable) {
+        this.local_not_applicable = true
+      }
     }
   },
   methods: {

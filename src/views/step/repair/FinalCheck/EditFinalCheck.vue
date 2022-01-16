@@ -91,6 +91,13 @@
         </a-tabs>
       </a-card>
 
+      <template v-if="flowID" >
+        <br>
+        <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+          <dispatchUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+        </a-card>
+      </template>
+
       <br>
       <a-card title="工时" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-row>
@@ -155,6 +162,7 @@
   import stepDetail from '../../modules/StepBaseInfo'
   import moment from 'moment'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
+  import dispatchUser from '@/views/step/modules/DispatchUser'
 
   export default {
     name: 'TearDown',
@@ -163,7 +171,8 @@
       FooterToolBar,
       UploadImg,
       stepDetail,
-      stepAllDetailModel
+      stepAllDetailModel,
+      dispatchUser
     },
     methods: {
       moment,

@@ -69,7 +69,7 @@
           <!-- 执行人 -->
           <br>
           <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <ExecutorUser :disableAll="assemble_valve_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+            <dispatchUser :disableAll="assemble_valve_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
           </a-card>
           <!-- 文件上传 -->
           <br>
@@ -193,7 +193,7 @@
           <!-- 执行人 -->
           <br>
           <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <ExecutorUser :disableAll="assemble_actuator_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
+            <dispatchUser :disableAll="assemble_actuator_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
           </a-card>
           <!-- 文件上传 -->
           <br>
@@ -231,7 +231,7 @@
   import uploadImg from '../../modules/UploadImg'
   import stepDetail from '../../modules/StepBaseInfo'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
-  import ExecutorUser from '@/views/step/modules/ExecutorUser'
+  import dispatchUser from '@/views/step/modules/DispatchUser'
 
   const assembleFields = ['assemble_valve_total_minute', 'assemble_actuator_total_minute', 'assemble_accessory_total_minute',
   'valve_assemble_content', 'actuator_assemble_content', 'accessory_assemble_content', 'valve_assemble_air_pressed', 'valve_assemble_air_pressed_unit',
@@ -246,7 +246,7 @@
       uploadImg,
       stepDetail,
       stepAllDetailModel,
-      ExecutorUser
+      dispatchUser
     },
     methods: {
       getValveCoverBoltTorqueUnit,

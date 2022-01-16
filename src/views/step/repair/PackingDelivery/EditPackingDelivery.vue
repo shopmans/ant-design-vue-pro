@@ -39,14 +39,14 @@
           </a-col>
         </a-row>
       </a-card>
-      <br><br>
+      <br>
 
       <a-card title="派员" :headStyle="{fontWeight:'bold'}">
-        <DispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flow_id" :currentStep="current_step" />
+        <dispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flow_id" :currentStep="current_step" :flag="'1'" />
       </a-card>
 
       <!-- 文件上传 -->
-      <br><br>
+      <br>
       <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <UploadImg :disableAll="not_applicable" ref="uploadImg" :queueType="'3'" :isMobile="isMobile" />
       </a-card>
@@ -73,7 +73,7 @@ import selectUser from '../../modules/SelectUser'
 import pick from 'lodash.pick'
 import stepDetail from '../../modules/StepBaseInfo'
 import stepAllDetailModel from '../../modules/StepAllDetailModel'
-import DispatchUser from '../../modules/DispatchUser'
+import dispatchUser from '../../modules/DispatchUser'
 import UploadImg from '../../modules/UploadImg'
 
   const deliveryFields = ['package_delivery_done_date', 'work_time', 'not_applicable']
@@ -87,7 +87,7 @@ export default {
     baseMixin,
     stepDetail,
     stepAllDetailModel,
-    DispatchUser,
+    dispatchUser,
     UploadImg
   },
   data () {

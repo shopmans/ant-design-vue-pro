@@ -317,20 +317,22 @@
             uploadFiles.teardown_accessory_date = moment()
           }
 
-          this.form.setFieldsValue(pick(uploadFiles, tearDonwFields))
-          if (uploadFiles.not_applicable) {
-            this.not_applicable = uploadFiles.not_applicable
+          if (uploadFiles) {
+            this.form.setFieldsValue(pick(uploadFiles, tearDonwFields))
+            if (uploadFiles.not_applicable) {
+              this.not_applicable = uploadFiles.not_applicable
+            }
+            if (uploadFiles.teardown_valve_not_applicable) {
+              this.disableAll_1 = uploadFiles.teardown_valve_not_applicable
+            }
+            if (uploadFiles.teardown_actuator_not_applicable) {
+              this.disableAll_2 = uploadFiles.teardown_actuator_not_applicable
+            }
+            if (uploadFiles.teardown_accessory_not_applicable) {
+              this.disableAll_3 = uploadFiles.teardown_accessory_not_applicable
+            }
+            this.refreshImageList(uploadFiles.uploads)
           }
-          if (uploadFiles.teardown_valve_not_applicable) {
-            this.disableAll_1 = uploadFiles.teardown_valve_not_applicable
-          }
-          if (uploadFiles.teardown_actuator_not_applicable) {
-            this.disableAll_2 = uploadFiles.teardown_actuator_not_applicable
-          }
-          if (uploadFiles.teardown_accessory_not_applicable) {
-            this.disableAll_3 = uploadFiles.teardown_accessory_not_applicable
-          }
-          this.refreshImageList(uploadFiles.uploads)
         } else {
           this.form.setFieldsValue(pick({ teardown_valve_date: moment() }, tearDonwFields))
           this.form.setFieldsValue(pick({ teardown_actuator_date: moment() }, tearDonwFields))

@@ -4,9 +4,17 @@
       <a-tabs default-active-key="1">
         <a-tab-pane key="2" tab="阀门信息" v-if="showValveForm" :forceRender="true">
           <ValveForm v-if="showValveForm" ref="valveForm" @selectInputChange="selectInputChangeEvent($event, selectInputChangeEvent)" />
+          <br>
+          <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+            <dispatchUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+          </a-card>
         </a-tab-pane>
         <a-tab-pane key="3" tab="执行机构信息" v-if="showActuatorForm" :forceRender="true">
           <ActuatorForm v-if="showActuatorForm" @selectActuInputChange="selectActuInputChangeEvent($event, selectActuInputChangeEvent)" />
+          <br>
+          <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+            <dispatchUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
+          </a-card>
         </a-tab-pane>
         <a-tab-pane key="4" tab="附件信息" v-if="showSlaveForm" :forceRender="true">
           <SlaveForm
@@ -16,6 +24,10 @@
             @selectSlaveInputChange="selectSlaveInputChangeEvent($event, selectSlaveInputChangeEvent)"
             @selectOtherSlaveChange="selectOtherSlaveChangeEvent($event, selectOtherSlaveChangeEvent)"
             @selectAreaOtherSlaveChange="selectAreaOtherSlaveChangeEvent($event, selectAreaOtherSlaveChangeEvent)" />
+          <br>
+          <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+            <dispatchUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'3'" />
+          </a-card>
         </a-tab-pane>
         <a-tab-pane key="5" tab="零部件信息" v-if="showPartsForm" :forceRender="true">
           <ValveParts v-if="showPartsForm" />
@@ -49,6 +61,7 @@
   import pick from 'lodash.pick'
   import { baseMixin } from '@/store/app-mixin'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
+  import dispatchUser from '@/views/step/modules/DispatchUser'
 
 export default {
   name: 'EditStepDataForm',
@@ -61,7 +74,8 @@ export default {
     ValveParts,
     baseMixin,
     FooterToolBar,
-    stepAllDetailModel
+    stepAllDetailModel,
+    dispatchUser
   },
   data () {
     return {

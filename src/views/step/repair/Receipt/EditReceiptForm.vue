@@ -51,12 +51,12 @@
           </a-col>
         </a-row>
       </a-card>
-      <br><br>
+      <br>
 
       <a-card title="派员" :headStyle="{fontWeight:'bold'}">
         <DispatchUser v-if="showDispatchUser" :disableAll="disableAll" :flowID="flow_id" :currentStep="current_step" />
       </a-card>
-      <br><br>
+      <br>
 
       <!-- 已购买备件清单 -->
       <a-card title="已购买备件清单" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
@@ -90,7 +90,6 @@
         </a-row>
       </a-card>
       <!-- 文件上传 -->
-      <br>
       <br>
       <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <UploadImg ref="uploadImg" :disableAll="disableAll" :queueType="'3'" :isMobile="isMobile" />

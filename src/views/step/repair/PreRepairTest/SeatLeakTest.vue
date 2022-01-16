@@ -113,7 +113,7 @@
       <!-- 行2 -->
       <a-row class="form-row" :gutter="36">
         <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-          <ExecutorUser :disableAll="disableAll" :flowID="flowId" :currentStep="currentStep" :flag="'1'" />
+          <dispatchUser :disableAll="disableAll" :flowID="flowId" :currentStep="currentStep" :flag="'1'" />
         </a-card>
       </a-row>
       <!-- 行2 -->
@@ -172,14 +172,14 @@
 </template>
 
 <script>
-import ExecutorUser from '@/views/step/modules/ExecutorUser'
+import dispatchUser from '@/views/step/modules/DispatchUser'
 import { getValveLeakLevel, getValveSeatLeakTestUnitText, getValveTestMediumUnit, getValveHydrostaticTestValueUnitText,
 getValveHydrostaticTestTimeUnitText } from '@/api/step'
 import UploadImg from '../../modules/UploadImg'
 
 export default {
   components: {
-    ExecutorUser,
+    dispatchUser,
     UploadImg
   },
   props: {

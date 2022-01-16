@@ -152,7 +152,7 @@
       <a-divider></a-divider>
       <a-row class="form-row" :gutter="16">
         <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-          <ExecutorUser :disableAll="disableAll" :flowID="flowId" :currentStep="currentStep" :flag="'3'" />
+          <dispatchUser :disableAll="disableAll" :flowID="flowId" :currentStep="currentStep" :flag="'3'" />
         </a-card>
       </a-row>
       <a-row>
@@ -217,7 +217,7 @@
 </template>
 
 <script>
-import ExecutorUser from '@/views/step/modules/ExecutorUser'
+import dispatchUser from '@/views/step/modules/DispatchUser'
 import uploadImg from '../../modules/UploadImg'
 
 export default {
@@ -248,7 +248,7 @@ export default {
     }
   },
   components: {
-    ExecutorUser,
+    dispatchUser,
     uploadImg
   },
   watch: {

@@ -20,7 +20,7 @@ const locale = {
   'menu.dashboard.workplace': '工作台',
   'menu.report': '报告',
 
-  'app.version': 'v1.0.3',
+  'app.version': 'v1.0.4',
   'app.flow.repair.start': '新建工单',
   'app.flow.repair.query': '工单查询',
   'app.flow.repair.receipt': '收货',

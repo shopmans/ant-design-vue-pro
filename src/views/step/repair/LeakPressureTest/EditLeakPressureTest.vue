@@ -257,8 +257,12 @@
       </footer-tool-bar>
     </a-form>
 
-    <br><br>
+    <br>
+    <a-card v-if="flowID" title="派员" :headStyle="{fontWeight:'bold'}">
+      <dispatchUser :disableAll="not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'"/>
+    </a-card>
 
+    <br>
     <!-- 文件上传 -->
     <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <uploadImg ref="uploadImg" :disableAll="not_applicable" :isMobile="isMobile" :queueType="'3'"/>
@@ -281,6 +285,7 @@
   import stepDetail from '../../modules/StepBaseInfo'
   import { saveLeakPressureData } from '@/api/leakPressureTest'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
+  import dispatchUser from '@/views/step/modules/DispatchUser'
 
   const leakPressureFields = ['leak_pressure_test_total_minute', 'leak_pressure_water_test_real_time',
   'leak_pressure_test_real_time', 'leak_test_real_valve', 'leak_test_real_valve_unit', 'leak_pressure_water_test_real_value',
@@ -296,7 +301,8 @@
       FooterToolBar,
       uploadImg,
       stepDetail,
-      stepAllDetailModel
+      stepAllDetailModel,
+      dispatchUser
     },
     methods: {
       getValveLeakLevel,

@@ -103,7 +103,8 @@ export default {
       },
       flag: {
           type: String,
-          default: ''
+          default: '',
+          required: true
       },
       disableAll: {
         type: Boolean,
@@ -132,7 +133,7 @@ export default {
           return
         }
         return getStepUsers({ flow_id: this.flowID, current_step: this.currentStep, flag: this.flag }).then(res => {
-            return res.result
+          return res.result
         })
       }
     }
@@ -169,6 +170,7 @@ export default {
     }
   },
   mounted () {
+    // 刷新执行人员下拉列表
     getUserList({ pageSize: 99999999, pageNo: 1, position: '2' }).then(e => {
       this.userList = e.result.data
     })

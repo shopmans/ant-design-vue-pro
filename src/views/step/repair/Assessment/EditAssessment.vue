@@ -670,20 +670,22 @@ export default {
               })
             })
           }
-          that.form.setFieldsValue(pick(assessmentData, assessmentFields))
-          if (assessmentData.not_applicable) {
-            that.not_applicable = assessmentData.not_applicable
+          if (assessmentData) {
+            that.form.setFieldsValue(pick(assessmentData, assessmentFields))
+            if (assessmentData.not_applicable) {
+              that.not_applicable = assessmentData.not_applicable
+            }
+            if (assessmentData.valve_not_applicable) {
+              this.disableAll_1 = assessmentData.valve_not_applicable
+            }
+            if (assessmentData.actuator_not_applicable) {
+              this.disableAll_2 = assessmentData.actuator_not_applicable
+            }
+            if (assessmentData.accessaries_not_applicable) {
+              this.disableAll_3 = assessmentData.accessaries_not_applicable
+            }
+            this.refreshImageList(assessmentData.uploads)
           }
-          if (assessmentData.valve_not_applicable) {
-            this.disableAll_1 = assessmentData.valve_not_applicable
-          }
-          if (assessmentData.actuator_not_applicable) {
-            this.disableAll_2 = assessmentData.actuator_not_applicable
-          }
-          if (assessmentData.accessaries_not_applicable) {
-            this.disableAll_3 = assessmentData.accessaries_not_applicable
-          }
-          this.refreshImageList(assessmentData.uploads)
           // this.repairRadioChangeImpl(this.form.getFieldsValue(['assessment_check_or_repair']).assessment_check_or_repair)
         }
       })

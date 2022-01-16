@@ -24,7 +24,7 @@
       <br>
       <!-- 评估人员 -->
       <a-card title="评估人员" :headStyle="{fontWeight:'bold'}">
-        <ExecutorUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'3'" />
+        <dispatchUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'3'" />
       </a-card>
       <!-- 文件上传 -->
       <br>
@@ -38,9 +38,8 @@
 
 <script>
 import AssessmentRow from '../../modules/AssessmentRow'
-import DispatchUser from '../../modules/DispatchUser'
+import dispatchUser from '../../modules/DispatchUser'
 import { getAccessariesASFields } from '@/api/assessment'
-import ExecutorUser from '../../modules/ExecutorUser'
 import uploadImg from '../../modules/UploadImg'
 
   const rowoptions = getAccessariesASFields()
@@ -48,8 +47,7 @@ import uploadImg from '../../modules/UploadImg'
 export default {
   components: {
     AssessmentRow,
-    DispatchUser,
-    ExecutorUser,
+    dispatchUser,
     uploadImg
   },
   props: {

@@ -319,7 +319,7 @@
       <br>
 
       <a-card title="派员" :headStyle="{fontWeight:'bold'}">
-        <DispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flowID" :currentStep="currentStep" />
+        <dispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
       </a-card>
       <br>
 
@@ -374,7 +374,7 @@ import { saveRepairData } from '@/api/repair'
 import stepAllDetailModel from '../../modules/StepAllDetailModel'
 import XLSX from 'xlsx'
 import { randomNum } from '@/api/utils'
-import DispatchUser from '../../modules/DispatchUser'
+import dispatchUser from '../../modules/DispatchUser'
 
 const repairFields = []
 
@@ -388,7 +388,7 @@ export default {
         stepDetail,
         uploadImg,
         stepAllDetailModel,
-        DispatchUser
+        dispatchUser
     },
     methods: {
       handleSubmit (e) {
@@ -900,19 +900,21 @@ export default {
             }
           }
 
-          if (repairData.valve_not_applicable) {
-            this.disableAll_1 = repairData.valve_not_applicable
+          if (repairData) {
+            if (repairData.valve_not_applicable) {
+              this.disableAll_1 = repairData.valve_not_applicable
+            }
+            if (repairData.actuator_not_applicable) {
+              this.disableAll_2 = repairData.actuator_not_applicable
+            }
+            if (repairData.accessaries_not_applicable) {
+              this.disableAll_3 = repairData.accessaries_not_applicable
+            }
+            this.refreshImageList(repairData.uploads)
           }
-          if (repairData.actuator_not_applicable) {
-            this.disableAll_2 = repairData.actuator_not_applicable
-          }
-          if (repairData.accessaries_not_applicable) {
-            this.disableAll_3 = repairData.accessaries_not_applicable
-          }
-          this.refreshImageList(repairData.uploads)
         })
 
-        getStepUsers({ flow_id: this.flowID, current_step: this.currentStep }).then(res => {
+        getStepUsers({ flow_id: this.flowID, current_step: this.currentStep, flag: '1' }).then(res => {
           if (res.result.data.length > 0) {
             res.result.data.forEach(e => {
               this.dispatchUserData.push({
