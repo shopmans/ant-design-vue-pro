@@ -416,7 +416,7 @@
           <span v-else>
             <a @click="saveRow(record)">保存</a>
             <a-divider type="vertical" />
-            <a @click="cancel(record.key)">取消</a>
+            <a @click="cancel(record.key)">返回</a>
           </span>
         </template>
         <span v-else>

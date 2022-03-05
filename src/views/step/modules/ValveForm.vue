@@ -89,10 +89,10 @@
               ]">
               <a-select v-decorator="[ 'valve_size_unit', {initialValue: '1', rules: [{ message: '请选择阀尺寸单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  Inch
+                  inch
                 </a-select-option>
                 <a-select-option value="2">
-                  Mm
+                  mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -198,10 +198,10 @@
               ]">
               <a-select v-decorator="[ 'valve_travel_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  Inch
+                  inch
                 </a-select-option>
                 <a-select-option value="2">
-                  Mm
+                  mm
                 </a-select-option>
                 <a-select-option value="3">
                   °
@@ -265,10 +265,10 @@
               ]">
               <a-select v-decorator="[ 'valve_rod_diameter_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  Inch
+                  inch
                 </a-select-option>
                 <a-select-option value="2">
-                  Mm
+                  mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -284,10 +284,10 @@
               ]">
               <a-select v-decorator="[ 'valve_caliber_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  Inch
+                  inch
                 </a-select-option>
                 <a-select-option value="2">
-                  Mm
+                  mm
                 </a-select-option>
                 <a-select-option value="3">
                   N/A
@@ -324,10 +324,10 @@
               ]">
               <a-select v-decorator="[ 'valve_flange_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  Inch
+                  inch
                 </a-select-option>
                 <a-select-option value="2">
-                  Mm
+                  mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -343,10 +343,10 @@
               ]">
               <a-select v-decorator="[ 'valve_connect_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  Inch
+                  inch
                 </a-select-option>
                 <a-select-option value="2">
-                  Mm
+                  mm
                 </a-select-option>
                 <a-select-option value="3">
                   N/A
@@ -514,10 +514,10 @@
               ]">
               <a-select v-decorator="[ 'valve_cover_bolt_size_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  Inch
+                  inch
                 </a-select-option>
                 <a-select-option value="2">
-                  Mm
+                  mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -533,10 +533,10 @@
               ]">
               <a-select v-decorator="[ 'valve_cover_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  Inch
+                  inch
                 </a-select-option>
                 <a-select-option value="2">
-                  Mm
+                  mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -575,10 +575,10 @@
               ]">
               <a-select v-decorator="[ 'valve_seat_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  Inch
+                  inch
                 </a-select-option>
                 <a-select-option value="2">
-                  Mm
+                  mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -616,10 +616,10 @@
               ]">
               <a-select v-decorator="[ 'valve_fill_bolt_tool_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                 <a-select-option value="1">
-                  Inch
+                  inch
                 </a-select-option>
                 <a-select-option value="2">
-                  Mm
+                  mm
                 </a-select-option>
               </a-select>
             </a-input>
@@ -706,17 +706,8 @@
                 {rules: [{ message: '请输入口径'}]}
               ]">
               <a-select v-decorator="[ 'valve_leak_test_std_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
-                <a-select-option value="1">
-                  PSI
-                </a-select-option>
-                <a-select-option value="2">
-                  BAR
-                </a-select-option>
-                <a-select-option value="3">
-                  MPa
-                </a-select-option>
-                <a-select-option value="4">
-                  KPa
+                <a-select-option v-for="item in StdTestPressed" :value="item" :key="item">
+                  {{ item }}
                 </a-select-option>
               </a-select>
             </a-input>
@@ -818,14 +809,8 @@
                 {rules: [{ message: '请输入水压测试标准值'}]}
               ]">
               <a-select v-decorator="[ 'valve_hydrostatic_test_value_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
-                <a-select-option value="1">
-                  PSI
-                </a-select-option>
-                <a-select-option value="2">
-                  BAR
-                </a-select-option>
-                <a-select-option value="3">
-                  MPa
+                <a-select-option v-for="item in StdTestPressed" :value="item" :key="item">
+                  {{ item }}
                 </a-select-option>
               </a-select>
             </a-input>
@@ -860,7 +845,7 @@
 <script>
 import { getValvaBanner, getValvePressureList, getValveFlowList, getValveFillInputList, getValveLeakTestInputList, getValveStdTestInputList,
 getValveCoreBallBettlefly, getValveStemAxis, getValveCageRetainingRing, getValveSetRing, getValveVillageBearing, getValveSpacerData,
-getValveCoverBoltMaterial, getValveTypeList, getValveLeakLevelList, getValveMaterial } from '@/api/step'
+getValveCoverBoltMaterial, getValveTypeList, getValveLeakLevelList, getValveMaterial, getValveStdTestPressedList } from '@/api/step'
 
 // import pick from 'lodash.pick'
 
@@ -897,7 +882,8 @@ export default {
         ValveCoverBoltMaterial: getValveCoverBoltMaterial(),
         valveSerialData: [],
         valveTypeList: getValveTypeList(),
-        ValveLeakLevelList: getValveLeakLevelList()
+        ValveLeakLevelList: getValveLeakLevelList(),
+        StdTestPressed: getValveStdTestPressedList()
       }
     },
     mounted () {

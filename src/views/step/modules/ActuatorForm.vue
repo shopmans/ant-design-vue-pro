@@ -95,6 +95,8 @@
               :allowClear="true" >
               <a-select-option value="1">PDTC</a-select-option>
               <a-select-option value="2">PDTO</a-select-option>
+              <a-select-option value="3">CWTC</a-select-option>
+              <a-select-option value="4">CCWTC</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -108,16 +110,16 @@
               ]">
               <a-select v-decorator="[ 'actu_spring_set_pressure_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 100px" :allowClear="true">
                 <a-select-option value="1">
-                  PSI
+                  Psig
                 </a-select-option>
                 <a-select-option value="2">
-                  BAR
+                  Bar
                 </a-select-option>
                 <a-select-option value="3">
-                  kg/cm2
+                  Kg/cm2
                 </a-select-option>
                 <a-select-option value="4">
-                  Kpa
+                  KPa
                 </a-select-option>
                 <a-select-option value="5">
                   KG
@@ -212,7 +214,7 @@
                   N.m
                 </a-select-option>
                 <a-select-option value="2">
-                  lbf.ft
+                  Lbf.ft
                 </a-select-option>
               </a-select>
             </a-input>
@@ -261,14 +263,8 @@
                 {rules: [{ message: '请输入气源压力'}]}
               ]">
               <a-select v-decorator="[ 'actu_air_pressed_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
-                <a-select-option value="1">
-                  PSI
-                </a-select-option>
-                <a-select-option value="2">
-                  BAR
-                </a-select-option>
-                <a-select-option value="3">
-                  MPa
+                <a-select-option v-for="item in StdTestPressed" :value="item" :key="item">
+                  {{ item }}
                 </a-select-option>
               </a-select>
             </a-input>
@@ -330,12 +326,12 @@
             <a-input
               v-decorator="[
                 'actu_install_travel',
-                {rules: [{ message: '请输入气源压力'}]}
+                {rules: [{ message: '请输入行程'}]}
               ]">
               <a-select v-decorator="[ 'actu_install_travel_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
-                <a-select-option value="1">in</a-select-option>
+                <a-select-option value="1">inch</a-select-option>
                 <a-select-option value="2">mm</a-select-option>
-                <a-select-option value="3">deg</a-select-option>
+                <a-select-option value="3">°</a-select-option>
               </a-select>
             </a-input>
           </a-form-item>
@@ -347,12 +343,13 @@
 </template>
 
 <script>
-import { getValvaBanner } from '@/api/step'
+import { getValvaBanner, getValveStdTestPressedList } from '@/api/step'
 
 export default {
   data () {
     return {
-      ValveActuBannerList: getValvaBanner()
+      ValveActuBannerList: getValvaBanner(),
+      StdTestPressed: getValveStdTestPressedList()
     }
   },
   methods: {

@@ -27,7 +27,7 @@
 
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
-        <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
+        <a-button style="margin-left: 8px" @click="cancelSubmit">返回</a-button>
         <a-button style="margin-left: 38px" @click="stepDone">结束流程</a-button>
       </footer-tool-bar>
 

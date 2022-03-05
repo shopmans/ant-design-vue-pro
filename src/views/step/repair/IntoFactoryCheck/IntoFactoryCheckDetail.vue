@@ -3,7 +3,7 @@
     <intoFactoryInfo />
     <br>
     <div style="float:right;">
-      <a-button type="primary" @click="cancelDetail">取消</a-button>
+      <a-button type="primary" @click="cancelDetail">返回</a-button>
     </div>
   </page-header-wrapper>
 </template>

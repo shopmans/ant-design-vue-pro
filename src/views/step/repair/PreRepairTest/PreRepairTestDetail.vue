@@ -2,7 +2,7 @@
   <page-header-wrapper>
     <preRepairTestDetailInfo />
     <br>
-    <a-button type="primary" @click="cancelDetail">取消</a-button>
+    <a-button type="primary" @click="cancelDetail">返回</a-button>
   </page-header-wrapper>
 </template>
 

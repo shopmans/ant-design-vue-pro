@@ -663,7 +663,7 @@
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
-        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >取消</a-button>
+        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >返回</a-button>
         <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
@@ -730,46 +730,44 @@
       // 供flutter刷新上传文件列表
       window.refreshUploads = this.refreshUploads
 
-      if (editData.step_data.length > 0) {
-        this.$nextTick(() => {
+      queryStepData({ id: this.flowID, current_step: '(start)' }).then(res => {
+        if (editData.step_data.length > 0) {
           const installIAData = JSON.parse(editData.step_data[0].JSON)
           this.form.setFieldsValue(pick(installIAData, adjustFields))
           this.$refs.uploadImg.imgFileList = installIAData.uploads
           this.not_applicable = installIAData.not_applicable
           if (installIAData.inputSignalData) { this.inputSignalData = installIAData.inputSignalData }
           if (installIAData.deadBandData) { this.deadBandData = installIAData.deadBandData }
-        })
-      }
-
-      queryStepData({ id: this.flowID, current_step: '(start)' }).then(res => {
-      res.result.step_data.forEach(stepItem => {
-        switch (stepItem.DataNum) {
-          case 1: { // baseInfo
-            const baseData = JSON.parse(stepItem.JSON)
-            // 开关阀、调节阀数据
-            if (baseData.control_model === '1') { // 调节阀
-              this.valveControlModel = 1
-              return
-            }
-            if (baseData.control_model === '2') { // 开关阀
-              this.valveControlModel = 2
-              return
-            }
-
-            this.$message.info('不能识别的阀类型(开关阀、调节阀)')
-            break
-          }
-          case 4: {
-            const tmpData = JSON.parse(stepItem.JSON)
-            this.selectArea = tmpData.other_slave_select_area
-            if (!this.selectArea) {
-              this.selectArea = () => ([])
-            }
-            break
-          }
         }
+
+        res.result.step_data.forEach(stepItem => {
+          switch (stepItem.DataNum) {
+            case 1: { // baseInfo
+              const baseData = JSON.parse(stepItem.JSON)
+              // 开关阀、调节阀数据
+              if (baseData.control_model === '1') { // 调节阀
+                this.valveControlModel = 1
+                return
+              }
+              if (baseData.control_model === '2') { // 开关阀
+                this.valveControlModel = 2
+                return
+              }
+
+              this.$message.info('不能识别的阀类型(开关阀、调节阀)')
+              break
+            }
+            case 4: {
+              const tmpData = JSON.parse(stepItem.JSON)
+              this.selectArea = tmpData.other_slave_select_area
+              if (!this.selectArea) {
+                this.selectArea = () => ([])
+              }
+              break
+            }
+          }
+        })
       })
-    })
     },
     methods: {
       handleSubmit (e) {

@@ -71,7 +71,7 @@
                 <span v-else>
                   <a :disabled="not_applicable" @click="saveRow(record)">保存</a>
                   <a-divider type="vertical" />
-                  <a :disabled="not_applicable" @click="cancel(record.key)">取消</a>
+                  <a :disabled="not_applicable" @click="cancel(record.key)">返回</a>
                 </span>
               </template>
               <span v-else>
@@ -124,7 +124,7 @@
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
-        <a-button style="margin-left: 8px" @click="cancelSubmit">取消</a-button>
+        <a-button style="margin-left: 8px" @click="cancelSubmit">返回</a-button>
         <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>

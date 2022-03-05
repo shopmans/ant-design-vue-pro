@@ -41,7 +41,7 @@
       <a-button @click="getReport('1')" type="primary" :loading="loading">生成报告(Excel)</a-button>
       <a-button @click="getReport('2')" style="margin-left: 8px" type="primary" :loading="loading">生成报告(PDF)</a-button>
       <a-button style="margin-left: 8px" @click="saveReportConfig" :loading="loading">保存设置</a-button>
-      <a-button style="margin-left: 8px" @click="cancelReport" >取消</a-button>
+      <a-button style="margin-left: 8px" @click="cancelReport" >返回</a-button>
     </footer-tool-bar>
 
     <!-- 对话框 -->

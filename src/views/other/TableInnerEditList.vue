@@ -100,7 +100,7 @@
             <a @click="() => save(record)">保存</a>
             <a-divider type="vertical" />
             <a-popconfirm title="真的放弃编辑吗?" @confirm="() => cancel(record)">
-              <a>取消</a>
+              <a>返回</a>
             </a-popconfirm>
           </span>
           <span v-else>

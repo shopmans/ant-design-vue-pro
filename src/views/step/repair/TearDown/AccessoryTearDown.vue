@@ -52,19 +52,19 @@
     <!-- 文件上传 -->
     <br>
     <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <uploadImg ref="uploadImg" :disableAll="disableAll" :isMobile="isMobile" :queueType="'3'" :flag="'3'" />
+      <uploadImg3 ref="uploadImg3" :disableAll="disableAll" :isMobile="isMobile" :queueType="'3'" :flag="'3'" />
     </a-card>
   </div>
 </template>
 
 <script>
 import dispatchUser from '../../modules/DispatchUser'
-import uploadImg from '../../modules/UploadImg'
+import uploadImg3 from '../../modules/UploadImg3'
 
 export default {
   components: {
     dispatchUser,
-    uploadImg
+    uploadImg3
   },
   props: {
     flowID: {
@@ -103,10 +103,10 @@ export default {
       this.$emit('accessoryNa', value)
     },
     getUploadImgData () {
-      return this.$refs.uploadImg.imgFileList
+      return this.$refs.uploadImg3.imgFileList
     },
     setUploadImgData (data) {
-      this.$refs.uploadImg.imgFileList = data
+      this.$refs.uploadImg3.imgFileList = data
     }
   },
   data () {

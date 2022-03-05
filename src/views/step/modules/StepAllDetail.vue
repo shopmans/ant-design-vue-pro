@@ -7,7 +7,7 @@
       ref="stepDetailModel" />
     <br>
     <div style="float: right">
-      <a-button v-if:="showButton" type="primary" @click="cancelDetail">取消</a-button>
+      <a-button v-if:="showButton" type="primary" @click="cancelDetail">返回</a-button>
     </div>
   </page-header-wrapper>
 </template>

@@ -535,11 +535,11 @@ export function getActuHandwheel (val) {
 export function getActuInstallTravel (val) {
   switch (val) {
     case '1':
-      return 'in, '
+      return 'inch'
     case '2':
       return 'mm'
     case '3':
-      return 'deg'
+      return '°'
     default:
       return ''
   }
@@ -556,9 +556,9 @@ export function getActuInstallTravelUnit (val, unitValue) {
 export function getValveSizeUnit (val) {
   switch (val) {
     case '1':
-      return 'Inch'
+      return 'inch'
     case '2':
-      return 'Mm'
+      return 'mm'
     case '3':
       return 'N/A'
     default:
@@ -568,7 +568,7 @@ export function getValveSizeUnit (val) {
 
 export function getUnit2ValveSizeValue (val) {
   switch (val) {
-    case 'Inch':
+    case 'inch':
       return '1'
     case 'mm':
       return '2'
@@ -593,9 +593,9 @@ export function getTestOrRepairUnit (val) {
 export function getValveTravelUnit (val) {
   switch (val) {
     case '1':
-      return 'Inch'
+      return 'inch'
     case '2':
-      return 'Mm'
+      return 'mm'
     case '3':
         return '°'
     default:
@@ -845,13 +845,13 @@ export function getValveLeakTestValueUnit (val) {
 export function getActuSpringSetPressureUnit (val) {
   switch (val) {
     case '1':
-      return 'PSI'
+      return 'Psig'
     case '2':
-      return 'BAR'
+      return 'Bar'
     case '3':
-    return 'kg/cm2'
+    return 'Kg/cm2'
     case '4':
-    return 'Kpa'
+    return 'KPa'
     case '5':
     return 'KG'
     default:
@@ -1200,6 +1200,10 @@ export function getActuActionModeUnit (val) {
       return 'PDTC'
     case '2':
       return 'PDTO'
+    case '3':
+      return 'CWTC'
+    case '4':
+      return 'CCWTC'
     default:
       return ''
   }
@@ -1856,7 +1860,7 @@ export function getValveSpacer (val) {
       return 'Spiral wound gasket'
     case 3:
     case '3':
-      return 'Graphite/ Spiral wound gasket'
+      return 'Spiral Inc/Graph'
     case 4:
     case '4':
       return '316SST'
@@ -2173,11 +2177,11 @@ export function getStepPartsFields () {
 }
 
 export function getValvaBanner () {
-  return ['Fisher', 'Baumann', 'Arca', 'Bray', 'Cameron', 'Cci', 'Copes', 'Crane', 'Edwards', 'Fasani', 'Flowserve', 'Gulde', 'Jamesbury', 'Jordan', 'Keystone', 'Ktm', 'Leslie', 'Masoneilan', 'Metso', 'Mogas', 'Neles', 'Neway', 'Orbit', 'Pacific', 'Samson', 'Saunders', 'Sempell', 'Spirax Sarco', 'Vanessa']
+  return ['FISHER', 'Baumann', 'ARCA', 'Bray', 'Cameron', 'CCI', 'Copes', 'Crane', 'Edwards', 'FASANI', 'Flowserve', 'Gulde', 'Jamesbury', 'Jordan', 'Keystone', 'KTM', 'LESLIE', 'Masoneilan', 'Metso', 'Mogas', 'Neles', 'Neway', 'Orbit', 'Pacific', 'Samson', 'Saunders', 'Sempell', 'Spirax Sarco', 'Vanessa']
 }
 
 export function getValveMaterial () {
-  return ['Wcb', 'Wcc', 'Wc5', 'Wc6', 'Wc9', 'Sst', 'Cf3m', 'Cf8m', 'Cast', 'Iron', 'A216 Wcb', 'Carbon Steel', 'Cg8m', 'Other']
+  return ['WCB', 'WCC', 'WC5', 'WC6', 'WC9', 'SST', 'CF3M', 'CF8M', 'Cast', 'Iron', 'A216 WCB', 'Carbon Steel', 'CG8M', 'Other']
 }
 
 export function getValvePressureList () {
@@ -2197,9 +2201,14 @@ export function getValveFillInputList () {
   return ['High Seal Graphite', 'Chesterton Comp', 'Chesterton Graph', 'Dbl PTFE V-Ring', 'Enviro Duplex', 'Enviro Graph', 'Enviro PTFE', 'Enviro ULF Graph', 'Kalrez', 'Low Emissions', 'PTFE Comp', 'PTFE V-ring', 'N/A', 'Other', 'GRAPHITE SINGLE']
 }
 
+// 标准测试压力
+export function getValveStdTestPressedList () {
+  return ['Psig', 'Bar', 'MPa', 'Kg/cm2', 'KPa']
+}
+
 // 泄漏等级
 export function getValveLeakLevelList () {
-  return ['Class Ⅱ', 'Class Ⅲ', 'Class Ⅳ', 'Class Ⅴ', 'Class Ⅵ', 'Class I', 'N/A', 'Other']
+  return ['Class I', 'Class II', 'Class III', 'Class IV', 'Class V', 'Class VI', 'N/A', 'Other']
 }
 
 export function getValveCoreBallBettlefly () {
@@ -2223,7 +2232,7 @@ export function getValveVillageBearing () {
 }
 
 export function getValveSpacerData () {
-  return ['Graphite', 'Spiral wound gasket', 'Graphite/ Spiral wound gasket', '316SST']
+  return ['Graphite', 'Spiral wound gasket', 'Spiral Inc/Graph', '316SST']
 }
 
 export function getValveCoverBoltMaterial () {
@@ -2243,7 +2252,7 @@ export function getValveStdTestInputList () {
 }
 
 export function getSalveLocaModList () {
-  return ['3570', '3580', '3582', '3582i', '3610', '3610J', '3610JP', '3611JP', '3620JP', '3621JP', '3622', '3661', '3710', '3720', 'DV2000', 'DVC6000f', 'DVC6010', 'DVC6020', 'DVC6030', 'DVC6200', 'DVC6200f', 'DVC6200P', 'Other']
+  return ['3570', '3580', '3582', '3582i', '3610', '3610J', '3610JP', '3611JP', '3620JP', '3621JP', '3622', '3661', '3710', '3720', 'DV2000', 'DVC6000F', 'DVC6010', 'DVC6020', 'DVC6030', 'DVC6200', 'DVC6200F', 'DVC6200P', 'Other']
 }
 
 // 其它附件

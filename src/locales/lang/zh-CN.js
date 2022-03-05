@@ -67,7 +67,7 @@ const locale = {
   'menu.project.new.valveNumber.require': '请输入阀门数量',
   'menu.project.new.contractTotal.require': '请输入合同金额',
 
-  'menu.project.repairProjectDetail': '维修工程详情',
+  'menu.project.repairProjectDetail': '查看工程',
   'menu.project.detail.info': '工程信息',
   'menu.project.detail.serial': '工程序号',
   'menu.project.detail.estStartDate': '预计开工日期',

@@ -13,11 +13,15 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 const whiteList = ['login', 'register', 'registerResult'] // no redirect whitelist
 const loginRoutePath = '/user/login'
 const defaultRoutePath = 'project/project-list'
+var logined = false
 
 router.beforeEach((to, from, next) => {
   console.log('router to: ' + to.fullPath)
   console.log('router from: ' + from.fullPath)
-  if (store.state.user.savePropmt === '1') {
+  console.log(to.fullPath.indexOf(loginRoutePath), '+++++++++++++++++++++++++')
+  if (to.fullPath.indexOf(loginRoutePath) >= 0) { logined = true }
+  if (to.fullPath === '/' && from.fullPath === '/' && logined) {
+    console.log('=================================================================================')
   //   this.$confirm({
   //     title: '确认删除此项目吗?',
   //     icon: <ExclamationCircleOutlined/>,

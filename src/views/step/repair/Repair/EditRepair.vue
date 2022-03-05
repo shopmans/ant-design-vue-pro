@@ -171,7 +171,7 @@
             <!-- 文件上传 -->
             <br>
             <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-              <uploadImg ref="uploadImg2" :disableAll="disableAll_2" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+              <uploadImg2 ref="uploadImg2" :disableAll="disableAll_2" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
             </a-card>
           </a-card>
         </a-tab-pane>
@@ -257,7 +257,7 @@
             <!-- 文件上传 -->
             <br>
             <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-              <uploadImg ref="uploadImg3" :disableAll="disableAll_3" :isMobile="isMobile" :queueType="'3'" :flag="'3'" />
+              <uploadImg3 ref="uploadImg3" :disableAll="disableAll_3" :isMobile="isMobile" :queueType="'3'" :flag="'3'" />
             </a-card>
           </a-card>
         </a-tab-pane>
@@ -349,7 +349,7 @@
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
-        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >取消</a-button>
+        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >返回</a-button>
         <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
@@ -366,7 +366,9 @@ import { baseMixin } from '@/store/app-mixin'
 import pick from 'lodash.pick'
 import stepDetail from '../../modules/StepBaseInfo'
 import uploadImg from '../../modules/UploadImg'
-import { stepDone, queryStepData, getStepUsers, getColumnsPurchased } from '@/api/step'
+import uploadImg2 from '../../modules/UploadImg2'
+import uploadImg3 from '../../modules/UploadImg3'
+import { stepDone, queryStepData, getColumnsPurchased } from '@/api/step'
 import { getValveASFields, getActuatorASFields, getAccessariesASFields, getValvaRepairCheckFields,
 getActuatorRepairCheckFields, getOtherRepairCheckFields } from '@/api/assessment'
 import { fetch } from '../../../../utils/inputSearch'
@@ -375,6 +377,7 @@ import stepAllDetailModel from '../../modules/StepAllDetailModel'
 import XLSX from 'xlsx'
 import { randomNum } from '@/api/utils'
 import dispatchUser from '../../modules/DispatchUser'
+import { getUserList } from '@/api/user'
 
 const repairFields = []
 
@@ -387,6 +390,8 @@ export default {
         pick,
         stepDetail,
         uploadImg,
+        uploadImg2,
+        uploadImg3,
         stepAllDetailModel,
         dispatchUser
     },
@@ -914,16 +919,28 @@ export default {
           }
         })
 
-        getStepUsers({ flow_id: this.flowID, current_step: this.currentStep, flag: '1' }).then(res => {
+        // 查找所有维修工程师
+        getUserList({ pageSize: 99999999, pageNo: 1, position: '2' }).then(res => {
           if (res.result.data.length > 0) {
             res.result.data.forEach(e => {
               this.dispatchUserData.push({
-                key: e.user_id,
+                key: e.id,
                 label: e.user_name
               })
             })
           }
         })
+
+        // getStepUsers({ flow_id: this.flowID, current_step: this.currentStep, flag: '1' }).then(res => {
+        //   if (res.result.data.length > 0) {
+        //     res.result.data.forEach(e => {
+        //       this.dispatchUserData.push({
+        //         key: e.user_id,
+        //         label: e.user_name
+        //       })
+        //     })
+        //   }
+        // })
       })
     },
     data () {

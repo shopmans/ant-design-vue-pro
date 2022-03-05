@@ -111,7 +111,7 @@
             <a-descriptions-item label="泄漏测试标准">{{ valveInfo.valve_seat_leak_test }}</a-descriptions-item>
             <a-descriptions-item label="阀座泄漏等级">{{ valveInfo.valve_leak_level }}</a-descriptions-item>
             <a-descriptions-item label="泄漏测试介质">{{ getValveTestMediumUnit(valveInfo.valve_leak_test_medium) }}</a-descriptions-item>
-            <a-descriptions-item label="泄漏标准测试压力">{{ getValveHydrostaticTestValueUnitText(valveInfo.valve_leak_test_std_pressed, valveInfo.valve_leak_test_std_pressed_unit) }}</a-descriptions-item>
+            <a-descriptions-item label="泄漏标准测试压力">{{ valveInfo.valve_leak_test_std_pressed + " " + valveInfo.valve_leak_test_std_pressed_unit }}</a-descriptions-item>
             <a-descriptions-item label="泄漏测试标准值">{{ valveInfo.valve_leak_test_value + " " + getValveLeakTestValueUnit(valveInfo.valve_leak_test_value_unit) }}</a-descriptions-item>
             <a-descriptions-item label="泄漏测试时间">{{ getValveHydrostaticTestTimeUnitText(valveInfo.valve_leak_test_time, valveInfo.valve_leak_test_time_unit) }}</a-descriptions-item>
           </a-descriptions>
@@ -119,7 +119,7 @@
           <a-descriptions title="水压测试" :column="4">
             <a-descriptions-item label="水压测试介质">{{ getValveTestMediumUnit(valveInfo.valve_test_medium) }}</a-descriptions-item>
             <a-descriptions-item label="水压测试标准">{{ valveInfo.valve_test_std }}</a-descriptions-item>
-            <a-descriptions-item label="水压测试标准值">{{ valveInfo.valve_hydrostatic_test_value + " " + getValveHydrostaticTestValueUnit(valveInfo.valve_hydrostatic_test_value_unit) }}</a-descriptions-item>
+            <a-descriptions-item label="水压测试标准值">{{ valveInfo.valve_hydrostatic_test_value + " " + valveInfo.valve_hydrostatic_test_value_unit }}</a-descriptions-item>
             <a-descriptions-item label="水压测试时间">{{ valveInfo.valve_hydrostatic_test_time + " " + getValveHydrostaticTestTimeUnit(valveInfo.valve_hydrostatic_test_time_unit) }}</a-descriptions-item>
           </a-descriptions>
         </a-card>
@@ -137,7 +137,7 @@
             <a-descriptions-item label="弹簧设置压力">{{ ActuatorInfo.actu_spring_set_pressure + " " +getActuSpringSetPressureUnit(ActuatorInfo.actu_spring_set_pressure_unit) }}</a-descriptions-item>
             <a-descriptions-item label="故障失效">{{ getActuFailureUnit(ActuatorInfo.actu_failure) }}</a-descriptions-item>
             <a-descriptions-item label="安装位置">{{ getActuInstallPointUnit(ActuatorInfo.actu_install_point) }}</a-descriptions-item>
-            <a-descriptions-item label="气源压力">{{ getValveHydrostaticTestValueUnitText(ActuatorInfo.actu_air_pressed, ActuatorInfo.actu_air_pressed_unit) }}</a-descriptions-item>
+            <a-descriptions-item label="气源压力">{{ ActuatorInfo.actu_air_pressed + " " + ActuatorInfo.actu_air_pressed_unit }}</a-descriptions-item>
             <!-- <a-descriptions-item label="是否集成附件安装支架">{{ getYesNoSwitchUnit(ActuatorInfo.actu_install_bracket) }}</a-descriptions-item>
             <a-descriptions-item label="附件安装支架方向">{{ getActuInstallDirectoreUnit(ActuatorInfo.actu_install_directore) }}</a-descriptions-item> -->
             <a-descriptions-item label="手轮">{{ getActuHandwheel(ActuatorInfo.actu_handwheel) }}</a-descriptions-item>

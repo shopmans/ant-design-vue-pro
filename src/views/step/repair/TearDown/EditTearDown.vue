@@ -41,7 +41,7 @@
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
         <a-button htmlType="submit" type="primary">保存</a-button>
-        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >取消</a-button>
+        <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >返回</a-button>
         <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
@@ -126,7 +126,7 @@
               })
             }
             // 执行机构拆解
-            if (this.$refs.valveTearDown) {
+            if (this.$refs.actuatorTearDown) {
               this.$refs.actuatorTearDown.getUploadImgData().forEach(e => {
                 tmpUpload.push(e)
               })
@@ -241,6 +241,7 @@
             this.$refs.valveTearDown.setUploadImgData(imgList1)
           }
           if (this.$refs.actuatorTearDown) {
+            console.log(imgList2)
             this.$refs.actuatorTearDown.setUploadImgData(imgList2)
           }
           if (this.$refs.accessoryTearDown) {
