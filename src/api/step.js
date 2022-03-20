@@ -343,6 +343,32 @@ export function getCurrentStepMap () {
   }
 }
 
+// 流程顺序位置换流程名称
+export function getFlowNameByIndex (index) {
+  switch (index) {
+    case 0: return 'app.flow.repair.receipt'
+    case 1: return 'app.flow.repair.intoFactoryCheck'
+    case 2: return 'app.flow.repair.preRepairDiag'
+    case 3: return 'app.flow.repair.preRepairTest'
+    case 4: return 'app.flow.repair.tearDown'
+    case 5: return 'app.flow.repair.assessment'
+    case 6: return 'app.flow.repair.repair'
+    case 7: return 'app.flow.repair.assemble'
+    case 8: return 'app.flow.repair.installActuator'
+    case 9: return 'app.flow.repair.leakPressureTest'
+    case 10: return 'app.flow.repair.installSlave'
+    case 11: return 'app.flow.repair.adjust'
+    case 12: return 'app.flow.repair.afterRepairDiag'
+    case 13: return 'app.flow.repair.RepairConfirm'
+    case 14: return 'app.flow.repair.finalCheck'
+    case 15: return 'app.flow.repair.packingDelivery2'
+    default:
+      return ''
+  }
+}
+
+export function getFlowTotalcount () { return 16 }
+
 // 折分维修前、后的值
 export function getRepairSplitValue (val) { return 30 }
 

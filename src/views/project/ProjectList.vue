@@ -25,7 +25,18 @@
             <!-- 销售 -->
             <a-col :md="4" :sm="24">
               <a-form-item :label="$t('menu.project.view.table.column.sales')">
-                <a-input v-model="queryParam.sales_name" placeholder=""/>
+                <!-- <a-input v-model="queryParam.sales_name" placeholder=""/> -->
+                <a-select
+                  :default-active-first-option="false"
+                  :filter-option="false"
+                  :not-found-content="null"
+                  style="width:100%;"
+                  v-model="queryParam.sales_name"
+                >
+                  <a-select-option v-for="d in salesList" :key="d.key">
+                    {{ d.label }}
+                  </a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
             <!-- 维修车间 -->
@@ -232,6 +243,9 @@
           {{ text | formatRepairPlan }}
         </span>
         <span slot="action" slot-scope="text, record">
+          <!-- 维修进度预览 -->
+          <a @click="progressReportRevice(record)">{{ $t('menu.review') }}</a>
+          <a-divider type="vertical" />
           <!-- 维修进度报表 -->
           <a @click="progressReport(record)">{{ $t('permissionid.export.project') }}</a>
         </span>
@@ -332,6 +346,47 @@
         </template>
       </s-table>
     </a-card>
+
+    <a-modal v-if="visibleProgress" :visible="visibleProgress" width="82%">
+      <a-descriptions :title="$t('maintenance.progress.report')">
+        <a-descriptions-item :label="$t('menu.project.view.query.customerName')">
+          {{ progressHeadData.CustomerName }}
+        </a-descriptions-item>
+        <a-descriptions-item label="最终用户名称">
+          {{ progressHeadData.FinallyUser }}
+        </a-descriptions-item>
+        <a-descriptions-item :label="$t('menu.project.detail.contractNumber')">
+          {{ progressHeadData.ContractSerial }}
+        </a-descriptions-item>
+        <a-descriptions-item :label="$t('menu.project.view.query.sales')">
+          {{ progressHeadData.SalesName }}
+        </a-descriptions-item>
+        <a-descriptions-item :label="$t('menu.project.detail.serial')">
+          {{ progressHeadData.Serial }}
+        </a-descriptions-item>
+        <a-descriptions-item :label="$t('工程状态')">
+          {{ $t(projectState(progressHeadData.State)) }}
+        </a-descriptions-item>
+        <a-descriptions-item :label="$t('menu.project.detail.repairShop')">
+          {{ $t(projectRepairPlan(progressHeadData.RepairPlan)) }}
+        </a-descriptions-item>
+        <a-descriptions-item :label="$t('menu.project.detail.reqCloseDate')">
+        </a-descriptions-item>
+      </a-descriptions>
+      <a-row v-for="(item, index) in progressData" :key="index">
+        <template v-if=" index === 0">
+          <a-col style="font: bold;" v-for="(v, i) in item" :key="i" :span="2">{{ v }}</a-col>
+        </template>
+        <template v-else>
+          <a-col v-for="(v, i) in item" :key="i" :span="2">{{ v }}</a-col>
+        </template>
+      </a-row>
+      <template slot="footer">
+        <a-button key="back" @click="()=> { visibleProgress = false }">
+          关闭
+        </a-button>
+      </template>
+    </a-modal>>
   </page-header-wrapper>
 </template>
 
@@ -339,10 +394,11 @@
 import moment from 'moment'
 import { saveAs } from 'file-saver'
 import { STable, Ellipsis } from '@/components'
-import { getProjectList, deleteProject, formatTotal, editProject, newProject, projectProgressReport, projectStatusReport, projectWorktimeReport } from '@/api/project'
+import { getProjectList, deleteProject, formatTotal, editProject, newProject, projectProgressReport, projectProgressReportReview, projectStatusReport, projectWorktimeReport, projectRepairPlan, projectState } from '@/api/project'
 import EditProject from './modules/EditProject'
-import { formatDateYMDZoneNull } from '@/api/step'
+import { formatDateYMDZoneNull, getFlowNameByIndex, getFlowTotalcount } from '@/api/step'
 import { deleteTmpReportFile } from '@/api/report'
+import { getUserList } from '@/api/user'
 
 const columns = [
   { // 工程编号
@@ -530,6 +586,18 @@ export default {
     if (this.$route.meta.opt === 'export') {
       this.optExport = true
     }
+
+    // 查找所有销售
+    getUserList({ pageSize: 99999999, pageNo: 1, position: '1' }).then(res => {
+      if (res.result.data.length > 0) {
+        res.result.data.forEach(e => {
+          this.salesList.push({
+            key: e.id,
+            label: e.user_name
+          })
+        })
+      }
+    })
   },
   data () {
     return {
@@ -540,13 +608,65 @@ export default {
       advanced: false,
       // 查询参数
       queryParam: {},
+      // 销售列表
+      salesList: [],
+      // 预览工程进度
+      visibleProgress: false,
+      // 预览工程头数据
+      progressHeadData: {},
+      progressData: [],
+      // 预览工程进度表行数据
+      // progressTableRow: parameter => {
+        // var rowData = []
+
+        // // 生成行数据
+        // for (var row = 0; row < getFlowTotalcount(); row++) { // 总流程数量是getFlowTotalcount个
+        //   // 本行生成第一列数据（流程名称）
+        //   var rowItemData = {}
+        //   rowItemData.id = row
+        //   rowItemData.flowAndDate = this.$t(getFlowNameByIndex(row))
+
+        //   Object.keys(this.progressData.FlowDate).forEach(col => { // 代表列（e即是列数）
+        //     var rowColumeKey = row + ',' + col
+        //     if (rowColumeKey in this.progressData.FlowCount) {
+        //       rowItemData[this.progressData.FlowDate[col]] = this.progressData.FlowCount[rowColumeKey]
+        //     }
+        //   })
+
+        //   rowData.push(rowItemData)
+        // }
+
+        // var ret = {}
+        // ret.data = rowData
+        // ret.pageNo = 1
+        // ret.pageSize = 9999
+        // ret.totalCount = rowData.length
+        // ret.totalPage = 1
+
+        // console.log(ret)
+        // return ret
+        // return null
+      // },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
 
+        // 销售查询条件id换名字
+        var querySalesname = ''
+        if (requestParameters.sales_name) {
+          this.salesList.forEach(e => {
+            if (e.key === requestParameters.sales_name) {
+              querySalesname = e.label
+            }
+          })
+        }
+        if (querySalesname.length > 1) {
+          requestParameters.sales_name = querySalesname
+        }
+
         return getProjectList(requestParameters)
           .then(res => {
-            console.log(res.result)
+            console.log(res.result, 8888888888888)
             return res.result
           })
       },
@@ -617,6 +737,10 @@ export default {
     }
   },
   methods: {
+    projectRepairPlan,
+    projectState,
+    getFlowNameByIndex,
+    getFlowTotalcount,
     handleAdd () {
       this.mdl = null
       this.$refs.createModal.createProjectSerial()
@@ -664,7 +788,6 @@ export default {
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
-        console.log(values)
         if (!errors) {
           if (values.id) {
             // 修改 e.g.
@@ -728,6 +851,77 @@ export default {
         deleteTmpReportFile(filename)
         this.loading = false
         this.$message.info('报告生成完毕')
+      })
+    },
+    progressReportRevice (record) {
+      projectProgressReportReview(record).then(res => {
+        this.progressHeadData = res.Header
+
+        // 第一行数据
+        var rowData = []
+        var rowItemData = []
+        rowItemData.push('流程/日期')
+        Object.keys(res.FlowDate).forEach(col => {
+          rowItemData.push(res.FlowDate[col])
+        })
+        rowData.push(rowItemData)
+
+        for (var row = 0; row < getFlowTotalcount(); row++) { // 总流程数量是getFlowTotalcount个
+          // 本行生成第一列数据（流程名称）
+          rowItemData = []
+          rowItemData.push(this.$t(getFlowNameByIndex(row)))
+
+          Object.keys(res.FlowDate).forEach(col => { // 代表列（e即是列数）
+            var rowColumeKey = row + ',' + col
+            if (rowColumeKey in res.FlowCount) {
+              rowItemData.push(res.FlowCount[rowColumeKey])
+            } else {
+              rowItemData.push('')
+            }
+          })
+
+          rowData.push(rowItemData)
+        }
+
+        // 生成工程进度表列数据
+        // this.progressTableColumns.length = 0
+        // this.progressTableColumns.push({
+        //   slotName: '流程/日期',
+        //   dataIndex: 'flowAndDate',
+        //   scopedSlots: { customRender: 'flowAndDate', title: '流程/日期' },
+        //   width: '150'
+        // })
+        // Object.keys(this.progressData.FlowDate).forEach(e => {
+        //   const value = this.progressData.FlowDate[e]
+        //   this.progressTableColumns.push({
+        //     slotName: value,
+        //     dataIndex: value,
+        //     scopedSlots: { customRender: value, title: value },
+        //     width: '150'
+        //   })
+        // })
+
+        // // 生成行数据
+        // for (var row = 0; row < getFlowTotalcount(); row++) { // 总流程数量是getFlowTotalcount个
+        //   // 本行生成第一列数据（流程名称）
+        //   var rowItemData = []
+        //   rowItemData.push(this.$t(getFlowNameByIndex(row)))
+
+        //   Object.keys(this.progressData.FlowDate).forEach(col => { // 代表列（e即是列数）
+        //     rowItemData.push(col)
+
+        //     var rowColumeKey = row + ',' + col
+        //     if (rowColumeKey in this.progressData.FlowCount) {
+        //       rowItemData.push(this.progressData.FlowCount[rowColumeKey])
+        //     }
+        //   })
+
+        //   rowData.push(rowItemData)
+        // }
+
+        this.progressData = rowData
+        console.log(this.progressData, 88888888888888888888888888888888888888)
+        this.visibleProgress = true
       })
     },
     statusReport (record) {

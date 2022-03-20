@@ -15,6 +15,7 @@ const locale = {
   'menu.dashboard.monitor': 'Monitor',
   'menu.dashboard.workplace': 'Workplace',
   'menu.report': 'Report',
+  'menu.review': 'Review',
 
   'app.flow.repair.start': 'Start',
   'app.flow.repair.query': 'Query',
@@ -35,6 +36,7 @@ const locale = {
   'app.flow.repair.RepairConfirm': 'RepairConfirm',
   'app.flow.repair.finalCheck': 'FinalCheck',
   'app.flow.repair.packingDelivery': 'PackingDelivery',
+  'app.flow.repair.packingDelivery2': 'PackingDelivery',
   'app.repair.report.delete.img': 'Are you sure delete this image?',
 
   'app.title': 'Sino Controls',
