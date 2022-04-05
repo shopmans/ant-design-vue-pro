@@ -9,7 +9,7 @@
         <a-row :gutter="24">
           <a-col :span="4">
             <a-form-item>
-              <a-select :disabled="disableAll" v-decorator="[ stateString, {}]" :allowClear="true">
+              <a-select :disabled="disableAll || isDone" v-decorator="[ stateString, {}]" :allowClear="true">
                 <a-select-option v-for="item in getSelectItem(rowoptions.state)" :value="item.key" :key="item.key">
                   {{ item.text }}
                 </a-select-option>
@@ -18,12 +18,12 @@
           </a-col>
           <a-col :span="14">
             <a-form-item>
-              <a-checkbox-group :disabled="disableAll" v-decorator="[repairString, { }]" :options="getCheckBoxOptions(rowoptions.state)" />
+              <a-checkbox-group :disabled="disableAll || isDone" v-decorator="[repairString, { }]" :options="getCheckBoxOptions(rowoptions.state)" />
             </a-form-item>
           </a-col>
           <a-col :span="6" >
             <a-form-item>
-              <a-input :disabled="disableAll" placeholder="备注" v-decorator="[memoString, { }]" :options="checkBoxOptions" />
+              <a-input :disabled="disableAll || isDone" placeholder="备注" v-decorator="[memoString, { }]" :options="checkBoxOptions" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -71,6 +71,10 @@ export default {
       default: null
     },
     disableAll: {
+      type: Boolean,
+      default: false
+    },
+    isDone: {
       type: Boolean,
       default: false
     }

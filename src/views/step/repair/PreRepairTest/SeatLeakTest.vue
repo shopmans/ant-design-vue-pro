@@ -2,7 +2,7 @@
   <div>
     <a-card title="阀座泄漏测试" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <template slot="extra">
-        <a-checkbox v-model="local_not_applicable" @change="localNotApplicableChange">
+        <a-checkbox :disabled="isDone" v-model="local_not_applicable" @change="localNotApplicableChange">
           不适用
         </a-checkbox>
       </template>
@@ -18,7 +18,7 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">阀座泄漏实际测试介质</div>
-            <a-select :disabled="disableAll" v-decorator="[ 'seat_leak_test_real_medium', {rules: [{ message: '请选择介质'}]}]" :allowClear="true">
+            <a-select :disabled="disableAll || isDone" v-decorator="[ 'seat_leak_test_real_medium', {rules: [{ message: '请选择介质'}]}]" :allowClear="true">
               <a-select-option value="1">
                 水
               </a-select-option>
@@ -35,12 +35,12 @@
           <a-form-item>
             <div class="linehight">实际测试压力</div>
             <a-input
-              :disabled="disableAll"
+              :disabled="disableAll || isDone"
               v-decorator="[
                 'seat_leak_test_real_pressed',
                 {rules: []}
               ]">
-              <a-select :disabled="disableAll" v-decorator="[ 'seat_leak_test_real_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+              <a-select :disabled="disableAll || isDone" v-decorator="[ 'seat_leak_test_real_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                 <a-select-option value="1">
                   PSI
                 </a-select-option>
@@ -57,8 +57,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">实际测试值</div>
-            <a-input :disabled="disableAll" v-decorator="[ 'seat_leak_test_real_value', {} ]">
-              <a-select :disabled="disableAll" v-decorator="[ 'seat_leak_test_real_value_unit', {rules: [{ message: ''}]} ]" slot="addonAfter" style="width: 120px" >
+            <a-input :disabled="disableAll || isDone" v-decorator="[ 'seat_leak_test_real_value', {} ]">
+              <a-select :disabled="disableAll || isDone" v-decorator="[ 'seat_leak_test_real_value_unit', {rules: [{ message: ''}]} ]" slot="addonAfter" style="width: 120px" >
                 <a-select-option value="1">SCFH</a-select-option>
                 <a-select-option value="2">ml/min</a-select-option>
                 <a-select-option value="3">bbl/min</a-select-option>
@@ -74,7 +74,7 @@
           <a-form-item>
             <div class="linehight">实际测试时间(分钟)</div>
             <a-input-number
-              :disabled="disableAll"
+              :disabled="disableAll || isDone"
               style="width:200px;"
               :min="0"
               v-decorator="[
@@ -86,7 +86,7 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">是否合格</div>
-            <a-radio-group :disabled="disableAll" v-decorator="['seat_leak_test_is_success', {} ]" @change="onChange">
+            <a-radio-group :disabled="disableAll || isDone" v-decorator="['seat_leak_test_is_success', {} ]" @change="onChange">
               <a-radio :value="1">
                 是
               </a-radio>
@@ -100,7 +100,7 @@
           <a-form-item>
             <div class="linehight">见证人</div>
             <a-input
-              :disabled="disableAll"
+              :disabled="disableAll || isDone"
               style="width:100%;"
               v-decorator="[
                 'seat_leak_test_witness',
@@ -113,21 +113,21 @@
       <!-- 行2 -->
       <a-row class="form-row" :gutter="36">
         <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-          <dispatchUser :disableAll="disableAll" :flowID="flowId" :currentStep="currentStep" :flag="'1'" />
+          <dispatchUser :disableAll="disableAll || isDone" :flowID="flowId" :currentStep="currentStep" :flag="'1'" />
         </a-card>
       </a-row>
       <!-- 行2 -->
       <a-row class="form-row" :gutter="36">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item label="测试日期">
-            <a-date-picker :disabled="disableAll" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['seat_leak_test_date', {}]" style="width: 100%" />
+            <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['seat_leak_test_date', {}]" style="width: 100%" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">工时(min)</div>
             <a-input-number
-              :disabled="disableAll"
+              :disabled="disableAll || isDone"
               :min="0"
               style="width:100%;"
               v-decorator="[
@@ -144,7 +144,7 @@
         <a-col :span="24">
           <a-form-item>
             <div class="linehight"></div>
-            <a-radio-group :disabled="disableAll" v-decorator="['prerepair_content_1', {rules: []}]">
+            <a-radio-group :disabled="disableAll || isDone" v-decorator="['prerepair_content_1', {rules: []}]">
               <a-radio :value="1">
                 合格
               </a-radio>
@@ -160,13 +160,20 @@
     <!-- 备注 -->
     <a-card title="备注">
       <a-form-item>
-        <a-textarea :disabled="disableAll" v-decorator="['prerepair_memo_1',{rules: []}]" rows="4" />
+        <a-textarea :disabled="disableAll || isDone" v-decorator="['prerepair_memo_1',{rules: []}]" rows="4" />
       </a-form-item>
     </a-card>
     <!-- 文件上传 -->
     <br>
     <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <UploadImg ref="uploadImg" :disableAll="disableAll" :queueType="'3'" :isMobile="isMobile" :flag="'3'" />
+      <UploadImg ref="uploadImg" :disableAll="disableAll || isDone" :queueType="'3'" :isMobile="isMobile" :flag="'3'" />
+    </a-card>
+    <br>
+    <a-card>
+      <div style="float:right;">
+        <a-button style="margin-right: 8px;" :disabled="disableAll || isDone" type="primary" @click="doneTab">操作完毕</a-button>
+        <a-button :disabled="disableAll" @click="editTab">编辑</a-button>
+      </div>
     </a-card>
   </div>
 </template>
@@ -200,6 +207,10 @@ export default {
       default: false
     },
     isMobile: {
+      type: Boolean,
+      default: false
+    },
+    isDone: {
       type: Boolean,
       default: false
     }
@@ -236,7 +247,9 @@ export default {
     },
     setUploadImgData (data) {
       this.$refs.uploadImg.imgFileList = data
-    }
+    },
+    doneTab () { this.$emit('done') },
+    editTab () { this.$emit('edit') }
   },
   data () {
     return {

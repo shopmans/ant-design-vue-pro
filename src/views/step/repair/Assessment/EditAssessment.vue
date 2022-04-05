@@ -16,7 +16,10 @@
               :disableAll="disableAll_1"
               :isMobile="isMobile"
               :flowID="flowID"
-              :currentStep="currentStep" />
+              :currentStep="currentStep"
+              :isDone="isValveAssessmentTabDone"
+              @done="valveAssessmentTabDone"
+              @edit="editValveAssessmentTab" />
           </a-tab-pane>
           <a-tab-pane key="2" tab="执行机构评估" v-if="ActuatorAS" :forceRender="true">
             <ActuatorAssessment
@@ -26,7 +29,10 @@
               :disableAll="disableAll_2"
               :isMobile="isMobile"
               :flowID="flowID"
-              :currentStep="currentStep" />
+              :currentStep="currentStep"
+              :isDone="isActuatorASTabDone"
+              @done="actuatorASTabDone"
+              @edit="editActuatorASTab" />
           </a-tab-pane>
           <a-tab-pane key="3" tab="附件评估" v-if="AccessoryAS" :forceRender="true">
             <AccessariesAssessment
@@ -38,7 +44,10 @@
               :selectArea="selectArea"
               :otherSelectArea="otherSelectArea"
               :flowID="flowID"
-              :currentStep="currentStep" />
+              :currentStep="currentStep"
+              :isDone="isAccessoryASTabDone"
+              @done="accessoryASTabDone"
+              @edit="editAccessoryASTab" />
           </a-tab-pane>
         </a-tabs>
       </a-card>
@@ -258,7 +267,10 @@ export default {
         disableAll_1: false,
         disableAll_2: false,
         disableAll_3: false,
-        currentImgFlag: '1'
+        currentImgFlag: '1',
+        isValveAssessmentTabDone: false,
+        isActuatorASTabDone: false,
+        isAccessoryASTabDone: false
       }
     },
     methods: {
@@ -295,6 +307,10 @@ export default {
               })
             }
             values.uploads = tmpUpload
+            // 标签操作完毕
+            values.is_valve_assessment_tab_done = this.isValveAssessmentTabDone
+            values.is_actuator_as_tab_done = this.isActuatorASTabDone
+            values.is_accessory_as_tab_done = this.isAccessoryASTabDone
 
             saveAssessmentData(values).then(res => {
               this.$message.info('保存成功')
@@ -585,7 +601,14 @@ export default {
             this.$refs.accessariesAssessment.setUploadImgData(imgList3)
           }
         }, 0)
-      }
+      },
+      // 标签操作完毕
+      valveAssessmentTabDone () { this.isValveAssessmentTabDone = true },
+      editValveAssessmentTab () { this.isValveAssessmentTabDone = false },
+      actuatorASTabDone () { this.isActuatorASTabDone = true },
+      editActuatorASTab () { this.isActuatorASTabDone = false },
+      accessoryASTabDone () { this.isAccessoryASTabDone = true },
+      editAccessoryASTab () { this.isAccessoryASTabDone = false }
     },
     mounted () {
       const that = this
@@ -685,6 +708,17 @@ export default {
               this.disableAll_3 = assessmentData.accessaries_not_applicable
             }
             this.refreshImageList(assessmentData.uploads)
+
+            // 标签操作完毕
+            if (assessmentData.is_valve_assessment_tab_done) {
+              this.isValveAssessmentTabDone = assessmentData.is_valve_assessment_tab_done
+            }
+            if (assessmentData.is_actuator_as_tab_done) {
+              this.isActuatorASTabDone = assessmentData.is_actuator_as_tab_done
+            }
+            if (assessmentData.is_accessory_as_tab_done) {
+              this.isAccessoryASTabDone = assessmentData.is_accessory_as_tab_done
+            }
           }
           // this.repairRadioChangeImpl(this.form.getFieldsValue(['assessment_check_or_repair']).assessment_check_or_repair)
         }

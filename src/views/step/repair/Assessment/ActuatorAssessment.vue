@@ -2,7 +2,7 @@
   <div>
     <a-card title="执行机构评估" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <template slot="extra">
-        <a-checkbox v-model="local_not_applicable" @change="actuatorNaChange">
+        <a-checkbox :disabled="isDone" v-model="local_not_applicable" @change="actuatorNaChange">
           不适用
         </a-checkbox>
       </template>
@@ -19,18 +19,25 @@
         </a-col>
       </a-row>
       <template v-for="item in rowoptions">
-        <AssessmentRow :disableAll="disableAll" :rowoptions="item" :key="item.state" />
+        <AssessmentRow :disableAll="disableAll" :isDone="isDone" :rowoptions="item" :key="item.state" />
       </template>
       <br>
       <!-- 评估人员 -->
       <a-card title="评估人员" :headStyle="{fontWeight:'bold'}">
-        <dispatchUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
+        <dispatchUser :disableAll="disableAll || isDone" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
       </a-card>
       <!-- 文件上传 -->
       <br>
       <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <uploadImg ref="uploadImg" :disableAll="disableAll" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+        <uploadImg ref="uploadImg" :disableAll="disableAll || isDone" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
       </a-card>
+    </a-card>
+    <br>
+    <a-card>
+      <div style="float:right;">
+        <a-button style="margin-right: 8px;" :disabled="disableAll || isDone" type="primary" @click="doneTab">操作完毕</a-button>
+        <a-button :disabled="disableAll" @click="editTab">编辑</a-button>
+      </div>
     </a-card>
     <br><br>
   </div>
@@ -66,6 +73,10 @@ export default {
     isMobile: {
       type: Boolean,
       default: false
+    },
+    isDone: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -91,7 +102,9 @@ export default {
     },
     setUploadImgData (data) {
       this.$refs.uploadImg.imgFileList = data
-    }
+    },
+    doneTab () { this.$emit('done') },
+    editTab () { this.$emit('edit') }
   },
   data () {
     return {

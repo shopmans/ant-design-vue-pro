@@ -11,7 +11,7 @@
         <a-tab-pane key="1" v-if="showValveForm" tab="阀维修内容" :forceRender="true">
           <a-card>
             <template slot="extra">
-              <a-checkbox v-model="disableAll_1" @change="valveNa">
+              <a-checkbox :disabled="isValveRepairTabDone" v-model="disableAll_1" @change="valveNa">
                 不适用
               </a-checkbox>
             </template>
@@ -47,7 +47,7 @@
                             <a-form-item>
                               <a-select
                                 label-in-value
-                                :disabled="disableAll_1"
+                                :disabled="disableAll_1 || isValveRepairTabDone"
                                 :default-active-first-option="false"
                                 :show-arrow="false"
                                 :filter-option="false"
@@ -69,7 +69,7 @@
                         <!-- 工时 -->
                         <a-row :gutter="16">
                           <a-col class="gutter-row">
-                            <a-form-item><a-input-number :disabled="disableAll_1" :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
+                            <a-form-item><a-input-number :disabled="disableAll_1 || isValveRepairTabDone" :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
                           </a-col>
                         </a-row>
                       </a-col>
@@ -87,15 +87,22 @@
             <!-- 文件上传 -->
             <br>
             <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-              <uploadImg ref="uploadImg1" :disableAll="disableAll_1" :isMobile="isMobile" :queueType="'3'" :flag="'1'" />
+              <uploadImg ref="uploadImg1" :disableAll="disableAll_1 || isValveRepairTabDone" :isMobile="isMobile" :queueType="'3'" :flag="'1'" />
             </a-card>
+          </a-card>
+          <br>
+          <a-card>
+            <div style="float:right;">
+              <a-button style="margin-right: 8px;" :disabled="disableAll_1 || isValveRepairTabDone" type="primary" @click="saveValveRepairTabDone">操作完毕</a-button>
+              <a-button @click="editValveRepairTab">编辑</a-button>
+            </div>
           </a-card>
         </a-tab-pane>
         <!-- 执行机构维修内容 -->
         <a-tab-pane key="2" v-if="showActuatorForm" tab="执行机构维修内容" :forceRender="true">
           <a-card>
             <template slot="extra">
-              <a-checkbox v-model="disableAll_2" @change="actuatorNa">
+              <a-checkbox :disabled="isActuatorRepairTabDone" v-model="disableAll_2" @change="actuatorNa">
                 不适用
               </a-checkbox>
             </template>
@@ -130,7 +137,7 @@
                           <a-col class="gutter-row">
                             <a-form-item>
                               <a-select
-                                :disabled="disableAll_2"
+                                :disabled="disableAll_2 || isActuatorRepairTabDone"
                                 label-in-value
                                 :default-active-first-option="false"
                                 :show-arrow="false"
@@ -153,7 +160,7 @@
                         <!-- 工时 -->
                         <a-row :gutter="16">
                           <a-col class="gutter-row">
-                            <a-form-item><a-input-number :disabled="disableAll_2" :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
+                            <a-form-item><a-input-number :disabled="disableAll_2 || isActuatorRepairTabDone" :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
                           </a-col>
                         </a-row>
                       </a-col>
@@ -171,15 +178,22 @@
             <!-- 文件上传 -->
             <br>
             <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-              <uploadImg2 ref="uploadImg2" :disableAll="disableAll_2" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+              <uploadImg2 ref="uploadImg2" :disableAll="disableAll_2 || isActuatorRepairTabDone" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
             </a-card>
+          </a-card>
+          <br>
+          <a-card>
+            <div style="float:right;">
+              <a-button style="margin-right: 8px;" :disabled="disableAll_1 || isActuatorRepairTabDone" type="primary" @click="saveActuatorRepairTabDone">操作完毕</a-button>
+              <a-button @click="editActuatorRepairTab">编辑</a-button>
+            </div>
           </a-card>
         </a-tab-pane>
         <!-- 附件维修内容 -->
         <a-tab-pane key="3" v-if="showSlaveForm" tab="附件维修内容" :forceRender="true">
           <a-card>
             <template slot="extra">
-              <a-checkbox v-model="disableAll_3" @change="accessoryNa">
+              <a-checkbox :disabled="isAccessoryRepairTabDone" v-model="disableAll_3" @change="accessoryNa">
                 不适用
               </a-checkbox>
             </template>
@@ -214,7 +228,7 @@
                           <a-col class="gutter-row">
                             <a-form-item>
                               <a-select
-                                :disabled="disableAll_3"
+                                :disabled="disableAll_3 || isAccessoryRepairTabDone"
                                 show-search
                                 label-in-value
                                 :default-active-first-option="false"
@@ -239,7 +253,7 @@
                         <!-- 工时 -->
                         <a-row :gutter="16">
                           <a-col class="gutter-row">
-                            <a-form-item><a-input-number :disabled="disableAll_3" :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
+                            <a-form-item><a-input-number :disabled="disableAll_3 || isAccessoryRepairTabDone" :min="0" style="width:100%;" v-decorator="[ 'repair_time_' + field.state + '_' + check.value, {rules: []} ]" placeholder="工时（分钟）" /></a-form-item>
                           </a-col>
                         </a-row>
                       </a-col>
@@ -257,8 +271,15 @@
             <!-- 文件上传 -->
             <br>
             <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-              <uploadImg3 ref="uploadImg3" :disableAll="disableAll_3" :isMobile="isMobile" :queueType="'3'" :flag="'3'" />
+              <uploadImg3 ref="uploadImg3" :disableAll="disableAll_3 || isAccessoryRepairTabDone" :isMobile="isMobile" :queueType="'3'" :flag="'3'" />
             </a-card>
+          </a-card>
+          <br>
+          <a-card>
+            <div style="float:right;">
+              <a-button style="margin-right: 8px;" :disabled="disableAll_3 || isAccessoryRepairTabDone" type="primary" @click="saveAccessoryRepairTabDone">操作完毕</a-button>
+              <a-button @click="editAccessoryRepairTab">编辑</a-button>
+            </div>
           </a-card>
         </a-tab-pane>
       </a-tabs>
@@ -429,6 +450,10 @@ export default {
               })
             }
             values.uploads = tmpUpload
+            // 标签操作完毕
+            values.is_valve_repair_tab_done = this.isValveRepairTabDone
+            values.is_actuator_repair_tab_done = this.isActuatorRepairTabDone
+            values.is_accessory_repair_tab_done = this.isAccessoryRepairTabDone
 
             saveRepairData(values).then(res => {
               this.$message.info('保存成功')
@@ -783,7 +808,14 @@ export default {
       },
       getOtherRepairCheckList (field) {
         return getOtherRepairCheckFields(field.state)
-      }
+      },
+      // 标签操作完毕
+      saveValveRepairTabDone () { this.isValveRepairTabDone = true },
+      editValveRepairTab () { this.isValveRepairTabDone = false },
+      saveActuatorRepairTabDone () { this.isActuatorRepairTabDone = true },
+      editActuatorRepairTab () { this.isActuatorRepairTabDone = false },
+      saveAccessoryRepairTabDone () { this.isAccessoryRepairTabDone = true },
+      editAccessoryRepairTab () { this.isAccessoryRepairTabDone = false }
     },
     mounted () {
       var tmpFields = []
@@ -857,6 +889,16 @@ export default {
         if (repairData != null) {
           this.form.setFieldsValue(pick(repairData, repairFields))
           this.not_applicable = repairData.not_applicable
+          // 标签操作完毕
+          if (repairData.is_valve_repair_tab_done) {
+            this.isValveRepairTabDone = repairData.is_valve_repair_tab_done
+          }
+          if (repairData.is_actuator_repair_tab_done) {
+            this.isActuatorRepairTabDone = repairData.is_actuator_repair_tab_done
+          }
+          if (repairData.is_accessory_repair_tab_done) {
+            this.isAccessoryRepairTabDone = repairData.is_accessory_repair_tab_done
+          }
         }
 
         // 引用评估内容的备注
@@ -969,7 +1011,10 @@ export default {
         disableAll_1: false,
         disableAll_2: false,
         disableAll_3: false,
-        currentImgFlag: '1'
+        currentImgFlag: '1',
+        isValveRepairTabDone: false,
+        isActuatorRepairTabDone: false,
+        isAccessoryRepairTabDone: false
       }
     }
 }

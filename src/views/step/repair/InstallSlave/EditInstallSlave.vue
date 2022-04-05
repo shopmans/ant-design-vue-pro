@@ -11,7 +11,7 @@
         <a-tab-pane key="1" tab="安装附件" :forceRender="true">
           <a-card title="安装附件" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <template slot="extra">
-              <a-checkbox v-model="install_slave_not_applicable" @change="installSlaveChange">
+              <a-checkbox :disabled="isInstallSlaveTableDone" v-model="install_slave_not_applicable" @change="installSlaveChange">
                 不适用
               </a-checkbox>
             </template>
@@ -24,13 +24,13 @@
             <a-row :gutter="16">
               <a-col :span="6">
                 <a-form-item label="安装附件日期">
-                  <a-date-picker :disabled="install_slave_not_applicable" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['install_slave_date', {}]" style="width: 100%" />
+                  <a-date-picker :disabled="install_slave_not_applicable || isInstallSlaveTableDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['install_slave_date', {}]" style="width: 100%" />
                 </a-form-item>
               </a-col>
               <a-col :span="6">
                 <a-form-item label="工时(min)">
                   <a-input-number
-                    :disabled="install_slave_not_applicable"
+                    :disabled="install_slave_not_applicable || isInstallSlaveTableDone"
                     style="width:100%;"
                     :min="0"
                     v-decorator="[
@@ -44,19 +44,26 @@
           <!-- 执行人 -->
           <br>
           <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <dispatchUser :disableAll="install_slave_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+            <dispatchUser :disableAll="install_slave_not_applicable || isInstallSlaveTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
           </a-card>
           <!-- 文件上传 -->
           <br>
           <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-            <uploadImg ref="uploadImg1" :disableAll="install_slave_not_applicable" :isMobile="isMobile" :queueType="'3'" :flag="'1'" />
+            <uploadImg ref="uploadImg1" :disableAll="install_slave_not_applicable || isInstallSlaveTableDone" :isMobile="isMobile" :queueType="'3'" :flag="'1'" />
+          </a-card>
+          <br>
+          <a-card>
+            <div style="float:right;">
+              <a-button style="margin-right: 8px;" :disabled="install_slave_not_applicable || isInstallSlaveTableDone" type="primary" @click="saveInstallSlaveTab">操作完毕</a-button>
+              <a-button @click="editInstallSlaveTab">编辑</a-button>
+            </div>
           </a-card>
         </a-tab-pane>
         <!-- 配制气源管 -->
         <a-tab-pane key="2" tab="配制气源管" :forceRender="true">
           <a-card title="配制气源管" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <template slot="extra">
-              <a-checkbox v-model="air_source_not_applicable" @change="airSourceChange">
+              <a-checkbox :disabled="isInstallAirTableDone" v-model="air_source_not_applicable" @change="airSourceChange">
                 不适用
               </a-checkbox>
             </template>
@@ -69,13 +76,13 @@
             <a-row :gutter="16">
               <a-col :span="6">
                 <a-form-item label="安装气源管日期">
-                  <a-date-picker :disabled="air_source_not_applicable" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['install_source_date', {}]" style="width: 100%" />
+                  <a-date-picker :disabled="air_source_not_applicable || isInstallAirTableDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['install_source_date', {}]" style="width: 100%" />
                 </a-form-item>
               </a-col>
               <a-col :span="6">
                 <a-form-item label="工时(min)">
                   <a-input-number
-                    :disabled="air_source_not_applicable"
+                    :disabled="air_source_not_applicable || isInstallAirTableDone"
                     style="width:100%;"
                     :min="0"
                     v-decorator="[
@@ -88,12 +95,19 @@
           </a-card>
           <br>
           <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <dispatchUser :disableAll="air_source_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
+            <dispatchUser :disableAll="air_source_not_applicable || isInstallAirTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
           </a-card>
           <!-- 文件上传 -->
           <br>
           <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-            <uploadImg ref="uploadImg2" :disableAll="air_source_not_applicable" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+            <uploadImg ref="uploadImg2" :disableAll="air_source_not_applicable || isInstallAirTableDone" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+          </a-card>
+          <br>
+          <a-card>
+            <div style="float:right;">
+              <a-button style="margin-right: 8px;" :disabled="air_source_not_applicable || isInstallAirTableDone" type="primary" @click="saveInstallAirTab">操作完毕</a-button>
+              <a-button @click="editInstallAirTab">编辑</a-button>
+            </div>
           </a-card>
         </a-tab-pane>
       </a-tabs>
@@ -166,6 +180,9 @@
               })
             }
             values.uploads = tmpUpload
+            // 标签操作完毕
+            values.is_install_slave_tab_done = this.isInstallSlaveTableDone
+            values.is_install_air_tab_done = this.isInstallAirTableDone
 
             saveInstallSlaveData(values).then(res => {
               this.$message.info('保存成功')
@@ -260,7 +277,11 @@
             this.$refs.uploadImg2.imgFileList = imgList2
           }
         }, 0)
-      }
+      },
+      saveInstallSlaveTab () { this.isInstallSlaveTableDone = true },
+      editInstallSlaveTab () { this.isInstallSlaveTableDone = false },
+      saveInstallAirTab () { this.isInstallAirTableDone = true },
+      editInstallAirTab () { this.isInstallAirTableDone = false }
     },
     mounted () {
       installAccessoryFields.forEach(v => this.form.getFieldDecorator(v))
@@ -304,6 +325,13 @@
             this.install_slave_not_applicable = installIAData.install_slave_not_applicable
             this.air_source_not_applicable = installIAData.air_source_not_applicable
             this.refreshImageList(installIAData.uploads)
+            // 标签操作完毕
+            if (installIAData.is_install_slave_tab_done) {
+              this.isInstallSlaveTableDone = installIAData.is_install_slave_tab_done
+            }
+            if (installIAData.is_install_air_tab_done) {
+              this.isInstallAirTableDone = installIAData.is_install_air_tab_done
+            }
           }
         })
       }
@@ -318,7 +346,9 @@
         not_applicable: false,
         install_slave_not_applicable: false,
         air_source_not_applicable: false,
-        currentImgFlag: '1'
+        currentImgFlag: '1',
+        isInstallSlaveTableDone: false,
+        isInstallAirTableDone: false
       }
     }
   }

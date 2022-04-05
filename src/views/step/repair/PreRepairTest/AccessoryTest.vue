@@ -2,7 +2,7 @@
   <div>
     <a-card title="附件功能测试" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <template slot="extra">
-        <a-checkbox v-model="local_not_applicable" @change="localNotApplicableChange">
+        <a-checkbox :disabled="isDone" v-model="local_not_applicable" @change="localNotApplicableChange">
           不适用
         </a-checkbox>
       </template>
@@ -12,7 +12,7 @@
           <a-col :lg="6" :md="12" :sm="24" v-if="baseInfo.control_model === '1'">
             <a-form-item>
               <div class="linehight">定位器(4mA 12mA 20mA)</div>
-              <a-radio-group :disabled="disableAll" v-decorator="['accessory_locator_is_success', { } ]">
+              <a-radio-group :disabled="disableAll || isDone" v-decorator="['accessory_locator_is_success', { } ]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -28,7 +28,7 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item>
               <div class="linehight">过滤减压阀</div>
-              <a-radio-group :disabled="disableAll" v-decorator="['accessory_test_filter_reducing_valve_is_success', { } ]">
+              <a-radio-group :disabled="disableAll || isDone" v-decorator="['accessory_test_filter_reducing_valve_is_success', { } ]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -43,7 +43,7 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item>
               <div class="linehight">电磁阀</div>
-              <a-radio-group :disabled="disableAll" v-decorator="['accessory_test_elec_valve_is_success', { } ]">
+              <a-radio-group :disabled="disableAll || isDone" v-decorator="['accessory_test_elec_valve_is_success', { } ]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -58,7 +58,7 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item>
               <div class="linehight">位置开关-开位</div>
-              <a-radio-group :disabled="disableAll" v-decorator="['accessory_test_position_switch_is_success', { } ]" @change="onChange">
+              <a-radio-group :disabled="disableAll || isDone" v-decorator="['accessory_test_position_switch_is_success', { } ]" @change="onChange">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -71,7 +71,7 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item>
               <div class="linehight">位置开关-关位</div>
-              <a-radio-group :disabled="disableAll" v-decorator="['accessory_test_position_switch_close_is_success', { } ]" @change="onChange">
+              <a-radio-group :disabled="disableAll || isDone" v-decorator="['accessory_test_position_switch_close_is_success', { } ]" @change="onChange">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -86,7 +86,7 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item>
               <div class="linehight">保位/切换阀</div>
-              <a-radio-group :disabled="disableAll" v-decorator="['accessory_test_retaining_valve_is_success', { } ]">
+              <a-radio-group :disabled="disableAll || isDone" v-decorator="['accessory_test_retaining_valve_is_success', { } ]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -105,7 +105,7 @@
                   'accessory_test_retaining_valve_set_point',
                   {rules: []}
                 ]">
-                <a-select :disabled="disableAll" v-decorator="[ 'accessory_test_retaining_valve_set_point_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+                <a-select :disabled="disableAll || isDone" v-decorator="[ 'accessory_test_retaining_valve_set_point_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                   <a-select-option value="1">
                     PSI
                   </a-select-option>
@@ -123,7 +123,7 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">气动放大器</div>
-            <a-radio-group :disabled="disableAll" v-decorator="['accessory_test_pneumatic_amplifier_is_success', { } ]">
+            <a-radio-group :disabled="disableAll || isDone" v-decorator="['accessory_test_pneumatic_amplifier_is_success', { } ]">
               <a-radio :value="1">
                 正常
               </a-radio>
@@ -137,7 +137,7 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item>
               <div class="linehight">其它</div>
-              <a-radio-group :disabled="disableAll" v-decorator="['accessory_test_other_is_success', { } ]">
+              <a-radio-group :disabled="disableAll || isDone" v-decorator="['accessory_test_other_is_success', { } ]">
                 <a-radio :value="1">
                   正常
                 </a-radio>
@@ -152,20 +152,20 @@
       <a-divider></a-divider>
       <a-row class="form-row" :gutter="16">
         <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-          <dispatchUser :disableAll="disableAll" :flowID="flowId" :currentStep="currentStep" :flag="'3'" />
+          <dispatchUser :disableAll="disableAll || isDone" :flowID="flowId" :currentStep="currentStep" :flag="'3'" />
         </a-card>
       </a-row>
       <a-row>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item label="测试日期">
-            <a-date-picker :disabled="disableAll" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['accessory_test_date', {}]" style="width: 90%" />
+            <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['accessory_test_date', {}]" style="width: 90%" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">工时(min)</div>
             <a-input-number
-              :disabled="disableAll"
+              :disabled="disableAll || isDone"
               style="width:90%;"
               :min="0"
               v-decorator="[
@@ -180,7 +180,7 @@
           <a-form-item>
             <div class="linehight">备注</div>
             <a-textarea
-              :disabled="disableAll"
+              :disabled="disableAll || isDone"
               rows="6"
               v-decorator="[
                 'accessory_test_memo',
@@ -196,7 +196,7 @@
         <a-col :span="24">
           <a-form-item>
             <div class="linehight"></div>
-            <a-radio-group :disabled="disableAll" v-decorator="['prerepair_content_3', {rules: []}]">
+            <a-radio-group :disabled="disableAll || isDone" v-decorator="['prerepair_content_3', {rules: []}]">
               <a-radio :value="1">
                 合格
               </a-radio>
@@ -211,7 +211,14 @@
     <!-- 文件上传 -->
     <br>
     <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <uploadImg ref="uploadImg" :disableAll="disableAll" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+      <uploadImg ref="uploadImg" :disableAll="disableAll || isDone" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+    </a-card>
+    <br>
+    <a-card>
+      <div style="float:right;">
+        <a-button style="margin-right: 8px;" :disabled="disableAll || isDone" type="primary" @click="doneTab">操作完毕</a-button>
+        <a-button :disabled="disableAll" @click="editTab">编辑</a-button>
+      </div>
     </a-card>
   </div>
 </template>
@@ -243,6 +250,10 @@ export default {
       default: false
     },
     isMobile: {
+      type: Boolean,
+      default: false
+    },
+    isDone: {
       type: Boolean,
       default: false
     }
@@ -278,7 +289,9 @@ export default {
     },
     setUploadImgData (data) {
       this.$refs.uploadImg.imgFileList = data
-    }
+    },
+    doneTab () { this.$emit('done') },
+    editTab () { this.$emit('edit') }
   },
   data () {
     return {

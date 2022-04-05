@@ -8,6 +8,7 @@ const projectApi = {
   globalSerial: '/globalSerial',
   queryProjectDesc: '/project/query/description',
   projectProgressReport: '/project-progress-report',
+  projectProgressReportPdf: '/project-progress-pdfreport',
   projectProgressReportReview: '/project-progress-data',
   projectStatusReport: '/project-status-report',
   projectWorktimeReport: '/project-worktime-report'
@@ -122,6 +123,22 @@ export function projectStatusReport (parameter) {
 export function projectWorktimeReport (parameter) {
   return request({
     url: projectApi.projectWorktimeReport,
+    method: 'post',
+    data: parameter
+  })
+}
+
+export function downloadReport (parameter) {
+  return request({
+    url: parameter,
+    method: 'get',
+    responseType: 'blob'
+  })
+}
+
+export function projectProgressReportPdf (parameter) {
+  return request({
+    url: projectApi.projectProgressReportPdf,
     method: 'post',
     data: parameter
   })

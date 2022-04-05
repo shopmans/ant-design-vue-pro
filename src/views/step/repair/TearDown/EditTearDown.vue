@@ -15,6 +15,9 @@
             :currentStep="current_step"
             :disableAll="disableAll_1"
             :isMobile="isMobile"
+            :isDone="isValveTDDone"
+            @done="valveTDTabDone"
+            @edit="editValveTDTab"
             @valveNa="valveNa" />
         </a-tab-pane>
         <a-tab-pane key="2" tab="执行机构拆解" :forceRender="true" v-if="ActuatorTD">
@@ -25,6 +28,9 @@
             :currentStep="current_step"
             :disableAll="disableAll_2"
             :isMobile="isMobile"
+            :isDone="isActuatorTDDone"
+            @done="actuatorTDTabDone"
+            @edit="editActuatorTDTab"
             @actuatorNa="actuatorNa" />
         </a-tab-pane>
         <a-tab-pane key="3" tab="附件折解" :forceRender="true" v-if="AccessoryTD">
@@ -35,6 +41,9 @@
             :currentStep="current_step"
             :disableAll="disableAll_3"
             :isMobile="isMobile"
+            :isDone="isAccessoryTDDone"
+            @done="accessoryTDTabDone"
+            @edit="editAccessoryTDTab"
             @accessoryNa="accessoryNa" />
         </a-tab-pane>
       </a-tabs>
@@ -102,7 +111,10 @@
         disableAll_1: false,
         disableAll_2: false,
         disableAll_3: false,
-        currentImgFlag: '1'
+        currentImgFlag: '1',
+        isValveTDDone: false,
+        isActuatorTDDone: false,
+        isAccessoryTDDone: false
       }
     },
     methods: {
@@ -138,6 +150,9 @@
               })
             }
             values.uploads = tmpUpload
+            values.is_valve_td_done = this.isValveTDDone
+            values.is_actuator_td_done = this.isActuatorTDDone
+            values.is_accessory_td_done = this.isAccessoryTDDone
 
             saveTearDown(values).then(res => {
               this.$message.info('保存成功')
@@ -248,7 +263,15 @@
             this.$refs.accessoryTearDown.setUploadImgData(imgList3)
           }
         }, 0)
-      }
+      },
+      // tab 操作完成
+      // 阀tab操作完成
+      valveTDTabDone () { this.isValveTDDone = true },
+      editValveTDTab () { this.isValveTDDone = false },
+      actuatorTDTabDone () { this.isActuatorTDDone = true },
+      editActuatorTDTab () { this.isActuatorTDDone = false },
+      accessoryTDTabDone () { this.isAccessoryTDDone = true },
+      editAccessoryTDTab () { this.isAccessoryTDDone = false }
     },
     mounted () {
       // 防止表单未注册
@@ -333,6 +356,17 @@
               this.disableAll_3 = uploadFiles.teardown_accessory_not_applicable
             }
             this.refreshImageList(uploadFiles.uploads)
+
+            // tab操作完成
+            if (uploadFiles.is_valve_td_done) {
+              this.isValveTDDone = uploadFiles.is_valve_td_done
+            }
+            if (uploadFiles.is_actuator_td_done) {
+              this.isActuatorTDDone = uploadFiles.is_actuator_td_done
+            }
+            if (uploadFiles.is_accessory_td_done) {
+              this.isAccessoryTDDone = uploadFiles.is_accessory_td_done
+            }
           }
         } else {
           this.form.setFieldsValue(pick({ teardown_valve_date: moment() }, tearDonwFields))

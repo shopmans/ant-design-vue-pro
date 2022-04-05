@@ -1,6 +1,15 @@
 <template>
   <page-header-wrapper>
     <a-card :bordered="false">
+      <template v-if="optEngineeringStatistic">
+        <div style="margin-bottom:20px;">
+          列选择器：<a-select mode="tags" style="width: 90%" :default-value="columnsSelectDefault" @change="columsSelecthandleChange">
+            <a-select-option v-for="item in enStatisticColumns" :key="item.slotName">
+              {{ $t(item.slotName) }}
+            </a-select-option>
+          </a-select>
+        </div>
+      </template>
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
@@ -67,16 +76,28 @@
                   <a-input v-model="queryParam.number" placeholder=""/>
                 </a-form-item>
               </a-col>
-              <!-- 收货日期 -->
+              <!-- 开始-收货日期 -->
               <a-col :md="4" :sm="24">
-                <a-form-item :label="$t('app.flow.repair.receipt.date')">
-                  <a-date-picker v-model="queryParam.receipt_date" style="width: 100%" />
+                <a-form-item :label="$t('app.flow.repair.receipt.date.start')">
+                  <a-date-picker v-model="queryParam.receipt_date_start" style="width: 100%" />
                 </a-form-item>
               </a-col>
-              <!-- 完工日期 -->
+              <!-- 结束-收货日期 -->
               <a-col :md="4" :sm="24">
-                <a-form-item :label="$t('menu.project.detail.closeDate')">
-                  <a-date-picker v-model="queryParam.close_date" style="width: 100%" />
+                <a-form-item :label="$t('app.flow.repair.receipt.date.end')">
+                  <a-date-picker v-model="queryParam.receipt_date_end" style="width: 100%" />
+                </a-form-item>
+              </a-col>
+              <!-- 开始-完工日期 -->
+              <a-col :md="4" :sm="24">
+                <a-form-item :label="$t('menu.project.detail.closeDate.start')">
+                  <a-date-picker v-model="queryParam.close_date_start" style="width: 100%" />
+                </a-form-item>
+              </a-col>
+              <!-- 结束-完工日期 -->
+              <a-col :md="4" :sm="24">
+                <a-form-item :label="$t('menu.project.detail.closeDate.end')">
+                  <a-date-picker v-model="queryParam.close_date_end" style="width: 100%" />
                 </a-form-item>
               </a-col>
             </template>
@@ -243,7 +264,7 @@
           {{ text | formatRepairPlan }}
         </span>
         <span slot="action" slot-scope="text, record">
-          <!-- 维修进度预览 -->
+          <!-- 维修进度预览 progressReportRevice -->
           <a @click="progressReportRevice(record)">{{ $t('menu.review') }}</a>
           <a-divider type="vertical" />
           <!-- 维修进度报表 -->
@@ -318,6 +339,34 @@
         </template>
       </s-table>
 
+      <!----------------------------------------------------- 工程统计报表 -->
+      <s-table
+        ref="table"
+        size="default"
+        rowKey="id"
+        :columns="enStatisticColumns"
+        :data="loadData"
+        v-if="optEngineeringStatistic"
+        :pagination="paginationOpt"
+        :scroll="{x: 1400}"
+      >
+        <span slot="state" slot-scope="text">
+          <a-badge :status="text | statusTypeFilter" :text="$t(statusMap[text].text)"></a-badge>
+        </span>
+        <span slot="receipt_date" slot-scope="text">
+          {{ text | format }}
+        </span>
+        <span slot="close_date" slot-scope="text">
+          {{ text | format }}
+        </span>
+        <span slot="repair_plan" slot-scope="text">
+          {{ text | formatRepairPlan }}
+        </span>
+        <template v-for="(item, index) in enStatisticColumns" :slot="item.slotName">
+          <span :key="index">{{ $t(item.slotName) }}</span>
+        </template>
+      </s-table>
+
       <!----------------------------------------------------- 工程导出 -->
       <s-table
         ref="table"
@@ -347,8 +396,15 @@
       </s-table>
     </a-card>
 
-    <a-modal v-if="visibleProgress" :visible="visibleProgress" width="82%">
-      <a-descriptions :title="$t('maintenance.progress.report')">
+    <a-modal :visible="visibleProgress" width="82%" :closable="false" @ok="() => { visibleProgress=false }">
+      <div class="excelView" ref="preview"></div>
+      <template slot="footer">
+        <a-button key="back" @click="()=> { visibleProgress = false }">
+          关闭
+        </a-button>
+      </template>
+      <!-- <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div> -->
+      <!-- <a-descriptions :title="$t('maintenance.progress.report')">
         <a-descriptions-item :label="$t('menu.project.view.query.customerName')">
           {{ progressHeadData.CustomerName }}
         </a-descriptions-item>
@@ -381,20 +437,18 @@
           <a-col v-for="(v, i) in item" :key="i" :span="2">{{ v }}</a-col>
         </template>
       </a-row>
-      <template slot="footer">
-        <a-button key="back" @click="()=> { visibleProgress = false }">
-          关闭
-        </a-button>
-      </template>
-    </a-modal>>
+       -->
+    </a-modal>
   </page-header-wrapper>
 </template>
 
 <script>
+import axios from 'axios'
+import XLSX from 'xlsx'
 import moment from 'moment'
 import { saveAs } from 'file-saver'
 import { STable, Ellipsis } from '@/components'
-import { getProjectList, deleteProject, formatTotal, editProject, newProject, projectProgressReport, projectProgressReportReview, projectStatusReport, projectWorktimeReport, projectRepairPlan, projectState } from '@/api/project'
+import { getProjectList, deleteProject, formatTotal, editProject, newProject, projectProgressReport, projectProgressReportPdf, projectStatusReport, projectWorktimeReport, projectRepairPlan, projectState, downloadReport } from '@/api/project'
 import EditProject from './modules/EditProject'
 import { formatDateYMDZoneNull, getFlowNameByIndex, getFlowTotalcount } from '@/api/step'
 import { deleteTmpReportFile } from '@/api/report'
@@ -547,12 +601,72 @@ const statusMap = {
   }
 }
 
+const enStatisticColumns = [
+  { // 工程编号
+    slotName: 'menu.project.view.query.projectSerial',
+    dataIndex: 'serial',
+    scopedSlots: { customRender: 'serial', title: 'menu.project.view.query.projectSerial' },
+    width: '10%'
+  },
+  { // 合同编号
+    slotName: 'menu.project.view.query.contractSerial',
+    dataIndex: 'contract_serial',
+    scopedSlots: { customRender: 'contract_serial', title: 'menu.project.view.query.contractSerial' },
+    width: '10%',
+    visible: false
+  },
+  { // 最终用户
+    slotName: 'menu.customer.new.finallyUser',
+    dataIndex: 'finally_user',
+    scopedSlots: { customRender: 'finally_user', title: 'menu.customer.new.finallyUser' },
+    width: '20%',
+    visible: false
+  },
+  { // 销售
+    slotName: 'menu.customer.sales',
+    dataIndex: 'sales_name',
+    scopedSlots: { customRender: 'sales_name', title: 'menu.customer.sales' },
+    width: '10%'
+  },
+  { // 维修车间
+    slotName: 'menu.project.detail.repairShop',
+    dataIndex: 'repair_plan',
+    scopedSlots: { customRender: 'repair_plan', title: 'menu.project.detail.repairShop' },
+    width: '10%'
+  },
+  { // 当前状态
+    slotName: 'menu.project.current.state',
+    dataIndex: 'state',
+    scopedSlots: { customRender: 'state', title: 'menu.project.current.state' },
+    width: '10%'
+  },
+  { // 阀门数量
+    slotName: 'menu.project.new.valveNumber',
+    dataIndex: 'number',
+    scopedSlots: { customRender: 'number', title: 'menu.project.new.valveNumber' },
+    width: '8%'
+  },
+  { // 收货日期
+    slotName: 'app.flow.repair.receipt.date',
+    dataIndex: 'receipt_date',
+    scopedSlots: { customRender: 'receipt_date', title: 'app.flow.repair.receipt.date' },
+    width: '10%'
+  },
+  { // 完工日期
+    slotName: 'menu.project.detail.closeDate',
+    dataIndex: 'close_date',
+    scopedSlots: { customRender: 'close_date', title: 'menu.project.detail.closeDate' },
+    width: '10%'
+  }
+]
+
 export default {
   name: 'TableList',
   components: {
     STable,
     Ellipsis,
-    EditProject
+    EditProject,
+    XLSX
   },
   mounted () {
     this.optOpen = false
@@ -560,6 +674,7 @@ export default {
     this.optMaintenanceProgress = false
     this.optMaintenanceStatus = false
     this.optMaintenanceWorkHour = false
+    this.optEngineeringStatistic = false
     this.optExport = false
 
     // 打开项目
@@ -582,6 +697,10 @@ export default {
     if (this.$route.meta.opt === 'MaintenanceWorkHour') {
       this.optMaintenanceWorkHour = true
     }
+    // 工程统计
+    if (this.$route.meta.opt === 'EngineeringStatistic') {
+      this.optEngineeringStatistic = true
+    }
     // 导出
     if (this.$route.meta.opt === 'export') {
       this.optExport = true
@@ -596,6 +715,14 @@ export default {
             label: e.user_name
           })
         })
+      }
+    })
+
+    this.enStatisticColumns.length = 0
+    columns.forEach(e => {
+      if (e.dataIndex !== 'action') {
+        this.columnsSelectDefault.push(e.slotName)
+        this.enStatisticColumns.push(e)
       }
     })
   },
@@ -615,6 +742,8 @@ export default {
       // 预览工程头数据
       progressHeadData: {},
       progressData: [],
+      // excel数据
+      excelData: null,
       // 预览工程进度表行数据
       // progressTableRow: parameter => {
         // var rowData = []
@@ -691,6 +820,7 @@ export default {
         }
       },
       columns: columns,
+      enStatisticColumns: enStatisticColumns,
       deleteColumns: deleteColumns,
       statusMap: statusMap,
       optDelete: false,
@@ -698,7 +828,9 @@ export default {
       optExport: false,
       optMaintenanceProgress: false,
       optMaintenanceStatus: false,
-      optMaintenanceWorkHour: false
+      optMaintenanceWorkHour: false,
+      optEngineeringStatistic: false,
+      columnsSelectDefault: []
     }
   },
   filters: {
@@ -741,6 +873,7 @@ export default {
     projectState,
     getFlowNameByIndex,
     getFlowTotalcount,
+    downloadReport,
     handleAdd () {
       this.mdl = null
       this.$refs.createModal.createProjectSerial()
@@ -757,8 +890,17 @@ export default {
         this.queryParam = {}
         this.$refs.table.refresh(true)
     },
-    kkkk (val) {
-      return statusMap[val].text
+    columsSelecthandleChange (val) {
+      const columsList = val
+      if (columsList.length <= 0) { return }
+      this.enStatisticColumns.length = 0
+      columsList.forEach(newCol => {
+        this.columns.forEach(orgCol => {
+          if (newCol === orgCol.slotName) {
+            this.enStatisticColumns.push(orgCol)
+          }
+        })
+      })
     },
     handleDelete (record) {
       const letThis = this
@@ -854,34 +996,78 @@ export default {
       })
     },
     progressReportRevice (record) {
-      projectProgressReportReview(record).then(res => {
-        this.progressHeadData = res.Header
-
-        // 第一行数据
-        var rowData = []
-        var rowItemData = []
-        rowItemData.push('流程/日期')
-        Object.keys(res.FlowDate).forEach(col => {
-          rowItemData.push(res.FlowDate[col])
-        })
-        rowData.push(rowItemData)
-
-        for (var row = 0; row < getFlowTotalcount(); row++) { // 总流程数量是getFlowTotalcount个
-          // 本行生成第一列数据（流程名称）
-          rowItemData = []
-          rowItemData.push(this.$t(getFlowNameByIndex(row)))
-
-          Object.keys(res.FlowDate).forEach(col => { // 代表列（e即是列数）
-            var rowColumeKey = row + ',' + col
-            if (rowColumeKey in res.FlowCount) {
-              rowItemData.push(res.FlowCount[rowColumeKey])
-            } else {
-              rowItemData.push('')
+      projectProgressReport(record).then(res => {
+      //   LuckyExcel.transformExcelToLuckyByUrl(res, '', (exportJson) => {
+      //   if (exportJson.sheets === null || exportJson.sheets.length === 0) {
+      //     this.$message.warning('无法读取excel文件的内容，目前不支持xls文件，仅支持xlsx类型!')
+      //     this.$nextTick(() => {
+      //       window.luckysheet.create({
+      //         container: 'luckysheet', // 设定DOM容器的id
+      //         lang: 'zh', // 设定表格语言
+      //         showinfobar: false
+      //       })
+      //     })
+      //     return
+      //   }
+      //   debugger
+      //   window.luckysheet.destroy()
+      //   this.$nextTick(() => {
+      //     window.luckysheet.create({
+      //       container: 'luckysheet', // luckysheet is the container id
+      //       lang: 'zh', // 设定表格语言
+      //       row: 100, // 默认500行
+      //       showinfobar: false,
+      //       data: exportJson.sheets
+      //       // title: exportJson.info.name,
+      //       // userInfo: exportJson.info.name.creator,
+      //     })
+      //   })
+      // })
+        this.visibleProgress = true
+        axios.get(res, { responseType: 'arraybuffer' }).then(xlsxData => {
+          var wb = XLSX.read(xlsxData.data, { type: 'array' })
+          var wsname = wb.SheetNames[0]
+            var ws = wb.Sheets[wsname]
+            var HTML = XLSX.utils.sheet_to_html(ws)
+            HTML = HTML.replace('<table', '<table class="excelViewTable"')
+            for (var i = 0; i < 500; i++) {
+              HTML = HTML.replace('<td colspan', '<td class="excelViewTd" colspan')
+              HTML = HTML.replace('<td t', '<td class="excelViewTd" t')
             }
-          })
+            console.log(HTML)
+            if (this.$refs.preview) {
+              this.$refs.preview.innerHTML = HTML
+            }
+        })
+      })
+      // projectProgressReportReview(record).then(res => {
+        // this.progressHeadData = res.Header
 
-          rowData.push(rowItemData)
-        }
+        // // 第一行数据
+        // var rowData = []
+        // var rowItemData = []
+        // rowItemData.push('流程/日期')
+        // Object.keys(res.FlowDate).forEach(col => {
+        //   rowItemData.push(res.FlowDate[col])
+        // })
+        // rowData.push(rowItemData)
+
+        // for (var row = 0; row < getFlowTotalcount(); row++) { // 总流程数量是getFlowTotalcount个
+        //   // 本行生成第一列数据（流程名称）
+        //   rowItemData = []
+        //   rowItemData.push(this.$t(getFlowNameByIndex(row)))
+
+        //   Object.keys(res.FlowDate).forEach(col => { // 代表列（e即是列数）
+        //     var rowColumeKey = row + ',' + col
+        //     if (rowColumeKey in res.FlowCount) {
+        //       rowItemData.push(res.FlowCount[rowColumeKey])
+        //     } else {
+        //       rowItemData.push('')
+        //     }
+        //   })
+
+        //   rowData.push(rowItemData)
+        // }
 
         // 生成工程进度表列数据
         // this.progressTableColumns.length = 0
@@ -919,10 +1105,60 @@ export default {
         //   rowData.push(rowItemData)
         // }
 
-        this.progressData = rowData
-        console.log(this.progressData, 88888888888888888888888888888888888888)
-        this.visibleProgress = true
+        // this.progressData = rowData
+        // console.log(this.progressData, 88888888888888888888888888888888888888)
+        // this.visibleProgress = true
+      // })
+    },
+    printProgress (record) {
+      projectProgressReportPdf(record).then(url => {
+        // /api/report/download/2022030102-天津钢铁-PSR_2022_03_21_21_47_35.xlsx
+
+        downloadReport(url.replace('/api', '')).then(res => {
+          const content = res
+          this.xlxsUrl = window.URL.createObjectURL(
+            new Blob([content], { type: 'application/vnd.ms-excel' })
+          )
+          window.open(this.xlxsUrl)
+          var date = new Date().getTime()
+          var ifr = document.createElement('iframe')
+          ifr.style.frameborder = 'no'
+          ifr.style.display = 'none'
+          ifr.style.pageBreakBefore = 'always'
+          ifr.setAttribute('id', 'printXls' + date)
+          ifr.setAttribute('name', 'printXls' + date)
+          ifr.src = this.xlxsUrl
+          document.body.appendChild(ifr)
+          // 打印
+          var ordonnance = document.getElementById('printXls' + date).contentWindow
+          setTimeout(() => {
+            ordonnance.print()
+          }, 100)
+          window.URL.revokeObjectURL(ifr.src) // 释放URL 对象
+        })
       })
+
+        // const content = res
+        // this.xlxsUrl = window.URL.createObjectURL(
+        //   new Blob([content], { type: 'application/vnd.ms-excel' })
+        // )
+        // window.open(this.xlxsUrl)
+        // var date = new Date().getTime()
+        // var ifr = document.createElement('iframe')
+        // ifr.style.frameborder = 'no'
+        // ifr.style.display = 'none'
+        // ifr.style.pageBreakBefore = 'always'
+        // ifr.setAttribute('id', 'printXls' + date)
+        // ifr.setAttribute('name', 'printXls' + date)
+        // ifr.src = this.xlxsUrl
+        // document.body.appendChild(ifr)
+        // // 打印
+        // var ordonnance = document.getElementById('printXls' + date).contentWindow
+        // setTimeout(() => {
+        //   ordonnance.print()
+        // }, 100)
+        // window.URL.revokeObjectURL(ifr.src) // 释放URL 对象
+      // })
     },
     statusReport (record) {
       projectStatusReport(record).then(res => {
@@ -945,3 +1181,31 @@ export default {
   }
 }
 </script>
+<style sceped>
+
+.excelViewTable {
+    table-layout: fixed !important;
+    width: 100% !important;
+    border-collapse:collapse;
+    border:none;
+    font-size:0.23rem;
+}
+
+.excelViewTd {
+    width:1px;
+    white-space:nowrap;
+    word-break:keep-all;
+    border:solid #676767 1px;
+    text-align:center;
+    white-space:pre-line;
+    word-break:break-all !important;
+    word-wrap:break-word !important;
+    display:table-cell;
+    vertical-align:middle !important;
+    white-space: normal !important;
+    height:auto;
+    vertical-align:text-top;
+    padding:2px 2px 0 2px;
+    display: table-cell;
+}
+</style>

@@ -2,7 +2,7 @@
   <div>
     <a-card title="执行机构泄漏测试" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <template slot="extra">
-        <a-checkbox v-model="local_not_applicable" @change="localNotApplicableChange">
+        <a-checkbox :disabled="isDone" v-model="local_not_applicable" @change="localNotApplicableChange">
           不适用
         </a-checkbox>
       </template>
@@ -11,7 +11,7 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">行程测试</div>
-            <a-radio-group :disabled="disableAll" v-decorator="['actuator_leak_test_travel_is_success', { } ]">
+            <a-radio-group :disabled="disableAll || isDone" v-decorator="['actuator_leak_test_travel_is_success', { } ]">
               <a-radio :value="1">
                 合格
               </a-radio>
@@ -24,7 +24,7 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">气密性测试</div>
-            <a-radio-group :disabled="disableAll" v-decorator="['actuator_leak_test_air_is_success', { } ]">
+            <a-radio-group :disabled="disableAll || isDone" v-decorator="['actuator_leak_test_air_is_success', { } ]">
               <a-radio :value="1">
                 合格
               </a-radio>
@@ -37,7 +37,7 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">Bench Set是否正确</div>
-            <a-radio-group :disabled="disableAll" v-decorator="['actuator_leak_test_benchset_is_success', { } ]">
+            <a-radio-group :disabled="disableAll || isDone" v-decorator="['actuator_leak_test_benchset_is_success', { } ]">
               <a-radio :value="1">
                 合格
               </a-radio>
@@ -53,7 +53,7 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">是否合格</div>
-            <a-radio-group :disabled="disableAll" v-decorator="['actuator_leak_test_is_success', { } ]" @change="onChange">
+            <a-radio-group :disabled="disableAll || isDone" v-decorator="['actuator_leak_test_is_success', { } ]" @change="onChange">
               <a-radio :value="1">
                 合格
               </a-radio>
@@ -67,20 +67,20 @@
       <a-divider></a-divider>
       <a-row class="form-row" :gutter="16">
         <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-          <dispatchUser :disableAll="disableAll" :flowID="flowId" :currentStep="currentStep" :flag="'2'" />
+          <dispatchUser :disableAll="disableAll || isDone" :flowID="flowId" :currentStep="currentStep" :flag="'2'" />
         </a-card>
       </a-row>
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item label="测试日期">
-            <a-date-picker :disabled="disableAll" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['actuator_leak_test_date', {}]" style="width: 100%" />
+            <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['actuator_leak_test_date', {}]" style="width: 100%" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item>
             <div class="linehight">工时(min)</div>
             <a-input-number
-              :disabled="disableAll"
+              :disabled="disableAll || isDone"
               style="width:100%;"
               :min="0"
               v-decorator="[
@@ -97,7 +97,7 @@
         <a-col :span="24">
           <a-form-item>
             <div class="linehight"></div>
-            <a-radio-group :disabled="disableAll" v-decorator="['prerepair_content_2', {rules: []}]">
+            <a-radio-group :disabled="disableAll || isDone" v-decorator="['prerepair_content_2', {rules: []}]">
               <a-radio :value="1">
                 合格
               </a-radio>
@@ -113,13 +113,20 @@
     <!-- 备注 -->
     <a-card title="备注">
       <a-form-item>
-        <a-textarea :disabled="disableAll" v-decorator="['prerepair_memo_2',{rules: []}]" rows="4" />
+        <a-textarea :disabled="disableAll || isDone" v-decorator="['prerepair_memo_2',{rules: []}]" rows="4" />
       </a-form-item>
     </a-card>
     <!-- 文件上传 -->
     <br>
     <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <UploadImg ref="uploadImg" :disableAll="disableAll" :isMobile="isMobile" :queueType="'3'" :flag="'5'" />
+      <UploadImg ref="uploadImg" :disableAll="disableAll || isDone" :isMobile="isMobile" :queueType="'3'" :flag="'5'" />
+    </a-card>
+    <br>
+    <a-card>
+      <div style="float:right;">
+        <a-button style="margin-right: 8px;" :disabled="disableAll || isDone" type="primary" @click="doneTab">操作完毕</a-button>
+        <a-button :disabled="disableAll" @click="editTab">编辑</a-button>
+      </div>
     </a-card>
   </div>
 </template>
@@ -153,6 +160,10 @@ export default {
     isMobile: {
       type: Boolean,
       default: false
+    },
+    isDone: {
+      type: Boolean,
+      default: false
     }
   },
   mounted () {
@@ -182,7 +193,9 @@ export default {
     },
     setUploadImgData (data) {
       this.$refs.uploadImg.imgFileList = data
-    }
+    },
+    doneTab () { this.$emit('done') },
+    editTab () { this.$emit('edit') }
   },
   data () {
     return {

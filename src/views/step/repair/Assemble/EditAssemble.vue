@@ -11,7 +11,7 @@
         <a-tab-pane key="1" tab="阀门组装" :forceRender="true" v-if="valveAB">
           <a-card title="阀门组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <template slot="extra">
-              <a-checkbox v-model="assemble_valve_not_applicable" @change="valveNaChange">
+              <a-checkbox :disabled="isAssembleValveTableDone" v-model="assemble_valve_not_applicable" @change="valveNaChange">
                 不适用
               </a-checkbox>
             </template>
@@ -41,7 +41,7 @@
                 <a-form-item>
                   <div class="linehight">工时(min)</div>
                   <a-input-number
-                    :disabled="assemble_valve_not_applicable"
+                    :disabled="assemble_valve_not_applicable || isAssembleValveTableDone"
                     style="width:100%;"
                     :min="0"
                     v-decorator="[
@@ -56,7 +56,7 @@
               <a-col :span="23">
                 <a-form-item label="组装内容">
                   <a-textarea
-                    :disabled="assemble_valve_not_applicable"
+                    :disabled="assemble_valve_not_applicable || isAssembleValveTableDone"
                     rows="6"
                     v-decorator="[
                       'valve_assemble_content',
@@ -69,12 +69,19 @@
           <!-- 执行人 -->
           <br>
           <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <dispatchUser :disableAll="assemble_valve_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+            <dispatchUser :disableAll="assemble_valve_not_applicable || isAssembleValveTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
           </a-card>
           <!-- 文件上传 -->
           <br>
           <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-            <uploadImg ref="uploadImg1" :disableAll="assemble_valve_not_applicable" :isMobile="isMobile" :queueType="'3'" :flag="'1'" />
+            <uploadImg ref="uploadImg1" :disableAll="assemble_valve_not_applicable || isAssembleValveTableDone" :isMobile="isMobile" :queueType="'3'" :flag="'1'" />
+          </a-card>
+          <br>
+          <a-card>
+            <div style="float:right;">
+              <a-button style="margin-right: 8px;" :disabled="assemble_valve_not_applicable || isAssembleValveTableDone" type="primary" @click="saveAssembleValveTab">操作完毕</a-button>
+              <a-button @click="editAssembleValve">编辑</a-button>
+            </div>
           </a-card>
         </a-tab-pane>
 
@@ -82,7 +89,7 @@
         <a-tab-pane key="2" tab="执行机构组装" :forceRender="true" v-if="actuatorAB">
           <a-card title="执行机构组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <template slot="extra">
-              <a-checkbox v-model="assemble_actuator_not_applicable" @change="actuatorNaChange">
+              <a-checkbox :disabled="isAssembleActuatorTableDone" v-model="assemble_actuator_not_applicable" @change="actuatorNaChange">
                 不适用
               </a-checkbox>
             </template>
@@ -112,7 +119,7 @@
                 <a-form-item
                   label="气源压力测试">
                   <a-input
-                    :disabled="assemble_actuator_not_applicable"
+                    :disabled="assemble_actuator_not_applicable || isAssembleActuatorTableDone"
                     v-decorator="[
                       'valve_assemble_air_pressed',
                       {rules: [{ message: '请输入口径'}]}
@@ -134,7 +141,7 @@
               <a-col :lg="6" :md="12" :sm="24">
                 <a-form-item>
                   <div class="linehight">气密性测试是否合格</div>
-                  <a-radio-group :disabled="assemble_actuator_not_applicable" v-decorator="['valve_assemble_air_tightness_is_success', { } ]">
+                  <a-radio-group :disabled="assemble_actuator_not_applicable || isAssembleActuatorTableDone" v-decorator="['valve_assemble_air_tightness_is_success', { } ]">
                     <a-radio :value="1">
                       是
                     </a-radio>
@@ -147,7 +154,7 @@
               <a-col :lg="6" :md="12" :sm="24">
                 <a-form-item>
                   <div class="linehight">Bench Set测试是否合格</div>
-                  <a-radio-group :disabled="assemble_actuator_not_applicable" v-decorator="['valve_assemble_benchset_is_success', { } ]">
+                  <a-radio-group :disabled="assemble_actuator_not_applicable || isAssembleActuatorTableDone" v-decorator="['valve_assemble_benchset_is_success', { } ]">
                     <a-radio :value="1">
                       是
                     </a-radio>
@@ -166,7 +173,7 @@
                 <a-form-item>
                   <div class="linehight">工时(min)</div>
                   <a-input-number
-                    :disabled="assemble_actuator_not_applicable"
+                    :disabled="assemble_actuator_not_applicable || isAssembleActuatorTableDone"
                     style="width:100%;"
                     :min="0"
                     v-decorator="[
@@ -180,7 +187,7 @@
               <a-col :span="23">
                 <a-form-item label="组装内容">
                   <a-textarea
-                    :disabled="assemble_actuator_not_applicable"
+                    :disabled="assemble_actuator_not_applicable || isAssembleActuatorTableDone"
                     rows="6"
                     v-decorator="[
                       'actuator_assemble_content',
@@ -193,12 +200,19 @@
           <!-- 执行人 -->
           <br>
           <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <dispatchUser :disableAll="assemble_actuator_not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
+            <dispatchUser :disableAll="assemble_actuator_not_applicable || isAssembleActuatorTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
           </a-card>
           <!-- 文件上传 -->
           <br>
           <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-            <uploadImg ref="uploadImg2" :disableAll="assemble_actuator_not_applicable" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+            <uploadImg ref="uploadImg2" :disableAll="assemble_actuator_not_applicable || isAssembleActuatorTableDone" :isMobile="isMobile" :queueType="'3'" :flag="'2'" />
+          </a-card>
+          <br>
+          <a-card>
+            <div style="float:right;">
+              <a-button style="margin-right: 8px;" :disabled="assemble_actuator_not_applicable || isAssembleActuatorTableDone" type="primary" @click="saveAssembleActuatorTab">操作完毕</a-button>
+              <a-button @click="editAssembleActuatorTab">编辑</a-button>
+            </div>
           </a-card>
         </a-tab-pane>
       </a-tabs>
@@ -286,6 +300,9 @@
               })
             }
             values.uploads = tmpUpload
+            // 标签操作完毕
+            values.is_assemble_valve_table_done = this.isAssembleValveTableDone
+            values.is_assemble_actuator_table_done = this.isAssembleActuatorTableDone
 
             saveAssembleData(values).then(res => {
               this.$message.info('保存成功')
@@ -400,7 +417,11 @@
             this.$refs.uploadImg2.imgFileList = imgList2
           }
         }, 0)
-      }
+      },
+      saveAssembleValveTab () { this.isAssembleValveTableDone = true },
+      editAssembleValve () { this.isAssembleValveTableDone = false },
+      saveAssembleActuatorTab () { this.isAssembleActuatorTableDone = true },
+      editAssembleActuatorTab () { this.isAssembleActuatorTableDone = false }
     },
     mounted () {
       // 防止表单未注册
@@ -417,6 +438,13 @@
         uploadFiles = JSON.parse(editData.step_data[0].JSON)
         this.form.setFieldsValue(pick(uploadFiles, assembleFields))
         this.not_applicable = uploadFiles.not_applicable
+        // 标签操作完毕
+        if (uploadFiles.is_assemble_valve_table_done) {
+          this.isAssembleValveTableDone = uploadFiles.is_assemble_valve_table_done
+        }
+        if (uploadFiles.is_assemble_actuator_table_done) {
+          this.isAssembleActuatorTableDone = uploadFiles.is_assemble_actuator_table_done
+        }
       }
 
       // 根据拆解的工时》0的结果决定组装显示内容
@@ -480,7 +508,9 @@
         not_applicable: false,
         assemble_valve_not_applicable: false,
         assemble_actuator_not_applicable: false,
-        currentImgFlag: '1'
+        currentImgFlag: '1',
+        isAssembleValveTableDone: false,
+        isAssembleActuatorTableDone: false
       }
     }
   }

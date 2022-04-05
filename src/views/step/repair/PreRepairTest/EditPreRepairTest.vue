@@ -5,13 +5,13 @@
         不适用
       </a-checkbox>
     </template>
-    <a-form @submit="handleSubmit" :form="form" class="form">
+    <a-form @submit="handleSubmit" :form="form" class="form" ref="mform">
       <a-tabs default-active-key="5" @change="tabChange">
         <!-- /////////////////////////////////////////////// 动作测试 /////////////////////////////////////////////////// -->
         <a-tab-pane key="1" tab="动作测试" v-if="SeatLeakTest || ActuatorLeakTest" :forceRender="true">
           <a-card title="动作测试" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <template slot="extra">
-              <a-checkbox v-model="action_not_applicable" @change="actionNotApplicableChange">
+              <a-checkbox :disabled="isActionSave" v-model="action_not_applicable" @change="actionNotApplicableChange">
                 不适用
               </a-checkbox>
             </template>
@@ -19,7 +19,7 @@
               <a-col :lg="6" :md="12" :sm="24">
                 <a-form-item>
                   <div class="linehight">动作测试-开</div>
-                  <a-radio-group :disabled="disableAll_1" v-decorator="['accessory_test_active_open', { } ]">
+                  <a-radio-group :disabled="disableAll_1 || isActionSave" v-decorator="['accessory_test_active_open', { } ]">
                     <a-radio :value="1">
                       正常
                     </a-radio>
@@ -32,7 +32,7 @@
               <a-col :lg="6" :md="12" :sm="24">
                 <a-form-item>
                   <div class="linehight">动作测试-关</div>
-                  <a-radio-group :disabled="disableAll_1" v-decorator="['accessory_test_active_close', { } ]">
+                  <a-radio-group :disabled="disableAll_1 || isActionSave" v-decorator="['accessory_test_active_close', { } ]">
                     <a-radio :value="1">
                       正常
                     </a-radio>
@@ -45,19 +45,19 @@
             </a-row>
             <a-divider></a-divider>
             <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-              <dispatchUser :disableAll="disableAll_1" :flowID="flow_id" :currentStep="current_step" :flag="'5'" />
+              <dispatchUser :disableAll="disableAll_1 || isActionSave" :flowID="flow_id" :currentStep="current_step" :flag="'5'" />
             </a-card>
             <a-row>
               <a-col :span="8">
                 <a-form-item label="测试日期">
-                  <a-date-picker :disabled="disableAll_1" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['prerepair_test_date', {}]" style="width: 90%" />
+                  <a-date-picker :disabled="disableAll_1 || isActionSave" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['prerepair_test_date', {}]" style="width: 90%" />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
                 <a-form-item>
                   <div class="linehight">工时(min)</div>
                   <a-input-number
-                    :disabled="disableAll_1"
+                    :disabled="disableAll_1 || isActionSave"
                     :min="0"
                     style="width:100%;"
                     v-decorator="[
@@ -74,7 +74,7 @@
               <a-col :span="24">
                 <a-form-item>
                   <div class="linehight"></div>
-                  <a-radio-group :disabled="disableAll_1" v-decorator="['prerepair_content_5', {rules: []}]">
+                  <a-radio-group :disabled="disableAll_1 || isActionSave" v-decorator="['prerepair_content_5', {rules: []}]">
                     <a-radio :value="1">
                       合格
                     </a-radio>
@@ -90,7 +90,7 @@
           <!-- 备注 -->
           <a-card title="备注">
             <a-form-item>
-              <a-textarea :disabled="disableAll_1" v-decorator="['prerepair_memo_5',{rules: []}]" rows="4" />
+              <a-textarea :disabled="disableAll_1 || isActionSave" v-decorator="['prerepair_memo_5',{rules: []}]" rows="4" />
             </a-form-item>
           </a-card>
           <!-- 文件上传 -->
@@ -98,10 +98,17 @@
           <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <uploadImg
               ref="uploadImg1"
-              :disableAll="disableAll_1"
+              :disableAll="disableAll_1 || isActionSave"
               :queueType="'3'"
               :isMobile="isMobile"
               :flag="'1'" />
+          </a-card>
+          <br>
+          <a-card>
+            <div style="float:right;">
+              <a-button style="margin-right: 8px;" :disabled="disableAll_1 || isActionSave" type="primary" @click="saveActionTab($event)">操作完毕</a-button>
+              <a-button @click="editActionTab($event)">编辑</a-button>
+            </div>
           </a-card>
         </a-tab-pane>
         <!-- /////////////////////////////////////////////// 附件功能测试 /////////////////////////////////////////////////// -->
@@ -113,9 +120,12 @@
             :baseInfo="valveBaseInfo"
             :selectArea="accessoryData"
             :disableAll="disableAll_2"
+            :isDone="isAccessoryDone"
             :isMobile="isMobile"
             @notOk="AccessoryLeakNotOk"
             @setFieldValue="setFieldValue"
+            @done="accessoryDone"
+            @edit="editAccessoryTab"
             v-if="AccessoryTest" />
         </a-tab-pane>
         <!-- /////////////////////////////////////////////// 阀座泄漏测试 /////////////////////////////////////////////////// -->
@@ -128,13 +138,16 @@
             :disableAll="disableAll_3"
             :isMobile="isMobile"
             v-if="SeatLeakTest"
+            :isDone="isLeakTestDone"
+            @done="leakTestTabDone"
+            @edit="editLeakTestTab"
             @notOk="seatLeakNotOk"
             @setFieldValue="setFieldValue" />
         </a-tab-pane>
         <a-tab-pane key="4" tab="水压测试" v-if="SeatLeakTest" :forceRender="true">
           <a-card title="测漏试压" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <template slot="extra">
-              <a-checkbox v-model="water_not_applicable" @change="waterNotApplicableChange">
+              <a-checkbox :disabled="isWaterDone" v-model="water_not_applicable" @change="waterNotApplicableChange">
                 不适用
               </a-checkbox>
             </template>
@@ -161,14 +174,14 @@
                 <a-form-item>
                   <div class="linehight">水压实际测试压力</div>
                   <a-input
-                    :disabled="disableAll_4"
+                    :disabled="disableAll_4 || isWaterDone"
                     style="width:200px;"
                     :min="0"
                     v-decorator="[
                       'leak_water_test_real_pressed',
                       {rules: []}
                     ]">
-                    <a-select :disabled="disableAll_4" v-decorator="[ 'leak_water_test_real_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
+                    <a-select :disabled="disableAll_4 || isWaterDone" v-decorator="[ 'leak_water_test_real_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                       <a-select-option value="1">
                         PSI
                       </a-select-option>
@@ -184,7 +197,7 @@
                 <a-form-item>
                   <div class="linehight">实际测试时间(分钟)</div>
                   <a-input-number
-                    :disabled="disableAll_4"
+                    :disabled="disableAll_4 || isWaterDone"
                     style="width:200px;"
                     :min="0"
                     v-decorator="[
@@ -194,7 +207,7 @@
                 </a-form-item>
                 <a-form-item>
                   <div class="linehight">实际测试介质</div>
-                  <a-select :disabled="disableAll_4" v-decorator="[ 'leak_pressure_water_real_test_medium', {rules: [{}]}]" style="width: 200px" :allowClear="true">
+                  <a-select :disabled="disableAll_4 || isWaterDone" v-decorator="[ 'leak_pressure_water_real_test_medium', {rules: [{}]}]" style="width: 200px" :allowClear="true">
                     <a-select-option value="1">
                       水
                     </a-select-option>
@@ -213,7 +226,7 @@
                 <a-form-item>
                   <div class="linehight" style="margin-top:20px;">备注</div>
                   <a-textarea
-                    :disabled="disableAll_4"
+                    :disabled="disableAll_4 || isWaterDone"
                     rows="6"
                     v-decorator="[
                       'leak_pressure_water_test_memo',
@@ -223,7 +236,7 @@
                 <a-form-item>
                   <div class="linehight">见证人</div>
                   <a-input
-                    :disabled="disableAll_4"
+                    :disabled="disableAll_4 || isWaterDone"
                     style="width:200px;"
                     v-decorator="[
                       'leak_pressure_water_test_witness',
@@ -234,19 +247,19 @@
             </a-row>
             <a-divider style="margin-bottom: 32px"/>
             <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-              <dispatchUser :disableAll="disableAll_4" :flowID="flow_id" :currentStep="current_step" :flag="'4'" />
+              <dispatchUser :disableAll="disableAll_4 || isWaterDone" :flowID="flow_id" :currentStep="current_step" :flag="'4'" />
             </a-card>
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item label="测试日期">
-                  <a-date-picker :disabled="disableAll_4" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['leak_pressure_test_date', {}]" style="width: 90%" />
+                  <a-date-picker :disabled="disableAll_4 || isWaterDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['leak_pressure_test_date', {}]" style="width: 90%" />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
                 <a-form-item>
                   <div class="linehight">工时(min)</div>
                   <a-input-number
-                    :disabled="disableAll_4"
+                    :disabled="disableAll_4 || isWaterDone"
                     style="width:100%;"
                     :min="0"
                     v-decorator="[
@@ -263,7 +276,7 @@
               <a-col :span="24">
                 <a-form-item>
                   <div class="linehight">结论</div>
-                  <a-radio-group :disabled="disableAll_4" v-decorator="['leak_pressure_test_content', {rules: []}]">
+                  <a-radio-group :disabled="disableAll_4 || isWaterDone" v-decorator="['leak_pressure_test_content', {rules: []}]">
                     <a-radio :value="1">
                       合格
                     </a-radio>
@@ -279,13 +292,20 @@
           <!-- 备注 -->
           <a-card title="备注">
             <a-form-item>
-              <a-textarea :disabled="disableAll_4" v-decorator="['prerepair_memo_4',{rules: []}]" rows="4" />
+              <a-textarea :disabled="disableAll_4 || isWaterDone" v-decorator="['prerepair_memo_4',{rules: []}]" rows="4" />
             </a-form-item>
           </a-card>
           <!-- 文件上传 -->
           <br>
           <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-            <uploadImg ref="uploadImg4" :disableAll="disableAll_4" :queueType="'3'" :isMobile="isMobile" :flag="'4'" />
+            <uploadImg ref="uploadImg4" :disableAll="disableAll_4 || isWaterDone" :queueType="'3'" :isMobile="isMobile" :flag="'4'" />
+          </a-card>
+          <br>
+          <a-card>
+            <div style="float:right;">
+              <a-button style="margin-right: 8px;" :disabled="disableAll_4 || isWaterDone" type="primary" @click="waterTabDone">操作完毕</a-button>
+              <a-button :disabled="disableAll_4" @click="editWaterTab">编辑</a-button>
+            </div>
           </a-card>
         </a-tab-pane>
         <!-- /////////////////////////////////////////////// 执行机构测试 /////////////////////////////////////////////////// -->
@@ -297,6 +317,9 @@
             v-if="ActuatorLeakTest"
             :isMobile="isMobile"
             :disableAll="disableAll_5"
+            :isDone="isActuatorDone"
+            @done="actuatorTabDone"
+            @edit="editActuatorTab"
             @notOk="ActuatorLeakNotOk"
             :mainForm="form"
             @setFieldValue="setFieldValue" />
@@ -304,7 +327,7 @@
       </a-tabs>
       <br>
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
-        <a-button htmlType="submit" type="primary">保存</a-button>
+        <a-button htmlType="submit" type="primary" >保存</a-button>
         <a-button style="margin-left: 8px" @click="cancelSubmit" v-if="!isMobile" >返回</a-button>
         <a-button style="margin-left: 38px" @click="handleStepDetail">{{ $t("menu.step.view") }}</a-button>
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
@@ -422,6 +445,11 @@
         disableAll_3: false,
         disableAll_4: false,
         disableAll_5: false,
+        isActionSave: false,
+        isAccessoryDone: false,
+        isLeakTestDone: false,
+        isWaterDone: false,
+        isActuatorDone: false,
         currentImgFlag: '1'
       }
     },
@@ -475,6 +503,11 @@
             values.perrepair_user_id = this.$store.state.user.info.id
             values.uploads = tmpUpload
             values.not_applicable = this.not_applicable
+            values.action_test_save = this.isActionSave
+            values.accessory_tab_done = this.isAccessoryDone
+            values.leak_test_done = this.isLeakTestDone
+            values.water_test_done = this.isWaterDone
+            values.actuator_test_done = this.isActuatorDone
 
             savePreRepairTest(values).then(res => {
               this.$message.info('保存成功')
@@ -672,6 +705,36 @@
             this.$refs.actuatorLeakTest.setUploadImgData(imgList5)
           }
         }, 0)
+      },
+      saveActionTab (e) { // 动作标签完成
+        this.isActionSave = true
+      },
+      editActionTab (e) { // 编辑动作标签
+        this.isActionSave = false
+      },
+      accessoryDone () { // 附件标签完成
+        this.isAccessoryDone = true
+      },
+      editAccessoryTab () { // 编辑附件标签
+        this.isAccessoryDone = false
+      },
+      leakTestTabDone () { // 泄漏测试标签完成
+        this.isLeakTestDone = true
+      },
+      editLeakTestTab () { // 编辑泄漏测试标签
+        this.isLeakTestDone = false
+      },
+      waterTabDone () { // 水压测试标签完成
+        this.isWaterDone = true
+      },
+      editWaterTab () { // 编辑水压测试标签
+        this.isWaterDone = false
+      },
+      actuatorTabDone () { // 执行机构测试标签完成
+        this.isActuatorDone = true
+      },
+      editActuatorTab () { // 编辑执行机构测试标签
+        this.isActuatorDone = false
       }
     },
     mounted () {
@@ -728,6 +791,22 @@
           }
           if (!uploadFiles.prerepair_test_date || uploadFiles.prerepair_test_date.indexOf('0001-') >= 0) {
             uploadFiles.prerepair_test_date = moment()
+          }
+          // 标签操作已完成
+          if (uploadFiles.action_test_save) {
+            this.isActionSave = uploadFiles.action_test_save
+          }
+          if (uploadFiles.accessory_tab_done) {
+            this.isAccessoryDone = uploadFiles.accessory_tab_done
+          }
+          if (uploadFiles.leak_test_done) {
+            this.isLeakTestDone = uploadFiles.leak_test_done
+          }
+          if (uploadFiles.water_test_done) {
+            this.isWaterDone = uploadFiles.water_test_done
+          }
+          if (uploadFiles.actuator_test_done) {
+            this.isActuatorDone = uploadFiles.actuator_test_done
           }
 
           if (uploadFiles) {

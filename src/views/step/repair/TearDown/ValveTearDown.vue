@@ -2,7 +2,7 @@
   <div>
     <a-card title="阀门拆解" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <template slot="extra">
-        <a-checkbox v-model="local_not_applicable" @change="valveNaChange">
+        <a-checkbox :disabled="isDone" v-model="local_not_applicable" @change="valveNaChange">
           不适用
         </a-checkbox>
       </template>
@@ -11,7 +11,7 @@
           <a-form-item>
             <div class="linehight">拆解工作及发现问题</div>
             <a-textarea
-              :disabled="disableAll"
+              :disabled="disableAll || isDone"
               rows="6"
               v-decorator="[
                 'teardown_valve_content',
@@ -24,13 +24,13 @@
       <a-row :gutter="16">
         <a-col :span="6">
           <a-form-item label="拆解日期">
-            <a-date-picker :disabled="disableAll" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['teardown_valve_date', {}]" style="width: 100%" />
+            <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['teardown_valve_date', {}]" style="width: 100%" />
           </a-form-item>
         </a-col>
         <a-col :span="6">
           <a-form-item label="工时(min)">
             <a-input-number
-              :disabled="disableAll"
+              :disabled="disableAll || isDone"
               :min="0"
               style="width:100%;"
               v-decorator="[
@@ -42,13 +42,20 @@
       </a-row>
       <br>
       <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-        <dispatchUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+        <dispatchUser :disableAll="disableAll || isDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
       </a-card>
       <!-- 文件上传 -->
       <br>
       <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <uploadImg ref="uploadImg" :disableAll="disableAll" :isMobile="isMobile" :queueType="'3'" :flag="'1'" />
+        <uploadImg ref="uploadImg" :disableAll="disableAll || isDone" :isMobile="isMobile" :queueType="'3'" :flag="'1'" />
       </a-card>
+    </a-card>
+    <br>
+    <a-card>
+      <div style="float:right;">
+        <a-button style="margin-right: 8px;" :disabled="disableAll || isDone" type="primary" @click="doneTab">操作完毕</a-button>
+        <a-button :disabled="disableAll" @click="editTab">编辑</a-button>
+      </div>
     </a-card>
   </div>
 </template>
@@ -82,6 +89,10 @@ export default {
     isMobile: {
       type: Boolean,
       default: false
+    },
+    isDone: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -107,7 +118,9 @@ export default {
     },
     setUploadImgData (data) {
       this.$refs.uploadImg.imgFileList = data
-    }
+    },
+    doneTab () { this.$emit('done') },
+    editTab () { this.$emit('edit') }
   },
   data () {
     return {
