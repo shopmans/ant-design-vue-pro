@@ -1,11 +1,16 @@
 <template>
   <div>
-    <a-card title="阀门评估" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+    <!-- 评估人员 -->
+    <a-card title="评估人员" :headStyle="{fontWeight:'bold'}">
       <template slot="extra">
         <a-checkbox :disabled="isDone" v-model="local_not_applicable" @change="valveNaChange">
           不适用
         </a-checkbox>
       </template>
+      <dispatchUser :disableAll="disableAll || isDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+    </a-card>
+    <br>
+    <a-card title="阀门评估" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-row :gutter="16">
         <a-col class="gutter-row" :span="4">
           <div class="gutter-box">
@@ -22,10 +27,6 @@
         <AssessmentRow :disableAll="disableAll" :isDone="isDone" :rowoptions="item" :key="item.state" />
       </template>
       <br>
-      <!-- 评估人员 -->
-      <a-card title="评估人员" :headStyle="{fontWeight:'bold'}">
-        <dispatchUser :disableAll="disableAll || isDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
-      </a-card>
       <!-- 文件上传 -->
       <br>
       <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">

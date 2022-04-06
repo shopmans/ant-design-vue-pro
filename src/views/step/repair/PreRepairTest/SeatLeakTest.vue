@@ -1,11 +1,36 @@
 <template>
   <div>
-    <a-card title="阀座泄漏测试" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+    <!-- 执行人 -->
+    <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
       <template slot="extra">
         <a-checkbox :disabled="isDone" v-model="local_not_applicable" @change="localNotApplicableChange">
           不适用
         </a-checkbox>
       </template>
+      <dispatchUser :disableAll="disableAll || isDone" :flowID="flowId" :currentStep="currentStep" :flag="'1'" />
+      <a-row :gutter="8">
+        <a-col :span="4">
+          <a-form-item>
+            <div class="linehight">工时(min)</div>
+            <a-input-number
+              :disabled="disableAll || isDone"
+              :min="0"
+              style="width:100%;"
+              v-decorator="[
+                'seat_leak_test_total_minute',
+                {rules: []}
+              ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="4">
+          <a-form-item label="测试日期">
+            <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['seat_leak_test_date', {}]" style="width: 100%" />
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-card>
+    <br>
+    <a-card title="阀座泄漏测试" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-descriptions :column="4">
         <a-descriptions-item label="阀座泄漏等级">{{ valveData.valve_leak_level }}</a-descriptions-item>
         <a-descriptions-item label="泄漏测试介质">{{ getValveTestMediumUnit(valveData.valve_leak_test_medium) }}</a-descriptions-item>
@@ -110,33 +135,6 @@
         </a-col>
       </a-row>
       <a-divider></a-divider>
-      <!-- 行2 -->
-      <a-row class="form-row" :gutter="36">
-        <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-          <dispatchUser :disableAll="disableAll || isDone" :flowID="flowId" :currentStep="currentStep" :flag="'1'" />
-        </a-card>
-      </a-row>
-      <!-- 行2 -->
-      <a-row class="form-row" :gutter="36">
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="测试日期">
-            <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['seat_leak_test_date', {}]" style="width: 100%" />
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item>
-            <div class="linehight">工时(min)</div>
-            <a-input-number
-              :disabled="disableAll || isDone"
-              :min="0"
-              style="width:100%;"
-              v-decorator="[
-                'seat_leak_test_total_minute',
-                {rules: []}
-              ]" />
-          </a-form-item>
-        </a-col>
-      </a-row>
     </a-card>
     <br>
     <a-card title="结论">

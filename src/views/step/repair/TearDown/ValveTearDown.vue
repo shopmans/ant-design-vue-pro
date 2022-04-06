@@ -1,11 +1,34 @@
 <template>
   <div>
-    <a-card title="阀门拆解" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+    <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
       <template slot="extra">
         <a-checkbox :disabled="isDone" v-model="local_not_applicable" @change="valveNaChange">
           不适用
         </a-checkbox>
       </template>
+      <dispatchUser :disableAll="disableAll || isDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+      <a-row :gutter="8">
+        <a-col :span="4">
+          <a-form-item label="工时(min)">
+            <a-input-number
+              :disabled="disableAll || isDone"
+              :min="0"
+              style="width:100%;"
+              v-decorator="[
+                'teardown_valve_total_minute',
+                {rules: []}
+              ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="4">
+          <a-form-item label="拆解日期">
+            <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['teardown_valve_date', {}]" style="width: 100%" />
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-card>
+    <br>
+    <a-card title="阀门拆解" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-row class="form-row" :gutter="16">
         <a-col :span="24">
           <a-form-item>
@@ -20,30 +43,6 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <br>
-      <a-row :gutter="16">
-        <a-col :span="6">
-          <a-form-item label="拆解日期">
-            <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['teardown_valve_date', {}]" style="width: 100%" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="工时(min)">
-            <a-input-number
-              :disabled="disableAll || isDone"
-              :min="0"
-              style="width:100%;"
-              v-decorator="[
-                'teardown_valve_total_minute',
-                {rules: []}
-              ]" />
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <br>
-      <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-        <dispatchUser :disableAll="disableAll || isDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
-      </a-card>
       <!-- 文件上传 -->
       <br>
       <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">

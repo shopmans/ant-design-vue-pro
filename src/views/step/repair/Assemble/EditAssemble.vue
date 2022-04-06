@@ -35,11 +35,15 @@
                 </a-descriptions>
               </a-col>
             </a-row>
-            <a-divider style="margin-bottom: 32px"/>
-            <a-row :gutter="16">
-              <a-col :span="8">
-                <a-form-item>
-                  <div class="linehight">工时(min)</div>
+          </a-card>
+          <br>
+
+          <!-- 执行人 -->
+          <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
+            <dispatchUser :disableAll="assemble_valve_not_applicable || isAssembleValveTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+            <a-row :gutter="8">
+              <a-col :span="4">
+                <a-form-item label="工时(min)">
                   <a-input-number
                     :disabled="assemble_valve_not_applicable || isAssembleValveTableDone"
                     style="width:100%;"
@@ -50,8 +54,16 @@
                     ]" />
                 </a-form-item>
               </a-col>
+              <a-col :span="4">
+                <a-form-item label="组装日期">
+                  <a-date-picker :disabled="assemble_valve_not_applicable || isAssembleValveTableDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['assemble_valve_date', {}]" style="width: 100%" />
+                </a-form-item>
+              </a-col>
             </a-row>
+          </a-card>
+          <br>
 
+          <a-card>
             <a-row :gutter="16">
               <a-col :span="23">
                 <a-form-item label="组装内容">
@@ -65,11 +77,6 @@
                 </a-form-item>
               </a-col>
             </a-row>
-          </a-card>
-          <!-- 执行人 -->
-          <br>
-          <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <dispatchUser :disableAll="assemble_valve_not_applicable || isAssembleValveTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
           </a-card>
           <!-- 文件上传 -->
           <br>
@@ -87,7 +94,7 @@
 
         <!-- 执行机构组装 -->
         <a-tab-pane key="2" tab="执行机构组装" :forceRender="true" v-if="actuatorAB">
-          <a-card title="执行机构组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-card title="基本信息" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <template slot="extra">
               <a-checkbox :disabled="isAssembleActuatorTableDone" v-model="assemble_actuator_not_applicable" @change="actuatorNaChange">
                 不适用
@@ -113,7 +120,34 @@
                 </a-descriptions>
               </a-col>
             </a-row>
-            <a-divider style="margin-bottom: 32px"/>
+          </a-card>
+          <br>
+
+          <a-card title="执行人" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+            <dispatchUser :disableAll="assemble_actuator_not_applicable || isAssembleActuatorTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
+            <a-row :gutter="8">
+              <a-col :span="4">
+                <a-form-item label="工时(min)">
+                  <a-input-number
+                    :disabled="assemble_actuator_not_applicable || isAssembleActuatorTableDone"
+                    style="width:100%;"
+                    :min="0"
+                    v-decorator="[
+                      'assemble_actuator_total_minute',
+                      {rules: []}
+                    ]" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="4">
+                <a-form-item label="组装执行机构日期">
+                  <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['assemble_actuator_date', {}]" style="width: 100%" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-card>
+          <br>
+
+          <a-card title="执行机构组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <a-row :gutter="16">
               <a-col :lg="6" :md="12" :sm="24">
                 <a-form-item
@@ -169,21 +203,6 @@
               </a-col>
             </a-row>
             <a-row :gutter="16">
-              <a-col :span="8">
-                <a-form-item>
-                  <div class="linehight">工时(min)</div>
-                  <a-input-number
-                    :disabled="assemble_actuator_not_applicable || isAssembleActuatorTableDone"
-                    style="width:100%;"
-                    :min="0"
-                    v-decorator="[
-                      'assemble_actuator_total_minute',
-                      {rules: []}
-                    ]" />
-                </a-form-item>
-              </a-col>
-            </a-row>
-            <a-row :gutter="16">
               <a-col :span="23">
                 <a-form-item label="组装内容">
                   <a-textarea
@@ -196,11 +215,6 @@
                 </a-form-item>
               </a-col>
             </a-row>
-          </a-card>
-          <!-- 执行人 -->
-          <br>
-          <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <dispatchUser :disableAll="assemble_actuator_not_applicable || isAssembleActuatorTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
           </a-card>
           <!-- 文件上传 -->
           <br>
@@ -246,10 +260,11 @@
   import stepDetail from '../../modules/StepBaseInfo'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
   import dispatchUser from '@/views/step/modules/DispatchUser'
+  import moment from 'moment'
 
   const assembleFields = ['assemble_valve_total_minute', 'assemble_actuator_total_minute', 'assemble_accessory_total_minute',
   'valve_assemble_content', 'actuator_assemble_content', 'accessory_assemble_content', 'valve_assemble_air_pressed', 'valve_assemble_air_pressed_unit',
-  'valve_assemble_air_tightness_is_success', 'valve_assemble_benchset_is_success',
+  'valve_assemble_air_tightness_is_success', 'valve_assemble_benchset_is_success', 'assemble_valve_date', 'assemble_actuator_date',
   'assemble_valve_not_applicable', 'assemble_actuator_not_applicable', 'not_applicable']
 
   export default {
@@ -444,6 +459,13 @@
         }
         if (uploadFiles.is_assemble_actuator_table_done) {
           this.isAssembleActuatorTableDone = uploadFiles.is_assemble_actuator_table_done
+        }
+        // 初始化日期
+        if (!uploadFiles.assemble_valve_date || uploadFiles.assemble_valve_date.indexOf('0001-') >= 0) {
+          this.form.setFieldsValue(pick({ assemble_valve_date: moment() }, 'assemble_valve_date'))
+        }
+        if (!uploadFiles.assemble_actuator_date || uploadFiles.assemble_actuator_date.indexOf('0001-') >= 0) {
+          this.form.setFieldsValue(pick({ assemble_actuator_date: moment() }, 'assemble_actuator_date'))
         }
       }
 

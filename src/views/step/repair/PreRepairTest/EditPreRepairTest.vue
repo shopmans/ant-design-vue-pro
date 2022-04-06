@@ -9,12 +9,35 @@
       <a-tabs default-active-key="5" @change="tabChange">
         <!-- /////////////////////////////////////////////// 动作测试 /////////////////////////////////////////////////// -->
         <a-tab-pane key="1" tab="动作测试" v-if="SeatLeakTest || ActuatorLeakTest" :forceRender="true">
-          <a-card title="动作测试" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
             <template slot="extra">
               <a-checkbox :disabled="isActionSave" v-model="action_not_applicable" @change="actionNotApplicableChange">
                 不适用
               </a-checkbox>
             </template>
+            <dispatchUser :disableAll="disableAll_1 || isActionSave" :flowID="flow_id" :currentStep="current_step" :flag="'5'" />
+            <a-row :gutter="8">
+              <a-col :span="4">
+                <a-form-item label="工时(min)">
+                  <a-input-number
+                    :disabled="disableAll_1 || isActionSave"
+                    :min="0"
+                    style="width:100%;"
+                    v-decorator="[
+                      'action_total_minute',
+                      {rules: []}
+                    ]" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="4">
+                <a-form-item label="测试日期">
+                  <a-date-picker :disabled="disableAll_1 || isActionSave" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['prerepair_test_date', {}]" style="width: 90%" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-card>
+          <br>
+          <a-card title="动作测试" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <a-row>
               <a-col :lg="6" :md="12" :sm="24">
                 <a-form-item>
@@ -44,29 +67,6 @@
               </a-col>
             </a-row>
             <a-divider></a-divider>
-            <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-              <dispatchUser :disableAll="disableAll_1 || isActionSave" :flowID="flow_id" :currentStep="current_step" :flag="'5'" />
-            </a-card>
-            <a-row>
-              <a-col :span="8">
-                <a-form-item label="测试日期">
-                  <a-date-picker :disabled="disableAll_1 || isActionSave" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['prerepair_test_date', {}]" style="width: 90%" />
-                </a-form-item>
-              </a-col>
-              <a-col :span="8">
-                <a-form-item>
-                  <div class="linehight">工时(min)</div>
-                  <a-input-number
-                    :disabled="disableAll_1 || isActionSave"
-                    :min="0"
-                    style="width:100%;"
-                    v-decorator="[
-                      'action_total_minute',
-                      {rules: []}
-                    ]" />
-                </a-form-item>
-              </a-col>
-            </a-row>
           </a-card>
           <br>
           <a-card title="结论">
@@ -145,12 +145,36 @@
             @setFieldValue="setFieldValue" />
         </a-tab-pane>
         <a-tab-pane key="4" tab="水压测试" v-if="SeatLeakTest" :forceRender="true">
-          <a-card title="测漏试压" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
             <template slot="extra">
               <a-checkbox :disabled="isWaterDone" v-model="water_not_applicable" @change="waterNotApplicableChange">
                 不适用
               </a-checkbox>
             </template>
+            <dispatchUser :disableAll="disableAll_4 || isWaterDone" :flowID="flow_id" :currentStep="current_step" :flag="'4'" />
+            <a-row :gutter="8">
+              <a-col :span="4">
+                <a-form-item>
+                  <div class="linehight">工时(min)</div>
+                  <a-input-number
+                    :disabled="disableAll_4 || isWaterDone"
+                    style="width:100%;"
+                    :min="0"
+                    v-decorator="[
+                      'leak_pressure_test_total_minute',
+                      {rules: []}
+                    ]" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="4">
+                <a-form-item label="测试日期">
+                  <a-date-picker :disabled="disableAll_4 || isWaterDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['leak_pressure_test_date', {}]" style="width: 90%" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-card>
+          <br>
+          <a-card title="测漏试压" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-descriptions title="水压测试" :column="1">
@@ -246,29 +270,6 @@
               </a-col>
             </a-row>
             <a-divider style="margin-bottom: 32px"/>
-            <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-              <dispatchUser :disableAll="disableAll_4 || isWaterDone" :flowID="flow_id" :currentStep="current_step" :flag="'4'" />
-            </a-card>
-            <a-row :gutter="16">
-              <a-col :span="8">
-                <a-form-item label="测试日期">
-                  <a-date-picker :disabled="disableAll_4 || isWaterDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['leak_pressure_test_date', {}]" style="width: 90%" />
-                </a-form-item>
-              </a-col>
-              <a-col :span="8">
-                <a-form-item>
-                  <div class="linehight">工时(min)</div>
-                  <a-input-number
-                    :disabled="disableAll_4 || isWaterDone"
-                    style="width:100%;"
-                    :min="0"
-                    v-decorator="[
-                      'leak_pressure_test_total_minute',
-                      {rules: []}
-                    ]" />
-                </a-form-item>
-              </a-col>
-            </a-row>
           </a-card>
           <br>
           <a-card title="结论">
@@ -777,6 +778,8 @@
 
         if (editData.step_data.length > 0) {
           const uploadFiles = JSON.parse(editData.step_data[0].JSON)
+
+          // 初始化日期
           if (!uploadFiles.seat_leak_test_date || uploadFiles.seat_leak_test_date.indexOf('0001-') >= 0) {
             uploadFiles.seat_leak_test_date = moment()
           }

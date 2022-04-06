@@ -1,14 +1,14 @@
 <template>
   <div>
-    <a-card title="附件折解" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+    <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
       <template slot="extra">
         <a-checkbox :disabled="isDone" v-model="local_not_applicable" @change="accessoryNaChange">
           不适用
         </a-checkbox>
       </template>
-      <!-- 行1 -->
-      <a-row class="form-row" :gutter="16">
-        <a-col :span="8">
+      <dispatchUser :disableAll="disableAll || isDone" :flowID="flowID" :currentStep="currentStep" :flag="'3'" />
+      <a-row class="form-row" :gutter="8">
+        <a-col :span="4">
           <a-form-item>
             <div class="linehight">工时(min)</div>
             <a-input-number
@@ -21,7 +21,17 @@
               ]" />
           </a-form-item>
         </a-col>
+        <a-form-item label="拆解日期">
+          <a-row>
+            <a-col :span="4">
+              <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['teardown_accessory_date', {}]" style="width: 100%" />
+            </a-col>
+          </a-row>
+        </a-form-item>
       </a-row>
+    </a-card>
+    <br>
+    <a-card title="附件折解" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-row class="form-row" :gutter="16">
         <a-col :span="24">
           <a-form-item>
@@ -36,18 +46,6 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <br>
-      <a-form-item label="拆解日期">
-        <a-row>
-          <a-col :span="8">
-            <a-date-picker :disabled="disableAll || isDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['teardown_accessory_date', {}]" style="width: 100%" />
-          </a-col>
-        </a-row>
-      </a-form-item>
-      <br>
-      <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-        <dispatchUser :disableAll="disableAll || isDone" :flowID="flowID" :currentStep="currentStep" :flag="'3'" />
-      </a-card>
     </a-card>
     <!-- 文件上传 -->
     <br>

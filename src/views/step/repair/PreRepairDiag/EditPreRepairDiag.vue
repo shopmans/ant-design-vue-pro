@@ -17,16 +17,12 @@
           <a-descriptions-item label="阀门型号">{{ valveRefData.valve_model }}</a-descriptions-item>
         </a-descriptions>
       </a-card>
-
       <br>
-      <a-card title="" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <a-row :gutter="16">
-          <a-col :span="8">
-            <a-form-item label="诊断日期">
-              <a-date-picker :disabled="disableAll" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['diag_date', {}]" style="width: 100%" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="8">
+
+      <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+        <DispatchUser :disableAll="disableAll" v-if="showDispatchUser" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+        <a-row :gutter="8">
+          <a-col :span="4">
             <a-form-item label="工时(min)">
               <a-input-number
                 :disabled="disableAll"
@@ -38,13 +34,14 @@
                 ]" />
             </a-form-item>
           </a-col>
+          <a-col :span="4">
+            <a-form-item label="诊断日期">
+              <a-date-picker :disabled="disableAll" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['diag_date', {}]" style="width: 100%" />
+            </a-form-item>
+          </a-col>
         </a-row>
       </a-card>
-
       <br>
-      <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-        <DispatchUser :disableAll="disableAll" v-if="showDispatchUser" :flowID="flowID" :currentStep="currentStep" />
-      </a-card>
 
       <!-- 页脚 -->
       <footer-tool-bar :is-mobile="isMobile" :collapsed="sideCollapsed">
@@ -82,6 +79,7 @@ import stepAllDetailModel from '../../modules/StepAllDetailModel'
 import pick from 'lodash.pick'
 import DispatchUser from '../../modules/DispatchUser'
 import UploadImg from '../../modules/UploadImg'
+import moment from 'moment'
 
 const preRepairDiagFields = ['work_time', 'not_applicable', 'diag_date']
 
@@ -112,6 +110,9 @@ export default {
           let preRepairDiag = {}
           if (editData.step_data.length > 0) {
               preRepairDiag = JSON.parse(editData.step_data[0].JSON)
+              if (!preRepairDiag.diag_date || preRepairDiag.diag_date.length <= 0) {
+                this.form.setFieldsValue(pick({ diag_date: moment(new Date()).format('YYYY-MM-DD') }, ['diag_date']))
+              }
           } else {
               preRepairDiag.receipt_parts = []
           }

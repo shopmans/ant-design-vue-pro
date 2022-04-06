@@ -6,26 +6,10 @@
       </a-checkbox>
     </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
-      <!-- 完成日期 -->
-      <a-card title="发货" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <a-row>
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item >
-              <div class="linehight">完成日期</div>
-              <a-date-picker
-                :disabled="not_applicable"
-                style="width:100%;"
-                :format="'YYYY-MM-DD'"
-                v-decorator="[
-                  'package_delivery_done_date',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-divider></a-divider>
-        <a-row>
-          <a-col :lg="6" :md="12" :sm="24">
+      <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+        <dispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flow_id" :currentStep="current_step" :flag="'1'" />
+        <a-row :gutter="8">
+          <a-col :span="4">
             <a-form-item label="工时(min)">
               <a-input-number
                 :disabled="not_applicable"
@@ -37,12 +21,19 @@
                 ]" />
             </a-form-item>
           </a-col>
+          <a-col :span="4">
+            <a-form-item label="完成日期">
+              <a-date-picker
+                :disabled="not_applicable"
+                style="width:100%;"
+                :format="'YYYY-MM-DD'"
+                v-decorator="[
+                  'package_delivery_done_date',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+          </a-col>
         </a-row>
-      </a-card>
-      <br>
-
-      <a-card title="派员" :headStyle="{fontWeight:'bold'}">
-        <dispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flow_id" :currentStep="current_step" :flag="'1'" />
       </a-card>
 
       <!-- 文件上传 -->
@@ -75,6 +66,7 @@ import stepDetail from '../../modules/StepBaseInfo'
 import stepAllDetailModel from '../../modules/StepAllDetailModel'
 import dispatchUser from '../../modules/DispatchUser'
 import UploadImg from '../../modules/UploadImg'
+import moment from 'moment'
 
   const deliveryFields = ['package_delivery_done_date', 'work_time', 'not_applicable']
 
@@ -116,6 +108,10 @@ export default {
         this.$refs.uploadImg.imgFileList = tmpStepData.uploads
         this.form.setFieldsValue(pick(tmpStepData, deliveryFields))
         this.not_applicable = tmpStepData.not_applicable
+        // 初始化日期
+        if (!tmpStepData.package_delivery_done_date || tmpStepData.package_delivery_done_date.indexOf('0001-') >= 0) {
+            this.form.setFieldsValue(pick({ package_delivery_done_date: moment() }, 'package_delivery_done_date'))
+          }
     })
   },
   methods: {

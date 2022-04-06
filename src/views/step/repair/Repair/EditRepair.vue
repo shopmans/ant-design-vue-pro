@@ -339,11 +339,6 @@
       </a-card>
       <br>
 
-      <a-card title="派员" :headStyle="{fontWeight:'bold'}">
-        <dispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
-      </a-card>
-      <br>
-
       <a-card>
         <a-form-item label="维修内容及结论">
           <a-textarea

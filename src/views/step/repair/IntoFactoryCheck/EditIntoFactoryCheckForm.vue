@@ -17,8 +17,41 @@
         <a-descriptions-item label="执行机构型号">{{ actuRefData.actu_model }}</a-descriptions-item>
         <a-descriptions-item label="执行机构尺寸">{{ actuRefData.actu_size }}</a-descriptions-item>
       </a-descriptions>
+      <br>
 
       <a-form @submit="handleSubmit" :form="form" class="form">
+        <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+          <!-- 执行人 -->
+          <dispatchUser :disableAll="disableAll" v-if="showDispatchUser" :flowID="flow_id" :currentStep="current_step" :flag="'1'" />
+          <!-- 工时 -->
+          <a-row :gutter="8">
+            <a-col :span="4">
+              <a-form-item label="工时(min)">
+                <a-input-number
+                  :disabled="disableAll"
+                  style="width:100%;"
+                  :min="0"
+                  v-decorator="[
+                    'work_time',
+                    {rules: []}
+                  ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="4">
+              <a-form-item label="入厂检查日期">
+                <a-date-picker
+                  :disabled="disableAll"
+                  style="width:100%;"
+                  :format="'YYYY-MM-DD'"
+                  v-decorator="[
+                    'step_date',
+                    {rules: []}
+                  ]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </a-card>
+        <br>
         <a-row :gutter="16">
           <!--=========================================== 阀体组件 ===========================================-->
           <template v-if="refData1.return_part === '1' || refData1.return_part === '3' || refData1.return_part === '4'">
@@ -871,27 +904,6 @@
             </div>
           </a-col>
         </a-row>
-        <!-- 工时 -->
-        <a-row :gutter="16">
-          <a-col class="gutter-row" :span="6">
-            <div class="gutter-box">
-              <a-form-item label="工时(min)">
-                <a-input-number
-                  :disabled="disableAll"
-                  style="width:100%;"
-                  :min="0"
-                  v-decorator="[
-                    'work_time',
-                    {rules: []}
-                  ]" />
-              </a-form-item>
-            </div>
-          </a-col>
-        </a-row>
-
-        <a-card title="派员" :headStyle="{fontWeight:'bold'}">
-          <DispatchUser :disableAll="disableAll" v-if="showDispatchUser" :flowID="flow_id" :currentStep="current_step" />
-        </a-card>
 
         <!-- 上传图片 -->
         <a-divider />
@@ -942,7 +954,8 @@ import pick from 'lodash.pick'
 import { stepDone, queryStepData, getValveSizeUnitText, getOtherFilterBegulator } from '@/api/step'
 import stepDetail from '../../modules/StepBaseInfo'
 import stepAllDetailModel from '../../modules/StepAllDetailModel'
-import DispatchUser from '../../modules/DispatchUser'
+import dispatchUser from '../../modules/DispatchUser'
+import moment from 'moment'
 
   const intoFactoryFields = ['work_order_serial', 'contract_serial', 'customer_name', 'intofc_valve_type', 'intofc_valve_size',
   'intofc_valve_tag', 'intofc_valve_serial', 'intofc_actuator_type', 'intofc_actuator_size', 'intofc_nameplate_content_yesno',
@@ -960,7 +973,7 @@ import DispatchUser from '../../modules/DispatchUser'
   'intofc_act_tubing_fittings_yesno', 'intofc_act_tubing_fittings_memo', 'intofc_other_lockup_trip_valve_yesno', 'intofc_other_lockup_trip_valve_memo',
   'intofc_act_handwheel_yesno', 'intofc_act_handwheel_memo', 'intofc_other_bybass_valve_yesno', 'intofc_other_bybass_valve_memo', 'intofc_act_stem_yoke_yesno',
   'intofc_act_stem_yoke_memo', 'intofc_other_other_yesno', 'intofc_other_other_memo', 'intofc_remark', 'intofc_cracks_on_casing_yesno', 'intofc_cracks_on_casing_memo',
-  'not_applicable', 'work_time', 'intofc_feedback_yesno', 'intofc_feedback_memo']
+  'not_applicable', 'work_time', 'intofc_feedback_yesno', 'intofc_feedback_memo', 'step_date']
 
 function getBase64 (file) {
   return new Promise((resolve, reject) => {
@@ -978,7 +991,7 @@ export default {
     baseMixin,
     stepDetail,
     stepAllDetailModel,
-    DispatchUser
+    dispatchUser
   },
   data () {
     return {
@@ -1028,6 +1041,10 @@ export default {
         this.disableAll = this.not_applicable
         if (intoFactoryData.uploads) {
           this.imgFileList = intoFactoryData.uploads
+          // 流程日期
+          if (!intoFactoryData.step_date || intoFactoryData.step_date.length <= 0) {
+            this.form.setFieldsValue(pick({ step_date: moment(new Date()).format('YYYY-MM-DD') }, ['step_date']))
+          }
         }
       }
 

@@ -330,7 +330,7 @@
 
         if (editData.step_data.length > 0) {
           const uploadFiles = JSON.parse(editData.step_data[0].JSON)
-
+          // 初始化日期
           if (!uploadFiles.teardown_valve_date || uploadFiles.teardown_valve_date.indexOf('0001-') >= 0) {
             uploadFiles.teardown_valve_date = moment()
           }

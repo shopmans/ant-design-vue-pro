@@ -6,6 +6,13 @@
       </a-checkbox>
     </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
+      <template v-if="valveControlModel">
+        <br>
+        <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+          <dispatchUser :disableAll="not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+        </a-card>
+        <br>
+      </template>
       <!-- <template v-if="valveControlModel === 2"> -->
       <template v-if="valveControlModel === 2">
         <a-card title="调校" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
@@ -668,13 +675,6 @@
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
     </a-form>
-
-    <template v-if="valveControlModel">
-      <br>
-      <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-        <dispatchUser :disableAll="not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
-      </a-card>
-    </template>
 
     <br>
     <!-- 文件上传 -->

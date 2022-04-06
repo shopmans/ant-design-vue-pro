@@ -6,6 +6,31 @@
       </a-checkbox>
     </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
+      <template v-if="flowID" >
+        <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+          <dispatchUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+          <a-row :gutter="8">
+            <a-col :span="4">
+              <a-form-item label="工时(min)">
+                <a-input-number
+                  :disabled="not_applicable"
+                  style="width:100%;"
+                  :min="0"
+                  v-decorator="[
+                    'work_time',
+                    {rules: []}
+                  ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="4">
+              <a-form-item label="诊断日期">
+                <a-date-picker :disabled="not_applicable" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['final_check_date', {}]" style="width: 100%" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </a-card>
+        <br>
+      </template>
       <a-card title="最终检查" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-descriptions>
           <a-descriptions-item label="工作单号">{{ baseInfo.work_order_serial }}</a-descriptions-item>
@@ -90,32 +115,6 @@
           </a-tab-pane>
         </a-tabs>
       </a-card>
-
-      <template v-if="flowID" >
-        <br>
-        <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-          <dispatchUser :disableAll="disableAll" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
-        </a-card>
-      </template>
-
-      <br>
-      <a-card title="工时" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <a-row>
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item label="工时(min)">
-              <a-input-number
-                :disabled="not_applicable"
-                style="width:100%;"
-                :min="0"
-                v-decorator="[
-                  'work_time',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-card>
-      <br>
 
       <!-- 备注 -->
       <a-card>
@@ -269,6 +268,10 @@
           this.form.setFieldsValue(pick(installIAData, ['not_applicable', 'work_time']))
           this.$refs.uploadImg.imgFileList = installIAData.uploads
           this.not_applicable = installIAData.not_applicable
+          // 初始化日期
+          if (!installIAData.final_check_date || installIAData.final_check_date.indexOf('0001-') >= 0) {
+            this.form.setFieldsValue(pick({ final_check_date: moment() }, 'final_check_date'))
+          }
         })
       }
     },

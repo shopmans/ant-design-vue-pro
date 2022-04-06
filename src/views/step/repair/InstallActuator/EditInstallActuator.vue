@@ -6,7 +6,7 @@
       </a-checkbox>
     </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
-      <a-card title="安装执行机构" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+      <a-card title="基本信息" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-descriptions title="">
           <a-descriptions-item label="阀行程">
             {{ getValveSizeUnitText(valveData.valve_travel, valveData.valve_travel_unit) }}
@@ -15,7 +15,34 @@
             {{ getActuFailureUnit(actuData.actu_failure) }}
           </a-descriptions-item>
         </a-descriptions>
-        <a-divider></a-divider>
+      </a-card>
+      <br>
+
+      <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
+        <dispatchUser :disableAll="not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'"/>
+        <a-row :gutter="8">
+          <a-col :span="4">
+            <a-form-item label="工时(min)">
+              <a-input-number
+                :disabled="not_applicable"
+                style="width:100%;"
+                :min="0"
+                v-decorator="[
+                  'install_actuator_total_minute',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="4">
+            <a-form-item label="安装执行机构日期">
+              <a-date-picker :disabled="assemble_valve_not_applicable || isAssembleValveTableDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['install_actuator_date', {}]" style="width: 100%" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-card>
+      <br>
+
+      <a-card title="安装执行机构" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-row :gutter="16">
           <a-col :span="8">
             <a-form-item label="阀门实际行程">
@@ -57,20 +84,6 @@
           </a-col>
         </a-row>
         <a-row>
-          <a-col :span="8">
-            <a-form-item label="工时(min)">
-              <a-input-number
-                :disabled="not_applicable"
-                style="width:100%;"
-                :min="0"
-                v-decorator="[
-                  'install_actuator_total_minute',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row>
           <a-col :span="24">
             <a-form-item label="备注">
               <a-textarea
@@ -83,11 +96,6 @@
             </a-form-item>
           </a-col>
         </a-row>
-      </a-card>
-
-      <br>
-      <a-card v-if="flowID" title="派员" :headStyle="{fontWeight:'bold'}">
-        <dispatchUser :disableAll="not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'"/>
       </a-card>
 
       <!-- 页脚 -->
@@ -121,6 +129,7 @@
   import stepDetail from '../../modules/StepBaseInfo'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
   import dispatchUser from '@/views/step/modules/DispatchUser'
+  import moment from 'moment'
 
   const installActuatorFields = ['install_actuator_total_minute', 'install_actuator_valve_real_travel', 'install_actuator_valve_real_travel_unit',
   'install_actuator_valve_real_fail_point', 'not_applicable', 'install_actuator_memo']
@@ -221,6 +230,10 @@
           this.form.setFieldsValue(pick(installACData, installActuatorFields))
           this.$refs.uploadImg.imgFileList = installACData.uploads
           this.not_applicable = installACData.not_applicable
+          // 初始化日期
+          if (!installACData.install_actuator_date || installACData.install_actuator_date.indexOf('0001-') >= 0) {
+            this.form.setFieldsValue(pick({ install_actuator_date: moment() }, 'install_actuator_date'))
+          }
         })
       }
     },

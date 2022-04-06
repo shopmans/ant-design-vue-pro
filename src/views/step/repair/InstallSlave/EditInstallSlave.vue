@@ -9,25 +9,15 @@
       <a-tabs @change="tabChange">
         <!-- 安装附件 -->
         <a-tab-pane key="1" tab="安装附件" :forceRender="true">
-          <a-card title="安装附件" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
             <template slot="extra">
               <a-checkbox :disabled="isInstallSlaveTableDone" v-model="install_slave_not_applicable" @change="installSlaveChange">
                 不适用
               </a-checkbox>
             </template>
-            <a-descriptions title="">
-              <a-descriptions-item label="故障位置">
-                {{ getValvePushDoneUnit(actuData.actu_failure) }}
-              </a-descriptions-item>
-            </a-descriptions>
-            <br>
-            <a-row :gutter="16">
-              <a-col :span="6">
-                <a-form-item label="安装附件日期">
-                  <a-date-picker :disabled="install_slave_not_applicable || isInstallSlaveTableDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['install_slave_date', {}]" style="width: 100%" />
-                </a-form-item>
-              </a-col>
-              <a-col :span="6">
+            <dispatchUser :disableAll="install_slave_not_applicable || isInstallSlaveTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+            <a-row :gutter="8">
+              <a-col :span="4">
                 <a-form-item label="工时(min)">
                   <a-input-number
                     :disabled="install_slave_not_applicable || isInstallSlaveTableDone"
@@ -39,12 +29,21 @@
                     ]" />
                 </a-form-item>
               </a-col>
+              <a-col :span="4">
+                <a-form-item label="安装附件日期">
+                  <a-date-picker :disabled="install_slave_not_applicable || isInstallSlaveTableDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['install_slave_date', {}]" style="width: 100%" />
+                </a-form-item>
+              </a-col>
             </a-row>
           </a-card>
-          <!-- 执行人 -->
           <br>
-          <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <dispatchUser :disableAll="install_slave_not_applicable || isInstallSlaveTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+          <a-card title="安装附件" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+            <a-descriptions title="">
+              <a-descriptions-item label="故障位置">
+                {{ getValvePushDoneUnit(actuData.actu_failure) }}
+              </a-descriptions-item>
+            </a-descriptions>
+            <br>
           </a-card>
           <!-- 文件上传 -->
           <br>
@@ -61,25 +60,15 @@
         </a-tab-pane>
         <!-- 配制气源管 -->
         <a-tab-pane key="2" tab="配制气源管" :forceRender="true">
-          <a-card title="配制气源管" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
             <template slot="extra">
               <a-checkbox :disabled="isInstallAirTableDone" v-model="air_source_not_applicable" @change="airSourceChange">
                 不适用
               </a-checkbox>
             </template>
-            <a-descriptions title="">
-              <a-descriptions-item label="故障位置">
-                {{ getValvePushDoneUnit(actuData.actu_failure) }}
-              </a-descriptions-item>
-            </a-descriptions>
-            <br>
-            <a-row :gutter="16">
-              <a-col :span="6">
-                <a-form-item label="安装气源管日期">
-                  <a-date-picker :disabled="air_source_not_applicable || isInstallAirTableDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['install_source_date', {}]" style="width: 100%" />
-                </a-form-item>
-              </a-col>
-              <a-col :span="6">
+            <dispatchUser :disableAll="air_source_not_applicable || isInstallAirTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
+            <a-row :gutter="8">
+              <a-col :span="4">
                 <a-form-item label="工时(min)">
                   <a-input-number
                     :disabled="air_source_not_applicable || isInstallAirTableDone"
@@ -91,12 +80,24 @@
                     ]" />
                 </a-form-item>
               </a-col>
+              <a-col :span="4">
+                <a-form-item label="安装气源管日期">
+                  <a-date-picker :disabled="air_source_not_applicable || isInstallAirTableDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['install_source_date', {}]" style="width: 100%" />
+                </a-form-item>
+              </a-col>
             </a-row>
           </a-card>
           <br>
-          <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
-            <dispatchUser :disableAll="air_source_not_applicable || isInstallAirTableDone" :flowID="flowID" :currentStep="currentStep" :flag="'2'" />
+
+          <a-card title="配制气源管" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+            <a-descriptions title="">
+              <a-descriptions-item label="故障位置">
+                {{ getValvePushDoneUnit(actuData.actu_failure) }}
+              </a-descriptions-item>
+            </a-descriptions>
+            <br>
           </a-card>
+          <br>
           <!-- 文件上传 -->
           <br>
           <a-card title="上传照片" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">

@@ -17,16 +17,12 @@
           <a-descriptions-item label="阀门型号">{{ valveRefData.valve_model }}</a-descriptions-item>
         </a-descriptions>
       </a-card>
-
       <br>
-      <a-card title="" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-        <a-row :gutter="16">
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item label="诊断日期">
-              <a-date-picker :disabled="not_applicable" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['after_repair_diag_date', {}]" style="width: 100%" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
+
+      <a-card title="执行人" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+        <DispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flowID" :currentStep="currentStep" :flag="'1'" />
+        <a-row :gutter="8">
+          <a-col :span="4">
             <a-form-item label="工时(min)">
               <a-input-number
                 :disabled="not_applicable"
@@ -38,12 +34,12 @@
                 ]" />
             </a-form-item>
           </a-col>
+          <a-col :span="4">
+            <a-form-item label="诊断日期">
+              <a-date-picker :disabled="not_applicable" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['after_repair_diag_date', {}]" style="width: 100%" />
+            </a-form-item>
+          </a-col>
         </a-row>
-      </a-card>
-
-      <br>
-      <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
-        <DispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flowID" :currentStep="currentStep" />
       </a-card>
 
       <!-- 页脚 -->

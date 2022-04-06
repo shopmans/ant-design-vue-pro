@@ -6,7 +6,38 @@
       </a-checkbox>
     </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
-      <!-- 收货日期 -->
+      <!-- 派员 -->
+      <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
+        <dispatchUser v-if="showDispatchUser" :disableAll="disableAll" :flowID="flow_id" :currentStep="current_step" :flag="'1'" />
+        <a-row :gutter="8">
+          <a-col :span="4">
+            <a-form-item label="工时(min)">
+              <a-input-number
+                :disabled="disableAll"
+                style="width:100%;"
+                :min="0"
+                v-decorator="[
+                  'work_time',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="4">
+            <a-form-item label="收货日期">
+              <a-date-picker
+                :disabled="disableAll"
+                style="width:100%;"
+                :format="'YYYY-MM-DD'"
+                v-decorator="[
+                  'receipt_date',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-card>
+      <br>
+
       <a-card title="收货" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-descriptions title="">
           <a-descriptions-item label="序号">{{ refData1.serial_number }}</a-descriptions-item>
@@ -20,41 +51,6 @@
           <a-descriptions-item label="阀门型号">{{ valveRefData.valve_model }}</a-descriptions-item>
         </a-descriptions>
         <a-divider></a-divider>
-        <a-row>
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item >
-              <div class="linehight">收货日期</div>
-              <a-date-picker
-                :disabled="disableAll"
-                style="width:100%;"
-                :format="dateFormat"
-                v-decorator="[
-                  'receipt_date',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-divider></a-divider>
-        <a-row>
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item label="工时(min)">
-              <a-input-number
-                :disabled="disableAll"
-                style="width:100%;"
-                :min="0"
-                v-decorator="[
-                  'work_time',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-card>
-      <br>
-
-      <a-card title="派员" :headStyle="{fontWeight:'bold'}">
-        <DispatchUser v-if="showDispatchUser" :disableAll="disableAll" :flowID="flow_id" :currentStep="current_step" />
       </a-card>
       <br>
 
@@ -116,8 +112,9 @@ import selectUser from '../../modules/SelectUser'
 import pick from 'lodash.pick'
 import stepDetail from '../../modules/StepBaseInfo'
 import stepAllDetailModel from '../../modules/StepAllDetailModel'
-import DispatchUser from '../../modules/DispatchUser'
+import dispatchUser from '../../modules/DispatchUser'
 import UploadImg from '../../modules/UploadImg'
+import moment from 'moment'
 
   const receiptFields = ['receipt_date', 'receipt_valve_serial', 'receipt_valve_factory_no', 'work_order_serial',
   'contract_serial', 'customer_name', 'valve_serial', 'not_applicable', 'work_time']
@@ -131,7 +128,7 @@ export default {
     baseMixin,
     stepDetail,
     stepAllDetailModel,
-    DispatchUser,
+    dispatchUser,
     UploadImg
   },
   data () {
@@ -149,7 +146,6 @@ export default {
       columnsPurchased: getColumnsPurchased(),
       dataPurchased: [],
       receiptPurchased: [],
-      dateFormat: 'YYYY-MM-DD',
       showDispatchUser: false,
       not_applicable: false,
       disableAll: false
@@ -173,6 +169,10 @@ export default {
       if (editData.step_data.length > 0) {
         receiptData = JSON.parse(editData.step_data[0].JSON)
         this.$refs.uploadImg.imgFileList = receiptData.uploads
+        // 填充日期
+        if (!receiptData.receipt_date || receiptData.receipt_date.indexOf('0001-') >= 0) {
+          this.form.setFieldsValue(pick({ 'receipt_date': moment(new Date()).format('YYYY-MM-DD') }, 'receipt_date'))
+        }
       } else {
         receiptData.receipt_parts = []
       }

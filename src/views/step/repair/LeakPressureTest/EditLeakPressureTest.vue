@@ -6,6 +6,31 @@
       </a-checkbox>
     </template>
     <a-form @submit="handleSubmit" :form="form" class="form">
+      <a-card v-if="flowID" title="执行人" :headStyle="{fontWeight:'bold'}">
+        <dispatchUser :disableAll="not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'"/>
+        <a-row :gutter="8">
+          <a-col :span="4">
+            <a-form-item>
+              <div class="linehight">工时(min)</div>
+              <a-input-number
+                :disabled="not_applicable"
+                style="width:100%;"
+                :min="0"
+                v-decorator="[
+                  'leak_pressure_test_total_minute',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="4">
+            <a-form-item label="测漏试压日期">
+              <a-date-picker :disabled="assemble_valve_not_applicable || isAssembleValveTableDone" valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['leak_test_date', {}]" style="width: 100%" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-card>
+      <br>
+
       <a-card title="测漏试压" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-row :gutter="16">
           <a-col :span="8">
@@ -231,21 +256,6 @@
           </a-col>
         </a-row>
         <a-divider style="margin-bottom: 32px"/>
-        <a-row :gutter="16">
-          <a-col :span="8">
-            <a-form-item>
-              <div class="linehight">工时(min)</div>
-              <a-input-number
-                :disabled="not_applicable"
-                style="width:100%;"
-                :min="0"
-                v-decorator="[
-                  'leak_pressure_test_total_minute',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col>
-        </a-row>
       </a-card>
 
       <!-- 页脚 -->
@@ -256,11 +266,6 @@
         <a-button style="margin-left: 8px" @click="handleStepDone">结束流程</a-button>
       </footer-tool-bar>
     </a-form>
-
-    <br>
-    <a-card v-if="flowID" title="派员" :headStyle="{fontWeight:'bold'}">
-      <dispatchUser :disableAll="not_applicable" :flowID="flowID" :currentStep="currentStep" :flag="'1'"/>
-    </a-card>
 
     <br>
     <!-- 文件上传 -->
@@ -286,11 +291,12 @@
   import { saveLeakPressureData } from '@/api/leakPressureTest'
   import stepAllDetailModel from '../../modules/StepAllDetailModel'
   import dispatchUser from '@/views/step/modules/DispatchUser'
+  import moment from 'moment'
 
   const leakPressureFields = ['leak_pressure_test_total_minute', 'leak_pressure_water_test_real_time',
   'leak_pressure_test_real_time', 'leak_test_real_valve', 'leak_test_real_valve_unit', 'leak_pressure_water_test_real_value',
   'leak_pressure_water_test_real_value_unit', 'leak_test_real_test_pressed', 'leak_test_real_test_pressed_unit',
-  'leak_water_test_real_pressed', 'leak_water_test_real_pressed_unit', 'leak_pressure_test_content',
+  'leak_water_test_real_pressed', 'leak_water_test_real_pressed_unit', 'leak_pressure_test_content', 'leak_test_date',
   'leak_pressure_water_test_content', 'leak_pressure_water_test_memo', 'leak_test_memo', 'leak_test_real_test_medium',
   'leak_pressure_water_real_test_medium', 'leak_pressure_water_test_witness', 'leak_test_real_test_witness', 'not_applicable']
 
@@ -390,6 +396,10 @@
           this.form.setFieldsValue(pick(leakPressureData, leakPressureFields))
           this.$refs.uploadImg.imgFileList = leakPressureData.uploads
           this.not_applicable = leakPressureData.not_applicable
+          // 初始化日期
+          if (!leakPressureData.leak_test_date || leakPressureData.leak_test_date.indexOf('0001-') >= 0) {
+            this.form.setFieldsValue(pick({ leak_test_date: moment() }, 'leak_test_date'))
+          }
         }
       })
     },
