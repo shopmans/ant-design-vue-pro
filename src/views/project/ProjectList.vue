@@ -299,6 +299,9 @@
           {{ text | formatRepairPlan }}
         </span>
         <span slot="action" slot-scope="text, record">
+          <!-- 维修状态报表 progressReportRevice -->
+          <a @click="statusReportReview(record)">{{ $t('menu.review') }}</a>
+          <a-divider type="vertical" />
           <!-- 维修状态报表 -->
           <a @click="statusReport(record)">{{ $t('permissionid.export.project') }}</a>
         </span>
@@ -331,6 +334,9 @@
           {{ text | formatRepairPlan }}
         </span>
         <span slot="action" slot-scope="text, record">
+          <!-- 维修工时报表 progressReportRevice -->
+          <a @click="workingHoursReportReview(record)">{{ $t('menu.review') }}</a>
+          <a-divider type="vertical" />
           <!-- 维修工时报表 -->
           <a @click="workingHoursReport(record)">{{ $t('permissionid.export.project') }}</a>
         </span>
@@ -395,55 +401,22 @@
         </template>
       </s-table>
     </a-card>
-
-    <a-modal :visible="visibleProgress" width="82%" :closable="false" @ok="() => { visibleProgress=false }">
-      <div class="excelView" ref="preview"></div>
-      <template slot="footer">
-        <a-button key="back" @click="()=> { visibleProgress = false }">
-          关闭
-        </a-button>
-      </template>
-      <!-- <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;height:100%;left: 0px;top: 0px;"></div> -->
-      <!-- <a-descriptions :title="$t('maintenance.progress.report')">
-        <a-descriptions-item :label="$t('menu.project.view.query.customerName')">
-          {{ progressHeadData.CustomerName }}
-        </a-descriptions-item>
-        <a-descriptions-item label="最终用户名称">
-          {{ progressHeadData.FinallyUser }}
-        </a-descriptions-item>
-        <a-descriptions-item :label="$t('menu.project.detail.contractNumber')">
-          {{ progressHeadData.ContractSerial }}
-        </a-descriptions-item>
-        <a-descriptions-item :label="$t('menu.project.view.query.sales')">
-          {{ progressHeadData.SalesName }}
-        </a-descriptions-item>
-        <a-descriptions-item :label="$t('menu.project.detail.serial')">
-          {{ progressHeadData.Serial }}
-        </a-descriptions-item>
-        <a-descriptions-item :label="$t('工程状态')">
-          {{ $t(projectState(progressHeadData.State)) }}
-        </a-descriptions-item>
-        <a-descriptions-item :label="$t('menu.project.detail.repairShop')">
-          {{ $t(projectRepairPlan(progressHeadData.RepairPlan)) }}
-        </a-descriptions-item>
-        <a-descriptions-item :label="$t('menu.project.detail.reqCloseDate')">
-        </a-descriptions-item>
-      </a-descriptions>
-      <a-row v-for="(item, index) in progressData" :key="index">
-        <template v-if=" index === 0">
-          <a-col style="font: bold;" v-for="(v, i) in item" :key="i" :span="2">{{ v }}</a-col>
-        </template>
-        <template v-else>
-          <a-col v-for="(v, i) in item" :key="i" :span="2">{{ v }}</a-col>
-        </template>
-      </a-row>
-       -->
-    </a-modal>
+    <template v-if="visibleProgress">
+      <div style="position:absolute;left: 0px; top: 0px;background-color:#efefef;width:90%;height:50px;">
+        <div style="float:right;">
+          <a-button key="back" style="height: 50px;background-color:#efefef;" @click="()=> { visibleProgress = false }">
+            X
+          </a-button>
+        </div>
+      </div>
+      <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:90%;height:80%;left: 0px;top: 48px;bottom: 0px;"></div>
+    </template>
   </page-header-wrapper>
 </template>
 
 <script>
-import axios from 'axios'
+import LuckyExcel from 'luckyexcel'
+// import axios from 'axios'
 import XLSX from 'xlsx'
 import moment from 'moment'
 import { saveAs } from 'file-saver'
@@ -666,7 +639,8 @@ export default {
     STable,
     Ellipsis,
     EditProject,
-    XLSX
+    XLSX,
+    LuckyExcel
   },
   mounted () {
     this.optOpen = false
@@ -725,6 +699,20 @@ export default {
         this.enStatisticColumns.push(e)
       }
     })
+
+    // eslint-disable-next-line no-undef
+    // $(function () {
+    //         // eslint-disable-next-line no-undef
+    //         luckysheet.create({
+    //           container: 'luckysheet',
+    //           lang: 'zh',
+    //           showtoolbar: false,
+    //           showsheetbar: false,
+    //           showtoolbarConfig: {
+    //             print: true
+    //           }
+    //         })
+    //       })
   },
   data () {
     return {
@@ -997,118 +985,35 @@ export default {
     },
     progressReportRevice (record) {
       projectProgressReport(record).then(res => {
-      //   LuckyExcel.transformExcelToLuckyByUrl(res, '', (exportJson) => {
-      //   if (exportJson.sheets === null || exportJson.sheets.length === 0) {
-      //     this.$message.warning('无法读取excel文件的内容，目前不支持xls文件，仅支持xlsx类型!')
-      //     this.$nextTick(() => {
-      //       window.luckysheet.create({
-      //         container: 'luckysheet', // 设定DOM容器的id
-      //         lang: 'zh', // 设定表格语言
-      //         showinfobar: false
-      //       })
-      //     })
-      //     return
-      //   }
-      //   debugger
-      //   window.luckysheet.destroy()
-      //   this.$nextTick(() => {
-      //     window.luckysheet.create({
-      //       container: 'luckysheet', // luckysheet is the container id
-      //       lang: 'zh', // 设定表格语言
-      //       row: 100, // 默认500行
-      //       showinfobar: false,
-      //       data: exportJson.sheets
-      //       // title: exportJson.info.name,
-      //       // userInfo: exportJson.info.name.creator,
-      //     })
-      //   })
-      // })
-        this.visibleProgress = true
-        axios.get(res, { responseType: 'arraybuffer' }).then(xlsxData => {
-          var wb = XLSX.read(xlsxData.data, { type: 'array' })
-          var wsname = wb.SheetNames[0]
-            var ws = wb.Sheets[wsname]
-            var HTML = XLSX.utils.sheet_to_html(ws)
-            HTML = HTML.replace('<table', '<table class="excelViewTable"')
-            for (var i = 0; i < 500; i++) {
-              HTML = HTML.replace('<td colspan', '<td class="excelViewTd" colspan')
-              HTML = HTML.replace('<td t', '<td class="excelViewTd" t')
-            }
-            console.log(HTML)
-            if (this.$refs.preview) {
-              this.$refs.preview.innerHTML = HTML
-            }
+        const filename = res.replace('/api/report/download/', '')
+        LuckyExcel.transformExcelToLuckyByUrl(res, filename, (exportJson) => {
+          if (exportJson.sheets === null || exportJson.sheets.length === 0) {
+            this.$message.warning('无法读取excel文件的内容，目前不支持xls文件，仅支持xlsx类型!')
+            this.$nextTick(() => {
+              window.luckysheet.create({
+                container: 'luckysheet', // 设定DOM容器的id
+                lang: 'zh', // 设定表格语言
+                showinfobar: false
+              })
+            })
+            return
+          }
+          this.visibleProgress = true
+          window.luckysheet.destroy()
+          this.$nextTick(() => {
+            window.luckysheet.create({
+              container: 'luckysheet', // luckysheet is the container id
+              lang: 'zh', // 设定表格语言
+              row: 100, // 默认500行
+              showtoolbar: false,
+              showinfobar: false,
+              data: exportJson.sheets,
+              title: exportJson.info.name
+              // userInfo: exportJson.info.name.creator,
+            })
+          })
         })
       })
-      // projectProgressReportReview(record).then(res => {
-        // this.progressHeadData = res.Header
-
-        // // 第一行数据
-        // var rowData = []
-        // var rowItemData = []
-        // rowItemData.push('流程/日期')
-        // Object.keys(res.FlowDate).forEach(col => {
-        //   rowItemData.push(res.FlowDate[col])
-        // })
-        // rowData.push(rowItemData)
-
-        // for (var row = 0; row < getFlowTotalcount(); row++) { // 总流程数量是getFlowTotalcount个
-        //   // 本行生成第一列数据（流程名称）
-        //   rowItemData = []
-        //   rowItemData.push(this.$t(getFlowNameByIndex(row)))
-
-        //   Object.keys(res.FlowDate).forEach(col => { // 代表列（e即是列数）
-        //     var rowColumeKey = row + ',' + col
-        //     if (rowColumeKey in res.FlowCount) {
-        //       rowItemData.push(res.FlowCount[rowColumeKey])
-        //     } else {
-        //       rowItemData.push('')
-        //     }
-        //   })
-
-        //   rowData.push(rowItemData)
-        // }
-
-        // 生成工程进度表列数据
-        // this.progressTableColumns.length = 0
-        // this.progressTableColumns.push({
-        //   slotName: '流程/日期',
-        //   dataIndex: 'flowAndDate',
-        //   scopedSlots: { customRender: 'flowAndDate', title: '流程/日期' },
-        //   width: '150'
-        // })
-        // Object.keys(this.progressData.FlowDate).forEach(e => {
-        //   const value = this.progressData.FlowDate[e]
-        //   this.progressTableColumns.push({
-        //     slotName: value,
-        //     dataIndex: value,
-        //     scopedSlots: { customRender: value, title: value },
-        //     width: '150'
-        //   })
-        // })
-
-        // // 生成行数据
-        // for (var row = 0; row < getFlowTotalcount(); row++) { // 总流程数量是getFlowTotalcount个
-        //   // 本行生成第一列数据（流程名称）
-        //   var rowItemData = []
-        //   rowItemData.push(this.$t(getFlowNameByIndex(row)))
-
-        //   Object.keys(this.progressData.FlowDate).forEach(col => { // 代表列（e即是列数）
-        //     rowItemData.push(col)
-
-        //     var rowColumeKey = row + ',' + col
-        //     if (rowColumeKey in this.progressData.FlowCount) {
-        //       rowItemData.push(this.progressData.FlowCount[rowColumeKey])
-        //     }
-        //   })
-
-        //   rowData.push(rowItemData)
-        // }
-
-        // this.progressData = rowData
-        // console.log(this.progressData, 88888888888888888888888888888888888888)
-        // this.visibleProgress = true
-      // })
     },
     printProgress (record) {
       projectProgressReportPdf(record).then(url => {
@@ -1137,28 +1042,38 @@ export default {
           window.URL.revokeObjectURL(ifr.src) // 释放URL 对象
         })
       })
-
-        // const content = res
-        // this.xlxsUrl = window.URL.createObjectURL(
-        //   new Blob([content], { type: 'application/vnd.ms-excel' })
-        // )
-        // window.open(this.xlxsUrl)
-        // var date = new Date().getTime()
-        // var ifr = document.createElement('iframe')
-        // ifr.style.frameborder = 'no'
-        // ifr.style.display = 'none'
-        // ifr.style.pageBreakBefore = 'always'
-        // ifr.setAttribute('id', 'printXls' + date)
-        // ifr.setAttribute('name', 'printXls' + date)
-        // ifr.src = this.xlxsUrl
-        // document.body.appendChild(ifr)
-        // // 打印
-        // var ordonnance = document.getElementById('printXls' + date).contentWindow
-        // setTimeout(() => {
-        //   ordonnance.print()
-        // }, 100)
-        // window.URL.revokeObjectURL(ifr.src) // 释放URL 对象
-      // })
+    },
+    statusReportReview (record) {
+      projectStatusReport(record).then(res => {
+        const filename = res.replace('/api/report/download/', '')
+        LuckyExcel.transformExcelToLuckyByUrl(res, filename, (exportJson) => {
+          if (exportJson.sheets === null || exportJson.sheets.length === 0) {
+            this.$message.warning('无法读取excel文件的内容，目前不支持xls文件，仅支持xlsx类型!')
+            this.$nextTick(() => {
+              window.luckysheet.create({
+                container: 'luckysheet', // 设定DOM容器的id
+                lang: 'zh', // 设定表格语言
+                showinfobar: false
+              })
+            })
+            return
+          }
+          this.visibleProgress = true
+          window.luckysheet.destroy()
+          this.$nextTick(() => {
+            window.luckysheet.create({
+              container: 'luckysheet', // luckysheet is the container id
+              lang: 'zh', // 设定表格语言
+              row: 100, // 默认500行
+              showtoolbar: false,
+              showinfobar: false,
+              data: exportJson.sheets,
+              title: exportJson.info.name
+              // userInfo: exportJson.info.name.creator,
+            })
+          })
+        })
+      })
     },
     statusReport (record) {
       projectStatusReport(record).then(res => {
@@ -1167,6 +1082,38 @@ export default {
         deleteTmpReportFile(filename)
         this.loading = false
         this.$message.info('报告生成完毕')
+      })
+    },
+    workingHoursReportReview (record) {
+      projectWorktimeReport(record).then(res => {
+        const filename = res.replace('/api/report/download/', '')
+        LuckyExcel.transformExcelToLuckyByUrl(res, filename, (exportJson) => {
+          if (exportJson.sheets === null || exportJson.sheets.length === 0) {
+            this.$message.warning('无法读取excel文件的内容，目前不支持xls文件，仅支持xlsx类型!')
+            this.$nextTick(() => {
+              window.luckysheet.create({
+                container: 'luckysheet', // 设定DOM容器的id
+                lang: 'zh', // 设定表格语言
+                showinfobar: false
+              })
+            })
+            return
+          }
+          this.visibleProgress = true
+          window.luckysheet.destroy()
+          this.$nextTick(() => {
+            window.luckysheet.create({
+              container: 'luckysheet', // luckysheet is the container id
+              lang: 'zh', // 设定表格语言
+              row: 100, // 默认500行
+              showtoolbar: false,
+              showinfobar: false,
+              data: exportJson.sheets,
+              title: exportJson.info.name
+              // userInfo: exportJson.info.name.creator,
+            })
+          })
+        })
       })
     },
     workingHoursReport (record) {
