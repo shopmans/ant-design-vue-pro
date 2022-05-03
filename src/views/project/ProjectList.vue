@@ -4,7 +4,7 @@
       <template v-if="optEngineeringStatistic">
         <div style="margin-bottom:20px;">
           列选择器：<a-select mode="tags" style="width: 90%" :default-value="columnsSelectDefault" @change="columsSelecthandleChange">
-            <a-select-option v-for="item in enStatisticColumns" :key="item.slotName">
+            <a-select-option v-for="item in enStatisticSelectColumns" :key="item.slotName">
               {{ $t(item.slotName) }}
             </a-select-option>
           </a-select>
@@ -266,6 +266,9 @@
         <span slot="action" slot-scope="text, record">
           <!-- 维修进度预览 progressReportRevice -->
           <a @click="progressReportRevice(record)">{{ $t('menu.review') }}</a>
+          <!-- <a-divider type="vertical" /> -->
+          <!-- 打印 -->
+          <!-- <a @click="printProgress(record)">{{ $t('menu.project.view.action.print') }}</a> -->
           <a-divider type="vertical" />
           <!-- 维修进度报表 -->
           <a @click="progressReport(record)">{{ $t('permissionid.export.project') }}</a>
@@ -416,12 +419,12 @@
 
 <script>
 import LuckyExcel from 'luckyexcel'
-// import axios from 'axios'
+// import axios from 'axios' projectProgressReportPdf
 import XLSX from 'xlsx'
 import moment from 'moment'
 import { saveAs } from 'file-saver'
 import { STable, Ellipsis } from '@/components'
-import { getProjectList, deleteProject, formatTotal, editProject, newProject, projectProgressReport, projectProgressReportPdf, projectStatusReport, projectWorktimeReport, projectRepairPlan, projectState, downloadReport } from '@/api/project'
+import { getProjectList, deleteProject, formatTotal, editProject, newProject, projectProgressReport, projectStatusReport, projectWorktimeReport, projectRepairPlan, projectState, downloadReport } from '@/api/project'
 import EditProject from './modules/EditProject'
 import { formatDateYMDZoneNull, getFlowNameByIndex, getFlowTotalcount } from '@/api/step'
 import { deleteTmpReportFile } from '@/api/report'
@@ -573,6 +576,65 @@ const statusMap = {
     text: 'menu.project.view.table.column.state.item3'
   }
 }
+
+const enStatisticSelectColumns = [
+  { // 工程编号
+    slotName: 'menu.project.view.query.projectSerial',
+    dataIndex: 'serial',
+    scopedSlots: { customRender: 'serial', title: 'menu.project.view.query.projectSerial' },
+    width: '10%'
+  },
+  { // 合同编号
+    slotName: 'menu.project.view.query.contractSerial',
+    dataIndex: 'contract_serial',
+    scopedSlots: { customRender: 'contract_serial', title: 'menu.project.view.query.contractSerial' },
+    width: '10%',
+    visible: false
+  },
+  { // 最终用户
+    slotName: 'menu.customer.new.finallyUser',
+    dataIndex: 'finally_user',
+    scopedSlots: { customRender: 'finally_user', title: 'menu.customer.new.finallyUser' },
+    width: '20%',
+    visible: false
+  },
+  { // 销售
+    slotName: 'menu.customer.sales',
+    dataIndex: 'sales_name',
+    scopedSlots: { customRender: 'sales_name', title: 'menu.customer.sales' },
+    width: '10%'
+  },
+  { // 维修车间
+    slotName: 'menu.project.detail.repairShop',
+    dataIndex: 'repair_plan',
+    scopedSlots: { customRender: 'repair_plan', title: 'menu.project.detail.repairShop' },
+    width: '10%'
+  },
+  { // 当前状态
+    slotName: 'menu.project.current.state',
+    dataIndex: 'state',
+    scopedSlots: { customRender: 'state', title: 'menu.project.current.state' },
+    width: '10%'
+  },
+  { // 阀门数量
+    slotName: 'menu.project.new.valveNumber',
+    dataIndex: 'number',
+    scopedSlots: { customRender: 'number', title: 'menu.project.new.valveNumber' },
+    width: '8%'
+  },
+  { // 收货日期
+    slotName: 'app.flow.repair.receipt.date',
+    dataIndex: 'receipt_date',
+    scopedSlots: { customRender: 'receipt_date', title: 'app.flow.repair.receipt.date' },
+    width: '10%'
+  },
+  { // 完工日期
+    slotName: 'menu.project.detail.closeDate',
+    dataIndex: 'close_date',
+    scopedSlots: { customRender: 'close_date', title: 'menu.project.detail.closeDate' },
+    width: '10%'
+  }
+]
 
 const enStatisticColumns = [
   { // 工程编号
@@ -809,6 +871,7 @@ export default {
       },
       columns: columns,
       enStatisticColumns: enStatisticColumns,
+      enStatisticSelectColumns: enStatisticSelectColumns,
       deleteColumns: deleteColumns,
       statusMap: statusMap,
       optDelete: false,
@@ -1016,32 +1079,51 @@ export default {
       })
     },
     printProgress (record) {
-      projectProgressReportPdf(record).then(url => {
-        // /api/report/download/2022030102-天津钢铁-PSR_2022_03_21_21_47_35.xlsx
+      // var iframe = document.createElement('iframe')
+      // iframe.style.border = '0px'
+      // iframe.style.position = 'absolute'
+      // iframe.style.width = '0px'
+      // iframe.style.height = '0px'
+      // iframe.style.right = '0px'
+      // iframe.style.top = '0px'
+      // iframe.setAttribute('src', '/api/report/download/2022032801-云南祥丰石化有限公司-PPR_2022_04_20_22_24_40.pdf')
+      // iframe.onload = () => {
+      //   debugger
+      //     iframe.contentWindow.print()
+      //     // setTimeout(() => {
+      //     //     document.body.removeChild(iframe);
+      //     // });
+      // }
+      // document.body.appendChild(iframe)
 
-        downloadReport(url.replace('/api', '')).then(res => {
-          const content = res
-          this.xlxsUrl = window.URL.createObjectURL(
-            new Blob([content], { type: 'application/vnd.ms-excel' })
-          )
-          window.open(this.xlxsUrl)
-          var date = new Date().getTime()
-          var ifr = document.createElement('iframe')
-          ifr.style.frameborder = 'no'
-          ifr.style.display = 'none'
-          ifr.style.pageBreakBefore = 'always'
-          ifr.setAttribute('id', 'printXls' + date)
-          ifr.setAttribute('name', 'printXls' + date)
-          ifr.src = this.xlxsUrl
-          document.body.appendChild(ifr)
-          // 打印
-          var ordonnance = document.getElementById('printXls' + date).contentWindow
-          setTimeout(() => {
-            ordonnance.print()
-          }, 100)
-          window.URL.revokeObjectURL(ifr.src) // 释放URL 对象
-        })
+      // downloadReport(url.replace('/api', '')).then(res => {
+      downloadReport('/report/download/2022032801-云南祥丰石化有限公司-PPR_2022_04_20_22_24_40.pdf').then(res => {
+        const content = res
+        this.xlxsUrl = window.URL.createObjectURL(
+          new Blob([content], { type: 'application/pdf' })
+        )
+        window.open(this.xlxsUrl)
+
+        // var date = new Date().getTime()
+        // var ifr = document.createElement('iframe')
+        // ifr.style.frameborder = 'no'
+        // ifr.style.display = 'none'
+        // ifr.style.pageBreakBefore = 'always'
+        // ifr.setAttribute('id', 'printXls' + date)
+        // ifr.setAttribute('name', 'printXls' + date)
+        // ifr.src = this.xlxsUrl
+
+        // document.body.appendChild(ifr)
+        // 打印
+        // var ordonnance = document.getElementById('printXls' + date).contentWindow
+        // setTimeout(() => {
+        //  ordonnance.print()
+        // }, 100)
+        // window.URL.revokeObjectURL(ifr.src) // 释放URL 对象
       })
+      // projectProgressReportPdf(record).then(url => {
+      //   // /api/report/download/2022030102-天津钢铁-PSR_2022_03_21_21_47_35.xlsx
+      // })
     },
     statusReportReview (record) {
       projectStatusReport(record).then(res => {
