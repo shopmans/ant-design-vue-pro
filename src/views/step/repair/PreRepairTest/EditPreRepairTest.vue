@@ -640,7 +640,7 @@
         this.checkDiskableAll()
       },
       actionNotApplicableChange (e) {
-        this.water_not_applicable = e.target.checked
+        this.action_not_applicable = e.target.checked
         this.disableAll_1 = e.target.checked
         if (e.target.checked) {
           this.form.setFieldsValue(pick({ action_test_not_applicable: '1' }, ['action_test_not_applicable']))
