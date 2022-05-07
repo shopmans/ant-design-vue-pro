@@ -11,7 +11,8 @@ const projectApi = {
   projectProgressReportPdf: '/project-progress-pdfreport',
   projectProgressReportReview: '/project-progress-data',
   projectStatusReport: '/project-status-report',
-  projectWorktimeReport: '/project-worktime-report'
+  projectWorktimeReport: '/project-worktime-report',
+  exportProjectStatistic: '/export-project-list'
 }
 
 export function getProjectList (parameter) {
@@ -139,6 +140,14 @@ export function downloadReport (parameter) {
 export function projectProgressReportPdf (parameter) {
   return request({
     url: projectApi.projectProgressReportPdf,
+    method: 'post',
+    data: parameter
+  })
+}
+
+export function exportProjectStatistic (parameter) {
+  return request({
+    url: projectApi.exportProjectStatistic,
     method: 'post',
     data: parameter
   })

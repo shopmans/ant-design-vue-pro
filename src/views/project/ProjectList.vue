@@ -349,6 +349,9 @@
       </s-table>
 
       <!----------------------------------------------------- 工程统计报表 -->
+      <div v-if="optEngineeringStatistic" class="table-operator">
+        <a-button type="primary" icon="plus" @click="handleExportProjectStatistic">{{ $t('permissionid.export.project') }}</a-button>
+      </div>
       <s-table
         ref="table"
         size="default"
@@ -424,7 +427,8 @@ import XLSX from 'xlsx'
 import moment from 'moment'
 import { saveAs } from 'file-saver'
 import { STable, Ellipsis } from '@/components'
-import { getProjectList, deleteProject, formatTotal, editProject, newProject, projectProgressReport, projectStatusReport, projectWorktimeReport, projectRepairPlan, projectState, downloadReport } from '@/api/project'
+import { getProjectList, deleteProject, formatTotal, editProject, newProject, projectProgressReport, projectStatusReport, projectWorktimeReport,
+projectRepairPlan, projectState, downloadReport, exportProjectStatistic } from '@/api/project'
 import EditProject from './modules/EditProject'
 import { formatDateYMDZoneNull, getFlowNameByIndex, getFlowTotalcount } from '@/api/step'
 import { deleteTmpReportFile } from '@/api/report'
@@ -759,6 +763,7 @@ export default {
       if (e.dataIndex !== 'action') {
         this.columnsSelectDefault.push(e.slotName)
         this.enStatisticColumns.push(e)
+        this.currentSelectColumns.push(e.dataIndex)
       }
     })
 
@@ -794,39 +799,8 @@ export default {
       progressData: [],
       // excel数据
       excelData: null,
-      // 预览工程进度表行数据
-      // progressTableRow: parameter => {
-        // var rowData = []
-
-        // // 生成行数据
-        // for (var row = 0; row < getFlowTotalcount(); row++) { // 总流程数量是getFlowTotalcount个
-        //   // 本行生成第一列数据（流程名称）
-        //   var rowItemData = {}
-        //   rowItemData.id = row
-        //   rowItemData.flowAndDate = this.$t(getFlowNameByIndex(row))
-
-        //   Object.keys(this.progressData.FlowDate).forEach(col => { // 代表列（e即是列数）
-        //     var rowColumeKey = row + ',' + col
-        //     if (rowColumeKey in this.progressData.FlowCount) {
-        //       rowItemData[this.progressData.FlowDate[col]] = this.progressData.FlowCount[rowColumeKey]
-        //     }
-        //   })
-
-        //   rowData.push(rowItemData)
-        // }
-
-        // var ret = {}
-        // ret.data = rowData
-        // ret.pageNo = 1
-        // ret.pageSize = 9999
-        // ret.totalCount = rowData.length
-        // ret.totalPage = 1
-
-        // console.log(ret)
-        // return ret
-        // return null
-      // },
-      // 加载数据方法 必须为 Promise 对象
+      // 当前选中列
+      currentSelectColumns: [],
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
 
@@ -925,6 +899,7 @@ export default {
     getFlowNameByIndex,
     getFlowTotalcount,
     downloadReport,
+    exportProjectStatistic,
     handleAdd () {
       this.mdl = null
       this.$refs.createModal.createProjectSerial()
@@ -943,12 +918,14 @@ export default {
     },
     columsSelecthandleChange (val) {
       const columsList = val
+      this.currentSelectColumns.length = 0
       if (columsList.length <= 0) { return }
       this.enStatisticColumns.length = 0
       columsList.forEach(newCol => {
         this.columns.forEach(orgCol => {
           if (newCol === orgCol.slotName) {
             this.enStatisticColumns.push(orgCol)
+            this.currentSelectColumns.push(orgCol.dataIndex)
           }
         })
       })
@@ -1205,6 +1182,18 @@ export default {
         deleteTmpReportFile(filename)
         this.loading = false
         this.$message.info('报告生成完毕')
+      })
+    },
+    handleExportProjectStatistic () {
+      var requestParameters = Object.assign({}, this.queryParam)
+      requestParameters.queryFieldList = this.currentSelectColumns
+      console.log(requestParameters)
+      exportProjectStatistic(requestParameters).then(res => {
+        const filename = res.replace('/api/report/download/', '')
+        saveAs(res, filename)
+        deleteTmpReportFile(filename)
+        this.loading = false
+        this.$message.info('导出工程统计完毕')
       })
     }
   }
