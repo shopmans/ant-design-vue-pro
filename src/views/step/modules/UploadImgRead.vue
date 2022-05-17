@@ -43,6 +43,14 @@ export default {
       this.previewVisible = true
       this.images.length = 0
       this.images.push(this.previewImage)
+    },
+    showFlagImage (flag) {
+      this.images.length = 0
+      for (var i = 0; i < this.imgFileList.length; i++) {
+        if (this.imgFileList[i].url && this.imgFileList[i].flag === flag) {
+          this.images.push(this.imgFileList[i].url)
+        }
+      }
     }
   },
   watch: {

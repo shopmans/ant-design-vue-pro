@@ -8,7 +8,7 @@
       </a-descriptions>
     </a-card>
     <br>
-    <a-tabs default-active-key="1">
+    <a-tabs default-active-key="1" @change="handleTabChange">
       <!-- 阀维修内容 -->
       <a-tab-pane v-if="ValueRepairData && ValueRepairData.length > 0" key="1" tab="阀维修内容" :forceRender="true">
         <a-card>
@@ -247,6 +247,9 @@ export default {
       this.ActuatorRepairData = magrinValveRepairData(this.ActuatorRepairData)
       this.AccessariesRepairData = magrinValveRepairData(this.AccessariesRepairData)
       this.$refs.uploadImgRead.imgFileList = this.repairData.uploads
+      this.$nextTick(() => {
+        this.$refs.uploadImgRead.showFlagImage('1')
+      })
     },
     data () {
       return {
@@ -281,6 +284,10 @@ export default {
           key++
         })
         return this.purchasedParts
+      },
+      handleTabChange (activeKey) {
+        // 上传图片的flag正好等于tab-panel的key
+        this.$refs.uploadImgRead.showFlagImage(activeKey)
       }
     }
 }

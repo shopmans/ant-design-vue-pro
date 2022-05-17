@@ -40,7 +40,7 @@
                   ]">
                   <a-select v-decorator="[ 'adjust_offon_air_pressed_set_value_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                     <a-select-option value="1">
-                      PSI
+                      Psig
                     </a-select-option>
                     <a-select-option value="2">
                       BAR
@@ -148,7 +148,7 @@
                   ]">
                   <a-select v-decorator="[ 'adjust_test_retaining_valve_set_point_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                     <a-select-option value="1">
-                      PSI
+                      Psig
                     </a-select-option>
                     <a-select-option value="2">
                       BAR
@@ -404,7 +404,7 @@
                     ]">
                     <a-select :disabled="not_applicable" v-decorator="[ 'adjust_control_air_pressed_set_value_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                       <a-select-option value="1">
-                        PSI
+                        Psig
                       </a-select-option>
                       <a-select-option value="2">
                         BAR
@@ -612,7 +612,7 @@
                     ]">
                     <a-select :disabled="not_applicable" v-decorator="[ 'adjust_lockup_time_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                       <a-select-option value="1">
-                        PSI
+                        Psig
                       </a-select-option>
                       <a-select-option value="2">
                         BAR

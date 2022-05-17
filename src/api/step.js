@@ -839,7 +839,7 @@ export function getActuFailureUnit (val) {
 export function getValveHydrostaticTestValueUnit (val) {
   switch (val) {
     case '1':
-      return 'PSI'
+      return 'Psig'
     case '2':
       return 'BAR'
     case '3':
@@ -890,8 +890,8 @@ export function getUnit2ActuSpringSetPressureValue (val) {
     return
   }
   const tmpValue = val.toUpperCase()
-  if (tmpValue.indexOf('PSIG') >= 0) {
-    return [tmpValue.replace('PSIG', '').trim(), '1']
+  if (tmpValue.indexOf('Psig') >= 0) {
+    return [tmpValue.replace('Psig', '').trim(), '1']
   }
 
   return ''
@@ -1523,10 +1523,10 @@ export function getPressureGaugeRangeUnit (val) {
   switch (val) {
     case 1:
     case '1':
-      return '60 PSI'
+      return '60 Psig'
     case 2:
     case '2':
-      return '160 PSI'
+      return '160 Psig'
     default:
       return ''
   }

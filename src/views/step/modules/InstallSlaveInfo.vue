@@ -8,58 +8,62 @@
       </a-descriptions>
     </a-card>
     <br>
-    <a-card title="安装附件" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <a-descriptions title="">
-        <a-descriptions-item label="故障位置">
-          {{ getValvePushDoneUnit(actuData.actu_failure) }}
-        </a-descriptions-item>
-      </a-descriptions>
-      <br>
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-descriptions title="安装附件日期">
-            <a-descriptions-item>
-              {{ installSlaveData.install_slave_date | moment }}
+    <a-tabs default-active-key="1" @change="handleTabChange">
+      <!-- 安装附件 -->
+      <a-tab-pane key="1" tab="安装附件" >
+        <a-card :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-descriptions title="">
+            <a-descriptions-item label="故障位置">
+              {{ getValvePushDoneUnit(actuData.actu_failure) }}
             </a-descriptions-item>
           </a-descriptions>
-        </a-col>
-        <a-col :span="8">
-          <a-descriptions title="工时(min)">
-            <a-descriptions-item>
-              {{ installSlaveData.install_slave_total_minute }}
+          <br>
+          <a-row :gutter="16">
+            <a-col :span="8">
+              <a-descriptions title="安装附件日期">
+                <a-descriptions-item>
+                  {{ installSlaveData.install_slave_date | moment }}
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+            <a-col :span="8">
+              <a-descriptions title="工时(min)">
+                <a-descriptions-item>
+                  {{ installSlaveData.install_slave_total_minute }}
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+          </a-row>
+        </a-card>
+      </a-tab-pane>
+      <!-- 配制气源管 -->
+      <a-tab-pane key="2" tab="配制气源管" >
+        <a-card :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-descriptions title="">
+            <a-descriptions-item label="故障位置">
+              {{ getValvePushDoneUnit(actuData.actu_failure) }}
             </a-descriptions-item>
           </a-descriptions>
-        </a-col>
-      </a-row>
-    </a-card>
-
-    <br>
-
-    <a-card title="配制气源管" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <a-descriptions title="">
-        <a-descriptions-item label="故障位置">
-          {{ getValvePushDoneUnit(actuData.actu_failure) }}
-        </a-descriptions-item>
-      </a-descriptions>
-      <br>
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-descriptions title="安装气源管日期">
-            <a-descriptions-item>
-              {{ installSlaveData.install_source_date | moment }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :span="8">
-          <a-descriptions title="工时(min)">
-            <a-descriptions-item>
-              {{ installSlaveData.install_source_total_minute }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-    </a-card>
-
+          <br>
+          <a-row :gutter="16">
+            <a-col :span="8">
+              <a-descriptions title="安装气源管日期">
+                <a-descriptions-item>
+                  {{ installSlaveData.install_source_date | moment }}
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+            <a-col :span="8">
+              <a-descriptions title="工时(min)">
+                <a-descriptions-item>
+                  {{ installSlaveData.install_source_total_minute }}
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+          </a-row>
+        </a-card>
+      </a-tab-pane>
+    </a-tabs>
     <br>
 
     <a-card title="适用" :headStyle="{fontWeight:'bold'}">
@@ -116,10 +120,18 @@ export default {
         })
       }
     })
+
+    this.$nextTick(() => {
+      this.$refs.uploadImgRead.showFlagImage('1')
+    })
   },
   methods: {
     getValveSizeUnitText,
-    getValvePushDoneUnit
+    getValvePushDoneUnit,
+    handleTabChange (activeKey) {
+      // 上传图片的flag正好等于tab-panel的key
+      this.$refs.uploadImgRead.showFlagImage(activeKey)
+    }
   },
   data () {
       return {

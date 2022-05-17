@@ -207,7 +207,7 @@
                     ]">
                     <a-select :disabled="disableAll_4 || isWaterDone" v-decorator="[ 'leak_water_test_real_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                       <a-select-option value="1">
-                        PSI
+                        Psig
                       </a-select-option>
                       <a-select-option value="2">
                         BAR

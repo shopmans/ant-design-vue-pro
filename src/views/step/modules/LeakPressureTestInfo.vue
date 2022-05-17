@@ -8,100 +8,86 @@
       </a-descriptions>
     </a-card>
     <br>
-    <a-card title="测漏试压" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <a-row :gutter="16">
-        <a-col :span="9">
-          <a-descriptions title="阀痤测试" :column="1">
-            <a-descriptions-item label="泄漏测试标准">{{ baseValveData.valve_seat_leak_test }}</a-descriptions-item>
-            <a-descriptions-item label="泄漏测试介质">{{ getValveTestMediumUnit(baseValveData.valve_leak_test_medium) }}</a-descriptions-item>
-            <a-descriptions-item label="泄漏标准测试压力">{{ getValveHydrostaticTestValueUnitText(baseValveData.valve_leak_test_std_pressed, baseValveData.valve_leak_test_std_pressed_unit) }}</a-descriptions-item>
-            <a-descriptions-item label="泄漏等级">
-              {{ getValveLeakLevel(baseValveData.valve_leak_level) }}
-            </a-descriptions-item>
-            <a-descriptions-item label="泄漏测试标准值">
-              {{ baseValveData.valve_leak_test_value ? baseValveData.valve_leak_test_value + " " + getValveLeakTestValueUnit(baseValveData.valve_leak_test_value_unit) : "" }}
-            </a-descriptions-item>
-            <a-descriptions-item label="泄漏测试时间">
-              {{ baseValveData.valve_leak_test_time ? baseValveData.valve_leak_test_time + " " + getValveHydrostaticTestTimeUnit(baseValveData.valve_leak_test_time_unit) : "" }}
-            </a-descriptions-item>
-            <a-descriptions-item label="泄漏实际测试压力">
-              {{ getValveHydrostaticTestValueUnitText(leakPressureData.leak_test_real_test_pressed, leakPressureData.leak_test_real_test_pressed_unit) }}
-            </a-descriptions-item>
-            <a-descriptions-item label="实际测试时间(分钟)">
-              {{ leakPressureData.leak_pressure_test_real_time }}
-            </a-descriptions-item>
-            <a-descriptions-item label="泄漏测试实际值">
-              {{ getValveSeatLeakTestUnitText(leakPressureData.leak_test_real_valve, leakPressureData.leak_test_real_valve_unit) }}
-            </a-descriptions-item>
-            <a-descriptions-item label="实际测试介质">
-              {{ getValveTestMediumUnit(leakPressureData.leak_test_real_test_medium) }}
-            </a-descriptions-item>
-          </a-descriptions>
-          备注
-          <a-textarea :rows="6" :value="leakPressureData.leak_test_memo" :disabled="true"></a-textarea>
-        </a-col>
-        <a-col :span="9">
-          <a-descriptions title="水压测试" :column="1">
-            <a-descriptions-item label="水压测试标准">{{ baseValveData.valve_test_std }}</a-descriptions-item>
-            <a-descriptions-item label="水压测试介质">
-              {{ getValveTestMediumUnit(baseValveData.valve_test_medium) }}
-            </a-descriptions-item>
-            <a-descriptions-item label="水压测试标准值">
-              {{ getValveHydrostaticTestValueUnitText(baseValveData.valve_hydrostatic_test_value, baseValveData.valve_hydrostatic_test_value_unit) }}
-            </a-descriptions-item>
-            <a-descriptions-item label="水压压力等级">
-              {{ baseValveData.valve_pressure_level }}
-            </a-descriptions-item>
-            <a-descriptions-item label="水压测试时间">
-              {{ baseValveData.valve_hydrostatic_test_time ? baseValveData.valve_hydrostatic_test_time + " " + getValveHydrostaticTestTimeUnit(baseValveData.valve_hydrostatic_test_time_unit) : "" }}
-            </a-descriptions-item>
-            <a-descriptions-item label="水压实际测试压力">
-              {{ getValveHydrostaticTestValueUnitText(leakPressureData.leak_water_test_real_pressed, leakPressureData.leak_water_test_real_pressed_unit) }}
-            </a-descriptions-item>
-            <a-descriptions-item label="实际测试时间(分钟)">
-              {{ leakPressureData.leak_pressure_water_test_real_time }}
-            </a-descriptions-item>
-            <a-descriptions-item label="实际测试介质">
-              {{ getValveTestMediumUnit(leakPressureData.leak_pressure_water_real_test_medium) }}
-            </a-descriptions-item>
-            <a-descriptions-item label="">
-              {{ }}
-            </a-descriptions-item>
-            <a-descriptions-item label="">
-              {{ }}
-            </a-descriptions-item>
-          </a-descriptions>
-          备注
-          <a-textarea :rows="6" :value="leakPressureData.leak_pressure_water_test_memo" :disabled="true"></a-textarea>
-        </a-col>
-      </a-row>
-      <br>
-      <a-row :gutter="16">
-        <a-descriptions title="结论">
-          <a-descriptions-item>
-            <template v-if="leakPressureData.leak_pressure_test_content && leakPressureData.leak_pressure_test_content === 1">
-              <a-badge>合格</a-badge>
-            </template>
-            <template v-else>
-              <a-badge>不合格</a-badge>
-            </template>
-          </a-descriptions-item>
-        </a-descriptions>
-        <!-- <a-col :span="18">
-          结论
-          <a-textarea :rows="6" :value="leakPressureData.leak_pressure_test_content" :disabled="true"></a-textarea>
-        </a-col> -->
-      </a-row>
-      <br>
-      <a-row :gutter="16">
-        <a-descriptions title="工时(min)">
-          <a-descriptions-item>
-            {{ leakPressureData.leak_pressure_test_total_minute }}
-          </a-descriptions-item>
-        </a-descriptions>
-      </a-row>
-    </a-card>
-
+    <a-tabs default-active-key="1" @change="handleTabChange">
+      <!-- 阀痤测试 -->
+      <a-tab-pane key="1" tab="阀痤测试" >
+        <a-card :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-row :gutter="16">
+            <a-col :span="9">
+              <a-descriptions :column="1">
+                <a-descriptions-item label="泄漏测试标准">{{ baseValveData.valve_seat_leak_test }}</a-descriptions-item>
+                <a-descriptions-item label="泄漏测试介质">{{ getValveTestMediumUnit(baseValveData.valve_leak_test_medium) }}</a-descriptions-item>
+                <a-descriptions-item label="泄漏标准测试压力">{{ getValveHydrostaticTestValueUnitText(baseValveData.valve_leak_test_std_pressed, baseValveData.valve_leak_test_std_pressed_unit) }}</a-descriptions-item>
+                <a-descriptions-item label="泄漏等级">
+                  {{ getValveLeakLevel(baseValveData.valve_leak_level) }}
+                </a-descriptions-item>
+                <a-descriptions-item label="泄漏测试标准值">
+                  {{ baseValveData.valve_leak_test_value ? baseValveData.valve_leak_test_value + " " + getValveLeakTestValueUnit(baseValveData.valve_leak_test_value_unit) : "" }}
+                </a-descriptions-item>
+                <a-descriptions-item label="泄漏测试时间">
+                  {{ baseValveData.valve_leak_test_time ? baseValveData.valve_leak_test_time + " " + getValveHydrostaticTestTimeUnit(baseValveData.valve_leak_test_time_unit) : "" }}
+                </a-descriptions-item>
+                <a-descriptions-item label="泄漏实际测试压力">
+                  {{ getValveHydrostaticTestValueUnitText(leakPressureData.leak_test_real_test_pressed, leakPressureData.leak_test_real_test_pressed_unit) }}
+                </a-descriptions-item>
+                <a-descriptions-item label="实际测试时间(分钟)">
+                  {{ leakPressureData.leak_pressure_test_real_time }}
+                </a-descriptions-item>
+                <a-descriptions-item label="泄漏测试实际值">
+                  {{ getValveSeatLeakTestUnitText(leakPressureData.leak_test_real_valve, leakPressureData.leak_test_real_valve_unit) }}
+                </a-descriptions-item>
+                <a-descriptions-item label="实际测试介质">
+                  {{ getValveTestMediumUnit(leakPressureData.leak_test_real_test_medium) }}
+                </a-descriptions-item>
+              </a-descriptions>
+              备注
+              <a-textarea :rows="6" :value="leakPressureData.leak_test_memo" :disabled="true"></a-textarea>
+            </a-col>
+          </a-row>
+        </a-card>
+      </a-tab-pane>
+      <!-- 水压测试 -->
+      <a-tab-pane key="2" tab="水压测试" >
+        <a-card :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-row :gutter="16">
+            <a-col :span="9">
+              <a-descriptions :column="1">
+                <a-descriptions-item label="水压测试标准">{{ baseValveData.valve_test_std }}</a-descriptions-item>
+                <a-descriptions-item label="水压测试介质">
+                  {{ getValveTestMediumUnit(baseValveData.valve_test_medium) }}
+                </a-descriptions-item>
+                <a-descriptions-item label="水压测试标准值">
+                  {{ getValveHydrostaticTestValueUnitText(baseValveData.valve_hydrostatic_test_value, baseValveData.valve_hydrostatic_test_value_unit) }}
+                </a-descriptions-item>
+                <a-descriptions-item label="水压压力等级">
+                  {{ baseValveData.valve_pressure_level }}
+                </a-descriptions-item>
+                <a-descriptions-item label="水压测试时间">
+                  {{ baseValveData.valve_hydrostatic_test_time ? baseValveData.valve_hydrostatic_test_time + " " + getValveHydrostaticTestTimeUnit(baseValveData.valve_hydrostatic_test_time_unit) : "" }}
+                </a-descriptions-item>
+                <a-descriptions-item label="水压实际测试压力">
+                  {{ getValveHydrostaticTestValueUnitText(leakPressureData.leak_water_test_real_pressed, leakPressureData.leak_water_test_real_pressed_unit) }}
+                </a-descriptions-item>
+                <a-descriptions-item label="实际测试时间(分钟)">
+                  {{ leakPressureData.leak_pressure_water_test_real_time }}
+                </a-descriptions-item>
+                <a-descriptions-item label="实际测试介质">
+                  {{ getValveTestMediumUnit(leakPressureData.leak_pressure_water_real_test_medium) }}
+                </a-descriptions-item>
+                <a-descriptions-item label="">
+                  {{ }}
+                </a-descriptions-item>
+                <a-descriptions-item label="">
+                  {{ }}
+                </a-descriptions-item>
+              </a-descriptions>
+              备注
+              <a-textarea :rows="6" :value="leakPressureData.leak_pressure_water_test_memo" :disabled="true"></a-textarea>
+            </a-col>
+          </a-row>
+        </a-card>
+      </a-tab-pane>
+    </a-tabs>
     <br>
     <a-card title="适用" :headStyle="{fontWeight:'bold'}">
       <a-descriptions :column="4">
@@ -144,14 +130,18 @@ export default {
     this.stepDoneDate = formatDateYMD(this.$store.state.editStepData.stepEditData.step_done_date)
 
     queryStepDataOnlyread({ id: this.leakPressureData.flow_id, current_step: '(start)' }).then(res => {
-        res.result.step_data.forEach(stepItem => {
-          switch (stepItem.DataNum) {
-            case 2: // 阀
-              this.baseValveData = JSON.parse(stepItem.JSON)
-              break
-          }
-        })
+      res.result.step_data.forEach(stepItem => {
+        switch (stepItem.DataNum) {
+          case 2: // 阀
+            this.baseValveData = JSON.parse(stepItem.JSON)
+            break
+        }
       })
+    })
+
+    this.$nextTick(() => {
+      this.$refs.uploadImgRead.showFlagImage('1')
+    })
   },
   methods: {
     getValveLeakLevel,
@@ -163,7 +153,11 @@ export default {
     getValveSeatLeakTestUnitText,
     getValveTestStdUnit,
     getYesNoSwitchUnit,
-    getValveSeatLeakTestUnit
+    getValveSeatLeakTestUnit,
+    handleTabChange (activeKey) {
+      // 上传图片的flag正好等于tab-panel的key
+      this.$refs.uploadImgRead.showFlagImage(activeKey)
+    }
   },
   data () {
       return {

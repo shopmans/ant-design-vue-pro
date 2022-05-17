@@ -8,103 +8,108 @@
       </a-descriptions>
     </a-card>
     <br>
-    <a-card v-if="valveAB" title="阀门组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-descriptions title="阀盖">
-            <a-descriptions-item>
-              阀盖螺栓扭矩标准值:  {{ getValveCoverBoltTorqueUnitText(baseData.valve_cover_bolt_torque, baseData.valve_cover_bolt_torque_unit) }}<br>
-              阀盖螺栓材质:  {{ getValveCoverBoltMaterialUnitNA(baseData.valve_cover_bolt_material) }}<br>
-              阀盖螺栓尺寸:  {{ getValveSizeUnitTextNA(baseData.valve_cover_bolt_size, baseData.valve_cover_bolt_size_unit) }}<br>
-              阀盖螺栓工具:  {{ getValveSizeUnitTextNA(baseData.valve_cover_bolt_tool, baseData.valve_cover_bolt_tool_unit) }}<br>
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :span="8">
-          <a-descriptions title="阀座">
-            <a-descriptions-item>
-              阀座螺栓扭矩标准值: {{ getValveSeatBoltTorque() }}<br>
-              阀座螺栓工具: {{ getValveSeatBoltTool() }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-      <a-divider style="margin-bottom: 32px"/>
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-descriptions>
-            <a-descriptions-item>
-              工时(min): {{ assembleData.assemble_valve_total_minute }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-      <a-row :gutter="16">
-        <a-col :span="23">
-          <a-form-item label="组装内容">
-            <a-textarea disabled rows="6" v-model="assembleValveContent" />
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-card>
-
-    <br><br>
-
-    <!-- 执行机构组装 -->
-    <a-card v-if="actuatorAB" title="执行机构组装" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-descriptions title="阀盖">
-            <a-descriptions-item>
-              阀盖螺栓扭矩标准值:  {{ getValveCoverBoltTorqueUnitText(actuatorData.actu_cover_bolt_torque, actuatorData.actu_cover_bolt_torque_unit) }}<br>
-              阀盖螺栓材质:  {{ getValveCoverBoltMaterialUnitNA(actuatorData.actu_cover_bolt_material) }}<br>
-              阀盖螺栓尺寸:  {{ getValveSizeUnitNA(actuatorData.actu_cover_bolt_size, actuatorData.actu_cover_bolt_size_unit) }}<br>
-              阀盖螺栓工具:  {{ getActuCoverBoltToolItemUnitTextNA(actuatorData.actu_cover_bolt_tool, actuatorData.actu_cover_bolt_tool_unit, actuatorData.actu_cover_bolt_tool_item) }}<br>
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-      <a-divider style="margin-bottom: 32px"/>
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-descriptions>
-            <a-descriptions-item>
-              气源压力测试: {{ getValveHydrostaticTestValueUnitText(assembleData.valve_assemble_air_pressed, assembleData.valve_assemble_air_pressed_unit) }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :span="8">
-          <a-descriptions>
-            <a-descriptions-item>
-              气密性测试是否合格: {{ getYesNoSwitchUnit(assembleData.valve_assemble_air_tightness_is_success) }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :span="8">
-          <a-descriptions>
-            <a-descriptions-item>
-              Bench Set测试是否合格: {{ getYesNoNAUnit(assembleData.valve_assemble_benchset_is_success) }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-      <a-row :gutter="16">
-        <a-col :span="8">
-          <a-descriptions>
-            <a-descriptions-item>
-              工时(min): {{ assembleData.assemble_actuator_total_minute }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-      <a-row :gutter="16">
-        <a-col :span="23">
-          <a-form-item label="组装内容">
-            <a-textarea disabled rows="6" v-model="assembleActuatorContent" />
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-card>
+    <a-tabs default-active-key="1" @change="handleTabChange">
+      <!-- 阀门组装 -->
+      <a-tab-pane key="1" tab="阀门组装" v-if="valveAB">
+        <a-card :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-row :gutter="16">
+            <a-col :span="8">
+              <a-descriptions title="阀盖">
+                <a-descriptions-item>
+                  阀盖螺栓扭矩标准值:  {{ getValveCoverBoltTorqueUnitText(baseData.valve_cover_bolt_torque, baseData.valve_cover_bolt_torque_unit) }}<br>
+                  阀盖螺栓材质:  {{ getValveCoverBoltMaterialUnitNA(baseData.valve_cover_bolt_material) }}<br>
+                  阀盖螺栓尺寸:  {{ getValveSizeUnitTextNA(baseData.valve_cover_bolt_size, baseData.valve_cover_bolt_size_unit) }}<br>
+                  阀盖螺栓工具:  {{ getValveSizeUnitTextNA(baseData.valve_cover_bolt_tool, baseData.valve_cover_bolt_tool_unit) }}<br>
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+            <a-col :span="8">
+              <a-descriptions title="阀座">
+                <a-descriptions-item>
+                  阀座螺栓扭矩标准值: {{ getValveSeatBoltTorque() }}<br>
+                  阀座螺栓工具: {{ getValveSeatBoltTool() }}
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+          </a-row>
+          <a-divider style="margin-bottom: 32px"/>
+          <a-row :gutter="16">
+            <a-col :span="8">
+              <a-descriptions>
+                <a-descriptions-item>
+                  工时(min): {{ assembleData.assemble_valve_total_minute }}
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+          </a-row>
+          <a-row :gutter="16">
+            <a-col :span="23">
+              <a-form-item label="组装内容">
+                <a-textarea disabled rows="6" v-model="assembleValveContent" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </a-card>
+      </a-tab-pane>
+      <!-- 执行机构组装 -->
+      <a-tab-pane key="2" tab="执行机构组装" v-if="actuatorAB">
+        <a-card :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+          <a-row :gutter="16">
+            <a-col :span="8">
+              <a-descriptions title="阀盖">
+                <a-descriptions-item>
+                  阀盖螺栓扭矩标准值:  {{ getValveCoverBoltTorqueUnitText(actuatorData.actu_cover_bolt_torque, actuatorData.actu_cover_bolt_torque_unit) }}<br>
+                  阀盖螺栓材质:  {{ getValveCoverBoltMaterialUnitNA(actuatorData.actu_cover_bolt_material) }}<br>
+                  阀盖螺栓尺寸:  {{ getValveSizeUnitNA(actuatorData.actu_cover_bolt_size, actuatorData.actu_cover_bolt_size_unit) }}<br>
+                  阀盖螺栓工具:  {{ getActuCoverBoltToolItemUnitTextNA(actuatorData.actu_cover_bolt_tool, actuatorData.actu_cover_bolt_tool_unit, actuatorData.actu_cover_bolt_tool_item) }}<br>
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+          </a-row>
+          <a-divider style="margin-bottom: 32px"/>
+          <a-row :gutter="16">
+            <a-col :span="8">
+              <a-descriptions>
+                <a-descriptions-item>
+                  气源压力测试: {{ getValveHydrostaticTestValueUnitText(assembleData.valve_assemble_air_pressed, assembleData.valve_assemble_air_pressed_unit) }}
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+            <a-col :span="8">
+              <a-descriptions>
+                <a-descriptions-item>
+                  气密性测试是否合格: {{ getYesNoSwitchUnit(assembleData.valve_assemble_air_tightness_is_success) }}
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+            <a-col :span="8">
+              <a-descriptions>
+                <a-descriptions-item>
+                  Bench Set测试是否合格: {{ getYesNoNAUnit(assembleData.valve_assemble_benchset_is_success) }}
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+          </a-row>
+          <a-row :gutter="16">
+            <a-col :span="8">
+              <a-descriptions>
+                <a-descriptions-item>
+                  工时(min): {{ assembleData.assemble_actuator_total_minute }}
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-col>
+          </a-row>
+          <a-row :gutter="16">
+            <a-col :span="23">
+              <a-form-item label="组装内容">
+                <a-textarea disabled rows="6" v-model="assembleActuatorContent" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </a-card>
+      </a-tab-pane>
+    </a-tabs>
+    <br>
     <a-card title="适用" :headStyle="{fontWeight:'bold'}">
       <a-descriptions :column="4">
         <a-descriptions-item label="不适用" v-if="assembleData.not_applicable">
@@ -182,6 +187,9 @@ export default {
         })
       })
     })
+    this.$nextTick(() => {
+      this.$refs.uploadImgRead.showFlagImage('1')
+    })
   },
   data () {
     return {
@@ -247,6 +255,10 @@ export default {
         }
 
         return 'N/A'
+      },
+      handleTabChange (activeKey) {
+        // 上传图片的flag正好等于tab-panel的key
+        this.$refs.uploadImgRead.showFlagImage(activeKey)
       }
   }
 }

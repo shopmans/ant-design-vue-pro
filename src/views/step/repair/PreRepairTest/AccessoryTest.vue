@@ -132,7 +132,7 @@
                 ]">
                 <a-select :disabled="disableAll || isDone" v-decorator="[ 'accessory_test_retaining_valve_set_point_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                   <a-select-option value="1">
-                    PSI
+                    Psig
                   </a-select-option>
                   <a-select-option value="2">
                     BAR

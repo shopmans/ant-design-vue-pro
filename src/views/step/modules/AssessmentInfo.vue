@@ -8,7 +8,7 @@
       </a-descriptions>
     </a-card>
     <br>
-    <a-tabs default-active-key="1">
+    <a-tabs default-active-key="1" @change="handleTabChange">
       <a-tab-pane key="1" tab="阀门评估" :forceRender="true" v-if="ValveAS">
         <a-card>
           <a-row :gutter="16">
@@ -270,6 +270,10 @@ export default {
           key++
         })
         return this.purchasedParts
+      },
+      handleTabChange (activeKey) {
+        // 上传图片的flag正好等于tab-panel的key
+        this.$refs.uploadImgRead.showFlagImage(activeKey)
       }
     },
     mounted () {
@@ -326,6 +330,9 @@ export default {
             break
           }
         }
+      })
+      this.$nextTick(() => {
+        this.$refs.uploadImgRead.showFlagImage('1')
       })
     },
     data () {

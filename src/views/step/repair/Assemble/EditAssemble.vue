@@ -160,7 +160,7 @@
                     ]">
                     <a-select v-decorator="[ 'valve_assemble_air_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                       <a-select-option value="1">
-                        PSI
+                        Psig
                       </a-select-option>
                       <a-select-option value="2">
                         BAR

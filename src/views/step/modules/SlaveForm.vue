@@ -302,7 +302,7 @@
               <a-input v-decorator="[ 'slave_retaining_valve_setpoint', {rules: [{ message: '请输入保位阀设定点', whitespace: true}]} ]">
                 <a-select v-decorator="[ 'slave_retaining_valve_setpoint_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
                   <a-select-option value="1">
-                    PSI
+                    Psig
                   </a-select-option>
                   <a-select-option value="2">
                     BAR

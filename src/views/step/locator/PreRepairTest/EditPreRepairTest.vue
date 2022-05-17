@@ -70,10 +70,10 @@
               <a-form-item label="压力表量程">
                 <a-radio-group :disabled="not_applicable" v-decorator="['hardware_check_locator_pressure_gauge_range', { }]">
                   <a-radio :value="1">
-                    60 PSI
+                    60 Psig
                   </a-radio>
                   <a-radio :value="2">
-                    160 PSI
+                    160 Psig
                   </a-radio>
                 </a-radio-group>
               </a-form-item>

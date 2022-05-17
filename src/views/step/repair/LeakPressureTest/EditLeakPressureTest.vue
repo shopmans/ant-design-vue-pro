@@ -80,7 +80,7 @@
                 ]">
                 <a-select v-decorator="[ 'leak_test_real_test_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                   <a-select-option value="1">
-                    PSI
+                    Psig
                   </a-select-option>
                   <a-select-option value="2">
                     BAR
@@ -235,7 +235,7 @@
                 ]">
                 <a-select v-decorator="[ 'leak_water_test_real_pressed_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px">
                   <a-select-option value="1">
-                    PSI
+                    Psig
                   </a-select-option>
                   <a-select-option value="2">
                     BAR

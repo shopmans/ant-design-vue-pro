@@ -7,7 +7,7 @@
         <a-descriptions-item label="总工时">{{ stepData.work_time_all }}</a-descriptions-item>
       </a-descriptions>
     </a-card>
-    <a-tabs default-active-key="1">
+    <a-tabs default-active-key="1" @change="handleTabChange">
       <a-tab-pane key="1" tab="阀座泄漏测试" v-if="SeatLeakTest">
         <a-card :bordered="false">
           <a-descriptions :column="4">
@@ -285,7 +285,11 @@ export default {
       getValveTestStdUnit,
       getValveWaterPressureLevelUnit,
       getHGUnit,
-      getNESwitchUnit
+      getNESwitchUnit,
+      handleTabChange (activeKey) {
+        // 上传图片的flag正好等于tab-panel的key
+        this.$refs.uploadImgRead.showFlagImage(activeKey)
+      }
     },
     mounted () {
       if (this.$store.state.editStepData.stepEditData.step_data.length <= 0) {
@@ -324,6 +328,9 @@ export default {
         })
         this.PreRepairTestData = JSON.parse(this.stepData.step_data[0].JSON)
         this.$refs.uploadImgRead.imgFileList = this.PreRepairTestData.uploads
+        this.$nextTick(() => {
+          this.$refs.uploadImgRead.showFlagImage('4')
+        })
     })
   }
 }
