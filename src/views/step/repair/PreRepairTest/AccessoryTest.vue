@@ -269,9 +269,11 @@ export default {
   },
   mounted () {
     const editData = this.$store.state.editStepData.stepEditData
-    const data = JSON.parse(editData.step_data[0].JSON)
-    if (data.accessory_test_not_applicable === '1') {
-      this.local_not_applicable = true
+    if (editData.step_data.length > 0) {
+      const data = JSON.parse(editData.step_data[0].JSON)
+      if (data.accessory_test_not_applicable === '1') {
+        this.local_not_applicable = true
+      }
     }
   },
   methods: {

@@ -1,10 +1,16 @@
 <template>
-  <page-header-wrapper>
-    <template slot="extra">
-      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
-        不适用
-      </a-checkbox>
-    </template>
+  <div ref="farther">
+    <page-header-wrapper style="position: fixed;z-index: 9;border-bottom: 1px solid #e8e8e8" :style="{width:fartherWidth}">
+      <template slot="extra">
+        <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+          不适用
+        </a-checkbox>
+      </template>
+    </page-header-wrapper>
+    <br>
+    <br>
+    <br>
+    <br>
     <a-form @submit="handleSubmit" :form="form" class="form">
       <a-card title="执行人" :headStyle="{fontWeight:'bold'}">
         <dispatchUser :disableAll="not_applicable" v-if="showDispatchUser" :flowID="flow_id" :currentStep="current_step" :flag="'1'" />
@@ -51,8 +57,7 @@
     </a-form>
 
     <stepAllDetailModel ref="stepAllDetailModel" :currenStep="current_step" :flowId="flow_id" />
-
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>
@@ -90,6 +95,7 @@ export default {
       current_step: '',
       stepData: {},
       showDispatchUser: false,
+      fartherWidth: '',
       not_applicable: false
     }
   },
@@ -113,6 +119,17 @@ export default {
             this.form.setFieldsValue(pick({ package_delivery_done_date: moment() }, 'package_delivery_done_date'))
           }
     })
+    this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    window.onresize = () => {
+      this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    }
+  },
+  watch: {
+    fartherWidth: {
+      handler (val) {
+        this.fartherWidth = val
+      }
+    }
   },
   methods: {
     handleSubmit (e) {

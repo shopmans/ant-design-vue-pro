@@ -1,5 +1,11 @@
 <template>
-  <page-header-wrapper>
+  <div ref="farther">
+    <page-header-wrapper style="position: fixed;z-index: 9;border-bottom: 1px solid #e8e8e8" :style="{width:fartherWidth}">
+    </page-header-wrapper>
+    <br>
+    <br>
+    <br>
+    <br>
     <a-card :bordered="false">
       <template v-if="optEngineeringStatistic">
         <div style="margin-bottom:20px;">
@@ -417,7 +423,7 @@
       </div>
       <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:90%;height:80%;left: 0px;top: 48px;bottom: 0px;"></div>
     </template>
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>
@@ -780,6 +786,11 @@ export default {
     //           }
     //         })
     //       })
+
+    this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    window.onresize = () => {
+      this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    }
   },
   data () {
     return {
@@ -801,6 +812,7 @@ export default {
       excelData: null,
       // 当前选中列
       currentSelectColumns: [],
+      fartherWidth: '',
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
 
@@ -890,6 +902,13 @@ export default {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange,
         type: 'radio'
+      }
+    }
+  },
+  watch: {
+    fartherWidth: {
+      handler (val) {
+        this.fartherWidth = val
       }
     }
   },

@@ -1,10 +1,16 @@
 <template>
-  <page-header-wrapper>
-    <template slot="extra">
-      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
-        不适用
-      </a-checkbox>
-    </template>
+  <div ref="farther">
+    <page-header-wrapper style="position: fixed;z-index: 9;border-bottom: 1px solid #e8e8e8" :style="{width:fartherWidth}">
+      <template slot="extra">
+        <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+          不适用
+        </a-checkbox>
+      </template>
+    </page-header-wrapper>
+    <br>
+    <br>
+    <br>
+    <br>
     <a-form @submit="handleSubmit" :form="form" class="form">
       <a-card title="维修前诊断" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
         <a-descriptions title="">
@@ -66,7 +72,7 @@
 
     <!-- 工单详细 -->
     <stepAllDetailModel ref="stepAllDetailModel" :currenStep="currentStep" :flowId="flowID" />
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>
@@ -94,54 +100,65 @@ export default {
       UploadImg
     },
     mounted () {
-        const editData = this.$store.state.editStepData.stepEditData
-        this.flowID = editData.flow_id
-        this.currentStep = editData.current_step
-        // 防止表单未注册
-        preRepairDiagFields.forEach(v => this.form.getFieldDecorator(v))
-        this.showDispatchUser = true
-        // 供flutter刷新上传文件列表
-        window.refreshUploads = this.refreshUploads
+      const editData = this.$store.state.editStepData.stepEditData
+      this.flowID = editData.flow_id
+      this.currentStep = editData.current_step
+      // 防止表单未注册
+      preRepairDiagFields.forEach(v => this.form.getFieldDecorator(v))
+      this.showDispatchUser = true
+      // 供flutter刷新上传文件列表
+      window.refreshUploads = this.refreshUploads
 
-        // 读baseinfo
-        queryStepData({ id: this.flowID, current_step: '(start)' }).then(res => {
-          this.refData2 = res.result.project
-          this.form.setFieldsValue(pick(editData.project, preRepairDiagFields))
-          let preRepairDiag = {}
-          if (editData.step_data.length > 0) {
-              preRepairDiag = JSON.parse(editData.step_data[0].JSON)
-              if (!preRepairDiag.diag_date || preRepairDiag.diag_date.length <= 0) {
-                this.form.setFieldsValue(pick({ diag_date: moment(new Date()).format('YYYY-MM-DD') }, ['diag_date']))
-              }
-          } else {
-              preRepairDiag.receipt_parts = []
+      // 读baseinfo
+      queryStepData({ id: this.flowID, current_step: '(start)' }).then(res => {
+        this.refData2 = res.result.project
+        this.form.setFieldsValue(pick(editData.project, preRepairDiagFields))
+        let preRepairDiag = {}
+        if (editData.step_data.length > 0) {
+            preRepairDiag = JSON.parse(editData.step_data[0].JSON)
+            if (!preRepairDiag.diag_date || preRepairDiag.diag_date.length <= 0) {
+              this.form.setFieldsValue(pick({ diag_date: moment(new Date()).format('YYYY-MM-DD') }, ['diag_date']))
+            }
+        } else {
+            preRepairDiag.receipt_parts = []
+        }
+
+        this.form.setFieldsValue(pick(preRepairDiag, preRepairDiagFields))
+        this.not_applicable = preRepairDiag.not_applicable
+        this.disableAll = this.not_applicable
+        // console.log(preRepairDiag)
+
+        res.result.step_data.forEach(e => {
+          // 查找 baseinfo
+          if (e.DataNum === 1) {
+            this.refData1 = JSON.parse(e.JSON)
           }
-
-          this.form.setFieldsValue(pick(preRepairDiag, preRepairDiagFields))
-          this.not_applicable = preRepairDiag.not_applicable
-          this.disableAll = this.not_applicable
-          // console.log(preRepairDiag)
-
-          res.result.step_data.forEach(e => {
-            // 查找 baseinfo
-            if (e.DataNum === 1) {
-              this.refData1 = JSON.parse(e.JSON)
-            }
-            // 查找阀
-            if (e.DataNum === 2) {
-              this.valveRefData = JSON.parse(e.JSON)
-            }
-          })
-
-          preRepairDiag.uploads.forEach(e => {
-            if (e.queue_type === '3') {
-              this.$refs.uploadImg.imgFileList.push(e)
-            }
-            if (e.queue_type === '1') {
-              this.$refs.upload_file.fileLists.push(e)
-            }
-          })
+          // 查找阀
+          if (e.DataNum === 2) {
+            this.valveRefData = JSON.parse(e.JSON)
+          }
         })
+
+        preRepairDiag.uploads.forEach(e => {
+          if (e.queue_type === '3') {
+            this.$refs.uploadImg.imgFileList.push(e)
+          }
+          if (e.queue_type === '1') {
+            this.$refs.upload_file.fileLists.push(e)
+          }
+        })
+      })
+      this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+      window.onresize = () => {
+        this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+      }
+    },
+    watch: {
+      fartherWidth: {
+        handler (val) {
+          this.fartherWidth = val
+        }
+      }
     },
     methods: {
       handleSubmit (e) {
@@ -225,6 +242,7 @@ export default {
         valveRefData: {},
         showDispatchUser: false,
         not_applicable: false,
+        fartherWidth: '',
         disableAll: false
       }
     }

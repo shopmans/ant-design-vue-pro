@@ -1,5 +1,11 @@
 <template>
-  <page-header-wrapper>
+  <div ref="farther">
+    <page-header-wrapper style="position: fixed;z-index: 9;border-bottom: 1px solid #e8e8e8" :style="{width:fartherWidth}">
+    </page-header-wrapper>
+    <br>
+    <br>
+    <br>
+    <br>
     <a-card :bordered="false">
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
@@ -483,7 +489,7 @@
       @cancel="handleImportCancel"
       @ok="handleImportOK"
     />
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>
@@ -855,6 +861,7 @@ export default {
       form: this.$form.createForm(this),
       permissions: [],
       addOrModify: true,
+      fartherWidth: '',
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
 
@@ -892,6 +899,19 @@ export default {
       columns: columns,
       userModelTitle: '',
       showDescrptionDat: {}
+    }
+  },
+  mounted () {
+    this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    window.onresize = () => {
+      this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    }
+  },
+  watch: {
+    fartherWidth: {
+      handler (val) {
+        this.fartherWidth = val
+      }
     }
   },
   filters: {

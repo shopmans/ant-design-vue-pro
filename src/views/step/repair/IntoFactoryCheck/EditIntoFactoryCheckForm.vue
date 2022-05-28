@@ -1,10 +1,16 @@
 <template>
-  <page-header-wrapper>
-    <template slot="extra">
-      <a-checkbox key="1" v-model="not_applicable" @change="naChange">
-        不适用
-      </a-checkbox>
-    </template>
+  <div ref="farther">
+    <page-header-wrapper style="position: fixed;z-index: 9;border-bottom: 1px solid #e8e8e8" :style="{width:fartherWidth}">
+      <template slot="extra">
+        <a-checkbox key="1" v-model="not_applicable" @change="naChange">
+          不适用
+        </a-checkbox>
+      </template>
+    </page-header-wrapper>
+    <br>
+    <br>
+    <br>
+    <br>
     <a-card title="入厂检查表 Receivd Condition Checklist" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-descriptions title="基本信息" :column="4">
         <a-descriptions-item label="工单号">{{ refData1.work_order_serial }}</a-descriptions-item>
@@ -942,8 +948,7 @@
     </a-card>
 
     <stepAllDetailModel ref="stepAllDetailModel" :flowId="flow_id" :currenStep="current_step" />
-
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>
@@ -1017,6 +1022,7 @@ export default {
       showPointSwitch: false,
       showRetainingValve: false,
       showFilterValve: false,
+      fartherWidth: '',
       disableAll: false
     }
   },
@@ -1104,6 +1110,17 @@ export default {
     //     }
     //   }
     // })
+    this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    window.onresize = () => {
+      this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    }
+  },
+  watch: {
+    fartherWidth: {
+      handler (val) {
+        this.fartherWidth = val
+      }
+    }
   },
   methods: {
     getValveSizeUnitText,

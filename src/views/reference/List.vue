@@ -1,5 +1,11 @@
 <template>
-  <page-header-wrapper>
+  <div ref="farther">
+    <page-header-wrapper style="position: fixed;z-index: 9;border-bottom: 1px solid #e8e8e8" :style="{width:fartherWidth}">
+    </page-header-wrapper>
+    <br>
+    <br>
+    <br>
+    <br>
     <a-card :bordered="false">
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
@@ -101,7 +107,7 @@
       </s-table>
 
     </a-card>
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>
@@ -176,6 +182,11 @@ export default {
     } else {
       this.columns = columns
     }
+
+    this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    window.onresize = () => {
+      this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    }
   },
   data () {
     return {
@@ -187,6 +198,7 @@ export default {
       advanced: false,
       // 查询参数
       queryParam: {},
+      fartherWidth: '',
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
@@ -244,6 +256,13 @@ export default {
 
       this.referenceFileList = fileList
       // this.$refs.table.refresh(true)
+    }
+  },
+  watch: {
+    fartherWidth: {
+      handler (val) {
+        this.fartherWidth = val
+      }
     }
   },
   filters: {

@@ -1,5 +1,11 @@
 <template>
-  <page-header-wrapper>
+  <div ref="farther">
+    <page-header-wrapper style="position: fixed;z-index: 9;border-bottom: 1px solid #e8e8e8" :style="{width:fartherWidth}">
+    </page-header-wrapper>
+    <br>
+    <br>
+    <br>
+    <br>
     <a-form @submit="handleSubmit" :form="form" class="form">
       <a-tabs default-active-key="1">
         <a-tab-pane key="2" tab="阀门信息" v-if="showValveForm" :forceRender="true">
@@ -46,7 +52,7 @@
 
     <!-- 工单详细 -->
     <stepAllDetailModel ref="stepAllDetailModel" :currenStep="currentStep" :flowId="flowID" />
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>
@@ -97,6 +103,7 @@ export default {
       selectAreaTarget: [], // 保存选择结果在change中修改(决定哪个部份显示)
       selectAreaTargetProp: [], // 在mount读取出来的内容赋值给slave作为初始数据(决定哪个部份显示)
       otherSlaveTarget: [], // 保存选择结果在change中修改(其它附件穿梭框)
+      fartherWidth: '',
       otherSlaveTargetProp: [] // 在mount读取出来的内容赋值(其它附件穿梭框)
     }
   },
@@ -224,6 +231,17 @@ export default {
         }
       })
     })
+    this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    window.onresize = () => {
+      this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+    }
+  },
+  watch: {
+    fartherWidth: {
+      handler (val) {
+        this.fartherWidth = val
+      }
+    }
   },
   methods: {
     repairSelectChange (value) {

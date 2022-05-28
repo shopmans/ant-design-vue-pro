@@ -1,5 +1,11 @@
 <template>
-  <page-header-wrapper>
+  <div ref="farther">
+    <page-header-wrapper style="position: fixed;z-index: 9;border-bottom: 1px solid #e8e8e8" :style="{width:fartherWidth}">
+    </page-header-wrapper>
+    <br>
+    <br>
+    <br>
+    <br>
     <template slot="extra">
       <a-checkbox key="1" v-model="not_applicable" @change="naChange">
         不适用
@@ -685,7 +691,7 @@
     <!-- 工单详细 -->
     <stepAllDetailModel ref="stepAllDetailModel" :currenStep="currentStep" :flowId="flowID" />
 
-  </page-header-wrapper>
+  </div>
 </template>
 
 <script>
@@ -768,6 +774,11 @@
           }
         })
       })
+
+      this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+      window.onresize = () => {
+        this.fartherWidth = this.$refs.farther.clientWidth + 50 + 'px'
+      }
     },
     methods: {
       handleSubmit (e) {
@@ -907,6 +918,13 @@
         this.not_applicable = e.target.checked
       }
     },
+    watch: {
+      fartherWidth: {
+        handler (val) {
+          this.fartherWidth = val
+        }
+      }
+    },
     data () {
       return {
         inputSignalColumns: getInputSignalColumns(),
@@ -919,6 +937,7 @@
         baseInfoData: null,
         valveControlModel: 0,
         selectArea: [], // 新建工单附件选择的区域
+        fartherWidth: '',
         not_applicable: false
       }
     }
