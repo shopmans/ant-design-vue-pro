@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card title="维修阀门信息" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+    <a-card :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <a-divider>阀门信息</a-divider>
       <!-- 行1 -->
       <a-row class="form-row" :gutter="16">

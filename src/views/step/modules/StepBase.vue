@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card title="维修工单基本信息" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+    <a-card :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <!-- 行1 -->
       <a-row class="form-row" :gutter="16">
         <a-divider orientation="left">1</a-divider>
@@ -118,20 +118,20 @@
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="工艺介质">
-            <a-input-group compact>
-              <a-input
-                v-decorator="[
-                  'process_medium',
-                  {initialValue: '', rules: [{ message: '请输入工艺介质'}]}
-                ]"
-                style="width: 65%" />
-              <a-select style="width: 35%" @change="selectProcessMediumChange" :allowClear="true">
-                <a-select-option v-for="item in processMediumList" :value="item" :key="item">
-                  {{ item }}
-                </a-select-option>
-              </a-select>
-            </a-input-group>
+          <a-form-item
+            label="应用位置">
+            <a-select
+              v-decorator="[
+                'application_local',
+                {rules: [{ message: ''}]}
+              ]"
+              :allowClear="true" >
+              <a-select-option value="1">调节阀</a-select-option>
+              <a-select-option value="2">开关阀</a-select-option>
+              <a-select-option value="3">Ggc</a-select-option>
+              <a-select-option value="4">仪表</a-select-option>
+              <a-select-option value="5">调压器</a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -150,6 +150,49 @@
               <a-select-option value="4">PDS阀</a-select-option>
               <a-select-option value="5">三偏心</a-select-option>
               <a-select-option value="6">锁渣阀</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item label="工艺介质">
+            <a-input-group compact>
+              <a-input
+                v-decorator="[
+                  'process_medium',
+                  {initialValue: '', rules: [{ message: '请输入工艺介质'}]}
+                ]"
+                style="width: 65%" />
+              <a-select style="width: 35%" @change="selectProcessMediumChange" :allowClear="true">
+                <a-select-option v-for="item in processMediumList" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input-group>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="工作温度">
+            <a-input v-decorator="[ 'worker_temp', {rules: [{whitespace: true}]} ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀前压力P1">
+            <a-select v-decorator="[ 'pre_valve_pressure', {rules: [{ message: '请选择单位'}]}]" :allowClear="true">
+              <a-select-option v-for="item in getValveStdTestPressedList()" :value="item" :key="item">
+                {{ item }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀后压力P2">
+            <a-select v-decorator="[ 'pressure_after_valve', {rules: [{ message: '请选择单位'}]}]" :allowClear="true">
+              <a-select-option v-for="item in getValveStdTestPressedList()" :value="item" :key="item">
+                {{ item }}
+              </a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -201,7 +244,7 @@
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="收货日期">
+          <a-form-item label="预计收货日期">
             <a-date-picker
               style="width:100%;"
               valueFormat="YYYY-MM-DDTHH:mm:ssZ"
@@ -298,6 +341,54 @@
         <a-col :span="6">
           <a-form-item label="完成日期">
             <a-date-picker valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['stepbase_workerdone_date', {}]" style="width: 100%" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="责任人1">
+            <a-select
+              v-decorator="[
+                'responsible1',
+                {rules: [{ message: ''}]}
+              ]"
+              :allowClear="true"
+            >
+              <a-select-option v-for="d in repairManList" :key="d.id" :value="d.id">
+                {{ d.user_name }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="责任人2">
+            <a-select
+              v-decorator="[
+                'responsible2',
+                {rules: [{ message: ''}]}
+              ]"
+              :allowClear="true"
+            >
+              <a-select-option v-for="d in repairManList" :key="d.id" :value="d.id">
+                {{ d.user_name }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="责任人3">
+            <a-select
+              v-decorator="[
+                'responsible3',
+                {rules: [{ message: ''}]}
+              ]"
+              :allowClear="true"
+            >
+              <a-select-option v-for="d in repairManList" :key="d.id" :value="d.id">
+                {{ d.user_name }}
+              </a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
       </a-row>
@@ -476,8 +567,9 @@
 <script>
 import { fetch } from '@/utils/inputSearch'
 import DispatchUser from '@/views/step/modules/DispatchUser'
-import { getColumnsPurchased, getWorkSerialSerial, getProcessMediumList, BaseFillerColumns, BaseFillerColumnNames, newBaseFillerColumns } from '@/api/step'
+import { getColumnsPurchased, getWorkSerialSerial, getProcessMediumList, BaseFillerColumns, BaseFillerColumnNames, newBaseFillerColumns, getValveStdTestPressedList } from '@/api/step'
 import { getProjectList } from '@/api/project'
+import { getUserList } from '@/api/user'
 import moment from 'moment'
 import XLSX from 'xlsx'
 import { querySparePartsBySerial } from '@/api/spareParts'
@@ -511,7 +603,8 @@ export default {
         processMediumList: getProcessMediumList(),
         selectProjectItem: null,
         currentStep: '',
-        flowID: ''
+        flowID: '',
+        repairManList: []
       }
     },
     mounted () {
@@ -567,12 +660,18 @@ export default {
           this.newWorkOrder = res
         })
       }
+      // 查询所有维修人员
+      getUserList({ pageSize: 99999999, pageNo: 1, position: '2' }).then(e => {
+        this.repairManList = e.result.data
+      })
     },
     methods: {
       moment,
       BaseFillerColumns,
       BaseFillerColumnNames,
       newBaseFillerColumns,
+      getValveStdTestPressedList,
+      getUserList,
       repairSelectChange (value) {
           this.$emit('repairSelectChange', value)
       },

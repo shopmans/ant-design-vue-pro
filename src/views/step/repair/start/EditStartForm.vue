@@ -169,6 +169,7 @@ export default {
             } else if (this.showValveForm && item.DataNum === 2) {
                 const valvaData = JSON.parse(item.JSON)
                 this.form.setFieldsValue(pick(valvaData, this.stepValveFields))
+
                 // 根据阀类型决定流向字段内容
                 const valveType = this.form.getFieldsValue(['valve_type'])
                 switch (valveType.valve_type) {

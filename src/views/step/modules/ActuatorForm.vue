@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card title="维修执行机构信息" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+    <a-card :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
       <!-- 行1 -->
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
