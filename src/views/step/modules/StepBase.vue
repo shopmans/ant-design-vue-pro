@@ -103,7 +103,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="设备类型">
-            <a-select
+            <editSelect :typeData="['调节阀', '开关阀', 'Ggc', '仪表', '调压器']" v-decorator="[ 'control_model', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'control_model',
                 {initialValue: '1', rules: [{ message: '请选择现场拆装'}]}
@@ -114,24 +115,13 @@
               <a-select-option value="3">Ggc</a-select-option>
               <a-select-option value="4">仪表</a-select-option>
               <a-select-option value="5">调压器</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="应用位置">
-            <a-select
-              v-decorator="[
-                'application_local',
-                {rules: [{ message: ''}]}
-              ]"
-              :allowClear="true" >
-              <a-select-option value="1">调节阀</a-select-option>
-              <a-select-option value="2">开关阀</a-select-option>
-              <a-select-option value="3">Ggc</a-select-option>
-              <a-select-option value="4">仪表</a-select-option>
-              <a-select-option value="5">调压器</a-select-option>
-            </a-select>
+            <editSelect :typeData="['调节阀', '开关阀', 'Ggc', '仪表', '调压器']" v-decorator="[ 'application_local', {rules: [{ message: ''}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -155,7 +145,8 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item label="工艺介质">
-            <a-input-group compact>
+            <editSelect :typeData="getProcessMediumList()" v-decorator="[ 'process_medium', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'process_medium',
@@ -167,7 +158,7 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -179,21 +170,13 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀前压力P1">
-            <a-select v-decorator="[ 'pre_valve_pressure', {rules: [{ message: '请选择单位'}]}]" :allowClear="true">
-              <a-select-option v-for="item in getValveStdTestPressedList()" :value="item" :key="item">
-                {{ item }}
-              </a-select-option>
-            </a-select>
+            <editSelect :typeData="getValveStdTestPressedList()" v-decorator="[ 'pre_valve_pressure', {rules: [{ message: ''}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀后压力P2">
-            <a-select v-decorator="[ 'pressure_after_valve', {rules: [{ message: '请选择单位'}]}]" :allowClear="true">
-              <a-select-option v-for="item in getValveStdTestPressedList()" :value="item" :key="item">
-                {{ item }}
-              </a-select-option>
-            </a-select>
+            <editSelect :typeData="getValveStdTestPressedList()" v-decorator="[ 'pressure_after_valve', {rules: [{ message: ''}]} ]" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -305,7 +288,8 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item label="现场拆装">
-            <a-select
+            <editSelect :typeData="['是', '否']" v-decorator="[ 'disassembly', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'disassembly',
                 {rules: [{ message: '请选择现场拆装'}]}
@@ -313,7 +297,7 @@
               :allowClear="true" >
               <a-select-option value="1">是</a-select-option>
               <a-select-option value="2">否</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <!-- <a-col :lg="6" :md="12" :sm="24">
@@ -574,12 +558,14 @@ import moment from 'moment'
 import XLSX from 'xlsx'
 import { querySparePartsBySerial } from '@/api/spareParts'
 import pdfView from '@/components/PdfView'
+import editSelect from '@/components/EditSelect'
 
 export default {
     components: {
       XLSX,
       pdfView,
-      DispatchUser
+      DispatchUser,
+      editSelect
     },
     data () {
       return {
@@ -600,7 +586,6 @@ export default {
         newWorkOrder: 1,
         valveSerialData: [],
         switchChecked: false,
-        processMediumList: getProcessMediumList(),
         selectProjectItem: null,
         currentStep: '',
         flowID: '',
@@ -672,6 +657,7 @@ export default {
       newBaseFillerColumns,
       getValveStdTestPressedList,
       getUserList,
+      getProcessMediumList,
       repairSelectChange (value) {
           this.$emit('repairSelectChange', value)
       },

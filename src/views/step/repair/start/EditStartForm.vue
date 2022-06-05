@@ -158,69 +158,64 @@ export default {
         }
       }
     })
-    this.$nextTick(() => {
+    var that = this
+    setTimeout(function () {
         dataList.forEach(item => {
             if (item.DataNum === 1) {
               const tmpBaseInfo = JSON.parse(item.JSON)
-              tmpBaseInfo.project_serial = this.projectData.serial
-              this.$refs.baseInfo.$emit('baseHasEdit', tmpBaseInfo)
-              this.form.setFieldsValue(pick(tmpBaseInfo, this.stepBaseFields))
-              this.$store.commit('VALVE_SERIAL', tmpBaseInfo.valve_serial)
-            } else if (this.showValveForm && item.DataNum === 2) {
+              tmpBaseInfo.project_serial = that.projectData.serial
+              that.$refs.baseInfo.$emit('baseHasEdit', tmpBaseInfo)
+              that.form.setFieldsValue(pick(tmpBaseInfo, that.stepBaseFields))
+              that.$store.commit('VALVE_SERIAL', tmpBaseInfo.valve_serial)
+            } else if (that.showValveForm && item.DataNum === 2) {
                 const valvaData = JSON.parse(item.JSON)
-                this.form.setFieldsValue(pick(valvaData, this.stepValveFields))
+                that.form.setFieldsValue(pick(valvaData, that.stepValveFields))
 
                 // 根据阀类型决定流向字段内容
-                const valveType = this.form.getFieldsValue(['valve_type'])
+                const valveType = that.form.getFieldsValue(['valve_type'])
                 switch (valveType.valve_type) {
                   case '1':
                   case '2': { // 选择的  GLOBE balanced    GLOBE unbalanced
-                    this.$refs.valveForm.selectArray = this.$refs.valveForm.globeValveTypeSelect
-                    this.$refs.valveForm.selectArrayKey = this.$refs.valveForm.globeValveTypeSelectKey
-                    this.$refs.valveForm.valueTypeValue = '1'
+                    that.$refs.valveForm.selectArray = that.$refs.valveForm.globeValveTypeSelect
+                    that.$refs.valveForm.selectArrayKey = that.$refs.valveForm.globeValveTypeSelectKey
+                    that.$refs.valveForm.valueTypeValue = '1'
                     break
                   }
                   case '3': {
-                    this.$refs.valveForm.selectArray = this.$refs.valveForm.butterflyValveTypeSelect
-                    this.$refs.valveForm.selectArrayKey = this.$refs.valveForm.butterflyValveTypeSelectKey
-                    this.$refs.valveForm.valueTypeValue = '1'
+                    that.$refs.valveForm.selectArray = that.$refs.valveForm.butterflyValveTypeSelect
+                    that.$refs.valveForm.selectArrayKey = that.$refs.valveForm.butterflyValveTypeSelectKey
+                    that.$refs.valveForm.valueTypeValue = '1'
                     break
                   }
                   case '4': {
-                    this.$refs.valveForm.selectArray = this.$refs.valveForm.BallValveTypeSelect
-                    this.$refs.valveForm.selectArrayKey = this.$refs.valveForm.BallValveTypeSelectKey
-                    this.$refs.valveForm.valueTypeValue = '1'
+                    that.$refs.valveForm.selectArray = that.$refs.valveForm.BallValveTypeSelect
+                    that.$refs.valveForm.selectArrayKey = that.$refs.valveForm.BallValveTypeSelectKey
+                    that.$refs.valveForm.valueTypeValue = '1'
                     break
                   }
                   case '5': {
-                    this.$refs.valveForm.valueTypeValue = '5'
-                    this.form.setFieldsValue({ valve_flow_input: this.form.getFieldsValue(['valve_flow_input']).valve_flow_input })
+                    that.$refs.valveForm.valueTypeValue = '5'
+                    that.form.setFieldsValue({ valve_flow_input: that.form.getFieldsValue(['valve_flow_input']).valve_flow_input })
                   }
                 }
 
                 // 还原阀门序号 还原阀门输入选择开关
-                this.$refs.valveForm.addValveSelectData(valvaData.valve_serial, valvaData.valve_serial, valvaData.valve_serial_switch)
-            } else if (this.showActuatorForm && item.DataNum === 3) {
-                this.form.setFieldsValue(pick(JSON.parse(item.JSON), this.stepActuatorFields))
-            } else if (this.showSlaveForm && item.DataNum === 4) {
+                that.$refs.valveForm.addValveSelectData(valvaData.valve_serial, valvaData.valve_serial, valvaData.valve_serial_switch)
+            } else if (that.showActuatorForm && item.DataNum === 3) {
+                that.form.setFieldsValue(pick(JSON.parse(item.JSON), that.stepActuatorFields))
+            } else if (that.showSlaveForm && item.DataNum === 4) {
                 const tmpSlaveData = JSON.parse(item.JSON)
-                this.slaveOtherTargets = tmpSlaveData.other_slave_target
-                this.otherSlaveTarget = this.slaveOtherTargets
-                this.selectAreaTarget = tmpSlaveData.other_slave_select_area
-                this.selectAreaTargetProp = this.selectAreaTarget
-                // if (!this.selectAreaTargetProp || this.selectAreaTargetProp.length <= 0) {
-                //   var tmpIdList = []
-                //   getOtherSlaveSelectArea().forEach(item => {
-                //     tmpIdList.push(item.key)
-                //   })
-                //   this.selectAreaTargetProp = tmpIdList // 老单子没有此项数据所在默认情况下全部显出来
-                // }
-                this.form.setFieldsValue(pick(tmpSlaveData, this.stepSlaveFields))
-            } else if (this.showPartsForm && item.DataNum === 5) {
-                this.form.setFieldsValue(pick(JSON.parse(item.JSON), this.stepPartsFields))
+                console.log(tmpSlaveData, ',,,,,,,,,,,,,,,,,,,,,,,,,,,')
+                that.slaveOtherTargets = tmpSlaveData.other_slave_target
+                that.otherSlaveTarget = that.slaveOtherTargets
+                that.selectAreaTarget = tmpSlaveData.other_slave_select_area
+                that.selectAreaTargetProp = that.selectAreaTarget
+                that.form.setFieldsValue(pick(tmpSlaveData, that.stepSlaveFields))
+            } else if (that.showPartsForm && item.DataNum === 5) {
+                that.form.setFieldsValue(pick(JSON.parse(item.JSON), that.stepPartsFields))
             }
         })
-    })
+    }, 10)
   },
   methods: {
     repairSelectChange (value) {

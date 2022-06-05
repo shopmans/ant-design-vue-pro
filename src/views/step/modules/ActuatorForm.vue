@@ -6,7 +6,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="执行机构品牌">
-            <a-input-group compact>
+            <editSelect :typeData="getValvaBanner()" v-decorator="[ 'actu_manufacturer', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'actu_manufacturer',
@@ -18,13 +19,14 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="类型">
-            <a-select
+            <editSelect :typeData="getActuType()" v-decorator="[ 'actu_type', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               :allowClear="true"
               v-decorator="[
                 'actu_type',
@@ -37,13 +39,14 @@
               <a-select-option value="6">直行程-弹簧薄膜</a-select-option>
               <a-select-option value="7">直行程-气缸</a-select-option>
               <a-select-option value="4">其它</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="作用方式">
-            <a-select
+            <editSelect :typeData="getActuUseMode()" v-decorator="[ 'actu_use_mode', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               :allowClear="true"
               v-decorator="[
                 'actu_use_mode',
@@ -54,7 +57,7 @@
               <a-select-option value="3">双作用</a-select-option>
               <a-select-option value="4">分程正作用</a-select-option>
               <a-select-option value="5">分程反作用</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -87,7 +90,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="动作方式">
-            <a-select
+            <editSelect :typeData="getActuActionMode()" v-decorator="[ 'actu_action_mode', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'actu_action_mode',
                 {rules: [{ message: '请选择动作方式'}]}
@@ -97,7 +101,7 @@
               <a-select-option value="2">PDTO</a-select-option>
               <a-select-option value="3">CWTC</a-select-option>
               <a-select-option value="4">CCWTC</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -131,7 +135,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="故障失效">
-            <a-select
+            <editSelect :typeData="getActuFailure()" v-decorator="[ 'actu_failure', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'actu_failure',
                 {rules: [{ message: '请选择故障失效'}]}
@@ -140,13 +145,14 @@
               <a-select-option value="1">Open</a-select-option>
               <a-select-option value="2">Close</a-select-option>
               <a-select-option value="3">Lock</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="安装位置">
-            <a-select
+            <editSelect :typeData="getActuInstallPoint()" v-decorator="[ 'actu_install_point', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'actu_install_point',
                 {rules: [{ message: '请选择安装位置'}]}
@@ -161,7 +167,7 @@
               <a-select-option value="7">右手3位(RH3)</a-select-option>
               <a-select-option value="8">右手4位(RH4)</a-select-option>
               <a-select-option value="9">N/A</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -223,7 +229,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="膜盖/缸盖螺栓材质">
-            <a-select
+            <editSelect :typeData="getActuCoverBoltMaterial()" v-decorator="[ 'actu_cover_bolt_material', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'actu_cover_bolt_material',
                 {rules: [{ message: '请输入阀盖螺栓材质'}]}
@@ -232,7 +239,7 @@
               <a-select-option value="1">SST(不锈钢)</a-select-option>
               <a-select-option value="2">B7(碳钢)</a-select-option>
               <a-select-option value="3">B8(碳钢)</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -301,7 +308,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="手轮">
-            <a-select
+            <editSelect :typeData="getActuHandwheel2()" v-decorator="[ 'actu_handwheel', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'actu_handwheel',
                 {rules: [{ message: ''}]}
@@ -317,7 +325,7 @@
               <a-select-option value="8">Top Mount</a-select-option>
               <a-select-option value="9">None</a-select-option>
               <a-select-option value="10">Other</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -343,16 +351,28 @@
 </template>
 
 <script>
-import { getValvaBanner, getValveStdTestPressedList } from '@/api/step'
+import { getValvaBanner, getValveStdTestPressedList, getActuType, getActuUseMode, getActuActionMode, getActuFailure, getActuInstallPoint,
+getActuCoverBoltMaterial, getActuHandwheel2 } from '@/api/step'
+import editSelect from '@/components/EditSelect'
 
 export default {
+  components: {
+    editSelect
+  },
   data () {
     return {
-      ValveActuBannerList: getValvaBanner(),
       StdTestPressed: getValveStdTestPressedList()
     }
   },
   methods: {
+    getValvaBanner,
+    getActuType,
+    getActuUseMode,
+    getActuActionMode,
+    getActuFailure,
+    getActuInstallPoint,
+    getActuCoverBoltMaterial,
+    getActuHandwheel2,
     selectActuBannerInputChange (value) {
       this.$emit('selectActuInputChange', { actu_manufacturer: value })
     },

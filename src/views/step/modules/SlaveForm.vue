@@ -23,15 +23,16 @@
       </a-row>
     </a-card>
     <br>
-    <a-card title="维修附件信息" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}" v-if="selectAreaTargets.length>0">
+    <a-card title="维修附件信息" :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}" v-if="allPart">
       <!-- 行1 -->
-      <template v-if="selectAreaTargets.indexOf('1')>=0">
+      <template>
         <a-divider>定位器</a-divider>
         <a-row :gutter="16">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item
               label="定位器品牌">
-              <a-input-group compact>
+              <editSelect :typeData="getValvaBanner()" v-decorator="[ 'slave_locator_brand', {rules: [{ message: ''}]} ]" />
+              <!-- <a-input-group compact>
                 <a-input
                   v-decorator="[
                     'slave_locator_brand',
@@ -43,7 +44,7 @@
                     {{ item }}
                   </a-select-option>
                 </a-select>
-              </a-input-group>
+              </a-input-group> -->
             </a-form-item>
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
@@ -55,7 +56,8 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item
               label="定位器型号">
-              <a-input-group compact>
+              <editSelect :typeData="getSalveLocaModList()" v-decorator="[ 'slave_locator_model', {rules: [{ message: ''}]} ]" />
+              <!-- <a-input-group compact>
                 <a-input
                   v-decorator="[
                     'slave_locator_model',
@@ -67,13 +69,14 @@
                     {{ item }}
                   </a-select-option>
                 </a-select>
-              </a-input-group>
+              </a-input-group> -->
             </a-form-item>
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item
               label="定位器等级">
-              <a-select
+              <editSelect :typeData="getSlaveLocatorLeval()" v-decorator="[ 'slave_locator_leval', {rules: [{ message: ''}]} ]" />
+              <!-- <a-select
                 v-decorator="[
                   'slave_locator_leval',
                   {initialValue: '2', rules: [{}]}
@@ -86,13 +89,14 @@
                 <a-select-option value="5">SIS</a-select-option>
                 <a-select-option value="6">ODV</a-select-option>
                 <a-select-option value="7">N/A</a-select-option>
-              </a-select>
+              </a-select> -->
             </a-form-item>
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item
               label="定位器作用方式">
-              <a-select
+              <editSelect :typeData="getSlaveLocatorActionmode()" v-decorator="[ 'slave_locator_actionmode', {rules: [{ message: ''}]} ]" />
+              <!-- <a-select
                 v-decorator="[
                   'slave_locator_actionmode',
                   {rules: [{ message: '请选择定位器作用方式'}]}
@@ -103,13 +107,14 @@
                 <a-select-option value="3">双作用</a-select-option>
                 <a-select-option value="4">分程正作用</a-select-option>
                 <a-select-option value="5">分程反作用</a-select-option>
-              </a-select>
+              </a-select> -->
             </a-form-item>
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item
               label="输入信号范围">
-              <a-select
+              <editSelect :typeData="getSlaveInputSignalScope()" v-decorator="[ 'slave_input_signal_scope', {rules: [{ message: ''}]} ]" />
+              <!-- <a-select
                 v-decorator="[
                   'slave_input_signal_scope',
                   {initialValue: '1', rules: [{}]}
@@ -120,7 +125,7 @@
                 <a-select-option value="3">12-20mA</a-select-option>
                 <a-select-option value="4">3-9 Psi</a-select-option>
                 <a-select-option value="5">3-15 Psi</a-select-option>
-              </a-select>
+              </a-select> -->
             </a-form-item>
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
@@ -139,7 +144,7 @@
           </a-col>
         </a-row>
       </template>
-      <template v-if="selectAreaTargets.indexOf('2')>=0">
+      <template v-if="part2">
         <a-divider>过滤减压阀</a-divider>
         <a-row :gutter="16">
           <a-col :lg="6" :md="12" :sm="24">
@@ -156,7 +161,7 @@
           </a-col>
         </a-row>
       </template>
-      <template v-if="selectAreaTargets.indexOf('3')>=0">
+      <template v-if="part3">
         <a-divider>电磁阀</a-divider>
         <a-row :gutter="16">
           <a-col :lg="6" :md="12" :sm="24">
@@ -264,7 +269,7 @@
           </a-col>
         </a-row>
       </template>
-      <template v-if="selectAreaTargets.indexOf('4')>=0">
+      <template v-if="part4">
         <a-divider>位置开关</a-divider>
         <a-row :gutter="16">
           <a-col :lg="6" :md="12" :sm="24">
@@ -281,7 +286,7 @@
           </a-col>
         </a-row>
       </template>
-      <template v-if="selectAreaTargets.indexOf('5')>=0">
+      <template v-if="part5">
         <a-divider>保位/切换阀</a-divider>
         <a-row :gutter="16">
           <a-col :lg="6" :md="12" :sm="24">
@@ -317,7 +322,8 @@
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item
               label="保位/切换阀动作">
-              <a-select
+              <editSelect :typeData="getSlaveRetainingValveActive()" v-decorator="[ 'slave_retaining_valve_active', {rules: [{ message: ''}]} ]" />
+              <!-- <a-select
                 v-decorator="[
                   'slave_retaining_valve_active',
                   {rules: [{ message: '请选择保位阀动作'}]}
@@ -326,12 +332,12 @@
                 <a-select-option value="1">故障开</a-select-option>
                 <a-select-option value="2">故障关</a-select-option>
                 <a-select-option value="3">故障保位</a-select-option>
-              </a-select>
+              </a-select> -->
             </a-form-item>
           </a-col>
         </a-row>
       </template>
-      <template v-if="selectAreaTargets.indexOf('6')>=0">
+      <template v-if="part6">
         <a-divider>其它附件</a-divider>
         <a-row :gutter="16">
           <a-col :lg="24" :md="24" :sm="24">
@@ -362,11 +368,14 @@
 
 <script>
 import { Transfer } from 'ant-design-vue'
-import { getValvaBanner, getSalveLocaModList, getOtherSlaveData, getOtherSlaveSelectArea } from '@/api/step'
+import { getValvaBanner, getSalveLocaModList, getOtherSlaveData, getOtherSlaveSelectArea, getSlaveLocatorLeval, getSlaveLocatorActionmode,
+getSlaveInputSignalScope, getSlaveRetainingValveActive } from '@/api/step'
+import editSelect from '@/components/EditSelect'
 
 export default {
   components: {
-    Transfer
+    Transfer,
+    editSelect
   },
   props: {
     targets: {
@@ -379,27 +388,55 @@ export default {
     }
   },
   mounted () {
+    this.$nextTick(() => {
+      // setTimeout(() => {
+      //   this.collapsed = !this.collapsed
+      // }, 16)
+    })
   },
   watch: {
     targets (val) {
       this.targetKeys = val
     },
     selectArea (val) {
+      this.allPart = true
       this.selectAreaTargets = val
+      if (this.selectAreaTargets.length <= 0) {
+        this.allPart = false
+        return
+      }
+      this.part1 = this.selectAreaTargets.indexOf('1') >= 0
+      this.part2 = this.selectAreaTargets.indexOf('2') >= 0
+      this.part3 = this.selectAreaTargets.indexOf('3') >= 0
+      this.part4 = this.selectAreaTargets.indexOf('4') >= 0
+      this.part5 = this.selectAreaTargets.indexOf('5') >= 0
+      this.part6 = this.selectAreaTargets.indexOf('6') >= 0
     }
   },
   data () {
     return {
       controlModel: '',
       SlaveBannerList: getValvaBanner(),
-      SalveLocaModList: getSalveLocaModList(),
       OtherSlaveData: getOtherSlaveData(),
       targetKeys: [],
       SelectArea: getOtherSlaveSelectArea(),
-      selectAreaTargets: []
+      selectAreaTargets: [],
+      part1: true,
+      part2: true,
+      part3: true,
+      part4: true,
+      part5: true,
+      part6: true,
+      allPart: true
     }
   },
   methods: {
+    getValvaBanner,
+    getSalveLocaModList,
+    getSlaveLocatorLeval,
+    getSlaveLocatorActionmode,
+    getSlaveInputSignalScope,
+    getSlaveRetainingValveActive,
     selectSalveBannerInputChange (value) {
       this.$emit('selectSlaveInputChange', { slave_locator_brand: value })
     },

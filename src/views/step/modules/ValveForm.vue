@@ -7,7 +7,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀类型">
-            <a-input-group compact>
+            <editSelect :typeData="getValveTypeList()" v-decorator="[ 'valve_type', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_type',
@@ -19,13 +20,14 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀门品牌">
-            <a-input-group compact>
+            <editSelect @change="selectInputChange" :typeData="getValvaBanner()" v-decorator="[ 'valve_manufacturer', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_manufacturer',
@@ -37,7 +39,7 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <!-- <a-col :lg="6" :md="12" :sm="24">
@@ -100,7 +102,8 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item label="阀门材质">
-            <a-input
+            <editSelect :typeData="getValveMaterial()" v-decorator="[ 'valve_material', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input
               v-decorator="[
                 'valve_material',
                 {rules: [{ message: '请输入阀门尺寸'}]}
@@ -111,13 +114,14 @@
               <a-select-option v-for="item in ValveMaterial" :value="item" :key="item">
                 {{ item }}
               </a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀门压力等级">
-            <a-input-group compact>
+            <editSelect :typeData="getValvePressureList()" v-decorator="[ 'valve_pressure_level', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_pressure_level',
@@ -129,13 +133,14 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀门流向">
-            <a-input-group compact>
+            <editSelect :typeData="getValveFlowList()" v-decorator="[ 'valve_flow', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_flow',
@@ -147,7 +152,7 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
             <!-- <template v-if="valueTypeValue == '99'">
               <a-input
                 v-decorator="[
@@ -177,7 +182,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="Push down to">
-            <a-select
+            <editSelect :typeData="['Open', 'Close']" v-decorator="[ 'valve_push_done', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'valve_push_done',
                 {rules: [{ message: '请选择向下压'}]}
@@ -185,7 +191,7 @@
               :allowClear="true" >
               <a-select-option value="1">Open</a-select-option>
               <a-select-option value="2">Close</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -222,7 +228,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀内件特性">
-            <a-select
+            <editSelect :typeData="getValveTrimChar()" v-decorator="[ 'valve_flow_char', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'valve_flow_char',
                 {rules: [{ message: '请选择阀内件特性'}]}
@@ -249,10 +256,7 @@
               <a-select-option value="19">Whisperflo</a-select-option>
               <a-select-option value="20">N/A</a-select-option>
               <a-select-option value="21">Other</a-select-option>
-              <!-- <a-select-option value="22">M-Flute</a-select-option>
-              <a-select-option value="23">M-Flute</a-select-option> -->
-
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -299,7 +303,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="连接方式">
-            <a-select
+            <editSelect :typeData="getValveConnectModel()" v-decorator="[ 'valve_connect_model', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'valve_connect_model',
                 {rules: [{ message: '请选择连接方式'}]}
@@ -311,7 +316,7 @@
               <a-select-option value="4">焊接</a-select-option>
               <a-select-option value="5">螺纹</a-select-option>
               <a-select-option value="6">其它</a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -358,7 +363,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀芯/阀球/蝶板材质">
-            <a-input-group compact>
+            <editSelect :typeData="getValveCoreBallBettlefly()" v-decorator="[ 'valve_core_ball_bettlefly', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_core_ball_bettlefly',
@@ -370,13 +376,14 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀杆/阀轴材质">
-            <a-input-group compact>
+            <editSelect :typeData="getValveStemAxis()" v-decorator="[ 'valve_stem_axis', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_stem_axis',
@@ -388,13 +395,14 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀笼/保持环材质">
-            <a-input-group compact>
+            <editSelect :typeData="getValveCageRetainingRing()" v-decorator="[ 'valve_cage_retaining_ring', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_cage_retaining_ring',
@@ -406,13 +414,14 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀座环/蝶阀密封圈材质">
-            <a-input-group compact>
+            <editSelect :typeData="getValveSetRing()" v-decorator="[ 'valve_set_ring', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_set_ring',
@@ -424,13 +433,14 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="村套/轴承材质">
-            <a-input-group compact>
+            <editSelect :typeData="getValveVillageBearing()" v-decorator="[ 'valve_village_bearing', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_village_bearing',
@@ -442,13 +452,14 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="垫片材质">
-            <a-input-group compact>
+            <editSelect :typeData="getValveSpacerData()" v-decorator="[ 'valve_spacer', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_spacer',
@@ -460,7 +471,7 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
       </a-row>
@@ -489,7 +500,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀盖螺栓材质">
-            <a-input-group compact>
+            <editSelect :typeData="getValveCoverBoltMaterial()" v-decorator="[ 'valve_cover_bolt_material', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_cover_bolt_material',
@@ -501,7 +513,7 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -591,7 +603,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="填料配置">
-            <a-input-group compact>
+            <editSelect :typeData="getValveFillInputList()" v-decorator="[ 'valve_fill_config', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_fill_config',
@@ -603,7 +616,7 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -650,7 +663,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="泄漏测试标准">
-            <a-input-group compact>
+            <editSelect :typeData="getValveFillInputList()" v-decorator="[ 'valve_seat_leak_test', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_seat_leak_test',
@@ -662,13 +676,14 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="泄漏等级">
-            <a-select
+            <editSelect :typeData="getValveLeakLevelList()" v-decorator="[ 'valve_leak_level', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'valve_leak_level',
                 {rules: [{ message: '请选择泄漏等级'}]}
@@ -678,13 +693,14 @@
               <a-select-option v-for="item in ValveLeakLevelList" :value="item" :key="item">
                 {{ item }}
               </a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="泄漏测试介质">
-            <a-select v-decorator="[ 'valve_leak_test_medium', {rules: [{ message: '请选择单位'}]}]" :allowClear="true">
+            <editSelect :typeData="getValveLeakTestMedium()" v-decorator="[ 'valve_leak_test_medium', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select v-decorator="[ 'valve_leak_test_medium', {rules: [{ message: '请选择单位'}]}]" :allowClear="true">
               <a-select-option value="1">
                 水
               </a-select-option>
@@ -694,7 +710,7 @@
               <a-select-option value="3">
                 氮气
               </a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -767,7 +783,8 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="水压测试介质">
-            <a-select
+            <editSelect :typeData="getValveTestMedium()" v-decorator="[ 'valve_test_medium', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
                 'valve_test_medium',
                 {rules: [{ message: '请选择泄漏等级'}]}
@@ -779,13 +796,14 @@
               <a-select-option value="2">
                 气
               </a-select-option>
-            </a-select>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="水压测试标准">
-            <a-input-group compact>
+            <editSelect :typeData="getValveTestStd()" v-decorator="[ 'valve_test_std', {rules: [{ message: ''}]} ]" />
+            <!-- <a-input-group compact>
               <a-input
                 v-decorator="[
                   'valve_test_std',
@@ -797,7 +815,7 @@
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-input-group>
+            </a-input-group> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -845,11 +863,15 @@
 <script>
 import { getValvaBanner, getValvePressureList, getValveFlowList, getValveFillInputList, getValveLeakTestInputList, getValveStdTestInputList,
 getValveCoreBallBettlefly, getValveStemAxis, getValveCageRetainingRing, getValveSetRing, getValveVillageBearing, getValveSpacerData,
-getValveCoverBoltMaterial, getValveTypeList, getValveLeakLevelList, getValveMaterial, getValveStdTestPressedList } from '@/api/step'
-
+getValveCoverBoltMaterial, getValveTypeList, getValveLeakLevelList, getValveMaterial, getValveStdTestPressedList, getValveTrimChar,
+getValveConnectModel, getValveLeakTestMedium, getValveTestMedium, getValveTestStd } from '@/api/step'
+import editSelect from '@/components/EditSelect'
 // import pick from 'lodash.pick'
 
 export default {
+  components: {
+    editSelect
+  },
     data () {
       this.format = 'YYYY-MM-DD'
       return {
@@ -866,23 +888,9 @@ export default {
         showSerialValue: true,
         valveSetRingSwitch: false,
         valveSetRingSwitchValue: false,
-        ValveBannerList: getValvaBanner(),
-        ValveMaterial: getValveMaterial(),
-        ValvePressureList: getValvePressureList(),
-        ValveFlowList: getValveFlowList(),
-        ValveFillInputList: getValveFillInputList(),
         ValveLeakTestInputList: getValveLeakTestInputList(),
         ValveStdTestInputList: getValveStdTestInputList(),
-        ValveCoreBallBettlefly: getValveCoreBallBettlefly(),
-        ValveStemAxis: getValveStemAxis(),
-        ValveCageRetainingRing: getValveCageRetainingRing(),
-        ValveSetRing: getValveSetRing(),
-        ValveVillageBearing: getValveVillageBearing(),
-        ValveSpacer: getValveSpacerData(),
-        ValveCoverBoltMaterial: getValveCoverBoltMaterial(),
         valveSerialData: [],
-        valveTypeList: getValveTypeList(),
-        ValveLeakLevelList: getValveLeakLevelList(),
         StdTestPressed: getValveStdTestPressedList()
       }
     },
@@ -890,6 +898,25 @@ export default {
       // ['valve_manufacturer'].forEach(v => this.form.getFieldDecorator(v))
     },
     methods: {
+      getValveTypeList,
+      getValvaBanner,
+      getValvePressureList,
+      getValveMaterial,
+      getValveFlowList,
+      getValveTrimChar,
+      getValveConnectModel,
+      getValveCoreBallBettlefly,
+      getValveStemAxis,
+      getValveCageRetainingRing,
+      getValveSetRing,
+      getValveVillageBearing,
+      getValveSpacerData,
+      getValveCoverBoltMaterial,
+      getValveFillInputList,
+      getValveLeakLevelList,
+      getValveLeakTestMedium,
+      getValveTestMedium,
+      getValveTestStd,
       nextStep () {
           const { form: { validateFields } } = this
           // 先校验，通过表单校验后，才进入下一步

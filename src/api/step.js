@@ -2233,9 +2233,99 @@ export function getValveStdTestPressedList () {
   return ['Psig', 'Bar', 'MPa', 'Kg/cm2', 'KPa']
 }
 
+// 返厂部件
+export function getReturnPart () {
+  return ['阀门', '执行机构', '阀门+执行机构', '阀门+执行机构+附件', '执行机构+附件', '附件', '零部件', '定位器']
+}
+
+// 阀内件特性
+export function getValveTrimChar () {
+  return ['线性', '快开', '等百分比', '修正等百分比', '定制', '修正线性', 'Anti-Cav', 'Cavitrol III', 'Cavitrol IV', 'M-Flat', 'M-Flow', 'M-Flute', 'M-Form', 'Micro Notch', 'Noise Atten', 'Notchflo', 'Whisper I',
+  'Whisper III', 'Whisperflo', 'N/A', 'Other']
+}
+
 // 泄漏等级
 export function getValveLeakLevelList () {
   return ['Class I', 'Class II', 'Class III', 'Class IV', 'Class V', 'Class VI', 'N/A', 'Other']
+}
+
+// 阀连接方式
+export function getValveConnectModel () {
+  return ['RF', 'RTJ', '对夹', '焊接', '螺纹', '其它']
+}
+
+// 泄漏测试介质
+export function getValveLeakTestMedium () {
+  return ['水', '压缩空气', '氮气']
+}
+
+// 水压测试介质
+export function getValveTestMedium () {
+  return ['水', '压缩空气']
+}
+
+// 水压测试标准
+export function getValveTestStd () {
+  return ['水', '压缩空气']
+}
+
+// 执行机类型
+export function getActuType () {
+  return ['旋转式-弹簧薄膜', '旋转式-气缸', '旋转式-齿轮齿条', '旋转式-拨叉', '直行程-弹簧薄膜', '直行程-气缸', '其它']
+}
+
+// 作用方式
+export function getActuUseMode () {
+  return ['正作用', '反作用', '双作用', '分程正作用', '分程反作用']
+}
+
+// 动作方式
+export function getActuActionMode () {
+  return ['PDTC', 'PDTO', 'CWTC', 'CCWTC']
+}
+
+// 故障失效
+export function getActuFailure () {
+  return ['Open', 'Close', 'Lock']
+}
+
+// 安装位置
+export function getActuInstallPoint () {
+  return ['左手1位(LH1)', '左手2位(LH2)', '左手3位(LH3)', '左手4位(LH4)', '右手1位(RH1)', '右手2位(RH2)', '右手3位(RH3)', '右手4位(RH4)', 'N/A']
+}
+
+// 膜盖/缸盖螺栓材质
+export function getActuCoverBoltMaterial () {
+  return ['SST(不锈钢)', 'B7(碳钢)', 'B8(碳钢)']
+}
+
+// 膜盖/缸盖螺栓材质
+export function getActuHandwheel2 () {
+  return ['顶装', '侧装', '1076', '1077', '1078', 'Integral', 'Side Mount', 'Top Mount', 'None', 'Other']
+}
+
+// 定位器等级
+export function getSlaveLocatorLeval () {
+  return ['AC', 'HC', 'AD', 'PD', 'SIS', 'ODV', 'N/A']
+}
+
+// 定位器作用方式
+export function getSlaveLocatorActionmode () {
+  return ['正作用', '反作用', '双作用', '分程正作用', '分程反作用']
+}
+
+// 输入信号范围
+export function getSlaveInputSignalScope () {
+  return ['4-20mA', '4-12mA', '12-20mA', '3-9 Psi', '3-15 Psi']
+}
+
+// 保位/切换阀动作
+export function getSlaveRetainingValveActive () {
+  return ['故障开', '故障关', '故障保位']
+}
+
+export function cccccccccccccc () {
+  return ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
 }
 
 export function getValveCoreBallBettlefly () {
