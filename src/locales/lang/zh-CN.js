@@ -21,7 +21,7 @@ const locale = {
   'menu.report': '报告',
   'menu.review': '预览',
 
-  'app.version': 'v1.0.16',
+  'app.version': 'v1.0.17',
   'app.flow.repair.start': '新建工单',
   'app.flow.repair.query': '工单管理',
   'app.flow.repair.receipt': '收货',
@@ -327,7 +327,13 @@ const locale = {
   'menu.reference.filename': '文件名称',
   'menu.reference.file.delete.confirm': '是否要删除此参考文件？',
   //
-  'menu.step.view': '查看工单'
+  'menu.step.view': '查看工单',
+  // 故障现象
+  'menu.fault.phenomenon': '故障现象',
+  'menu.fault.phenomenon.add': '新建故障现象',
+  'menu.fault.phenomenon.modify': '修改故障现象',
+  // 维修内容
+  'menu.maintenance.content': '维修内容'
 }
 
 export default {

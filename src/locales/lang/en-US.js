@@ -331,7 +331,13 @@ const locale = {
   'menu.reference.filename': 'Filename',
   'menu.reference.file.delete.confirm': 'Do you want to delete this reference?',
   //
-  'menu.step.view': 'View'
+  'menu.step.view': 'View',
+  // 故障现象
+  'menu.fault.phenomenon': 'Fault Phenomenon',
+  'menu.fault.phenomenon.add': 'New Fault Phenomenon',
+  'menu.fault.phenomenon.modify': 'Modify Fault Phenomenon',
+  // 维修内容
+  'menu.maintenance.content': 'Maintenance Cntent'
 }
 
 export default {

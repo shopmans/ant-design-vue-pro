@@ -218,9 +218,9 @@ export default {
       })
 
       if (!hasData) {
-        this.$message.info('没有执行数据')
-        this.$router.push({ path: '/step/steplist' })
-        return
+        // this.$message.info('没有执行数据')
+        // this.$router.push({ path: '/step/steplist' })
+        // return
       }
 
       // 查询出评估内容，取评估备注信息

@@ -883,12 +883,18 @@ export const asyncRouterMap = [
             component: () => import('@/views/step/repair/start/ReportStep'),
             meta: { title: 'permissionid.report.project', keepAlive: false, permission: [ 'dashboard' ], opt: 'report' }
           },
-          // { // 已完工工单
-          //   path: '/step/donesteplist',
-          //   name: 'donesteplist',
-          //   component: () => import('@/views/step/repair/StepListDone'),
-          //   meta: { title: 'permissionid.repairWorkOrder.done', keepAlive: false, permission: [ 'dashboard' ] }
-          // },
+          { // 故障现象
+            path: '/fault/phenomenon',
+            name: 'faultPhenomenon',
+            component: () => import('@/views/FaultPhenomenon/Page'),
+            meta: { title: 'menu.fault.phenomenon', keepAlive: false, permission: [ 'dashboard' ] }
+          },
+          { // 维修内容
+            path: '/maintenance/content',
+            name: 'maintenanceContent',
+            component: () => import('@/views/MaintenanceContent/Page'),
+            meta: { title: 'menu.maintenance.content', keepAlive: false, permission: [ 'dashboard' ] }
+          },
           {
             path: '/step/start',
             name: 'editStep',
