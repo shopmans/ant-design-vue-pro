@@ -12,7 +12,7 @@
           <a-row :gutter="8">
             <a-col :md="6" :sm="24">
               <a-form-item :label="$t('menu.fault.phenomenon')">
-                <a-input v-model="queryParam.faultPhenomenon" />
+                <a-input v-model="queryParam.fault" />
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
@@ -82,10 +82,9 @@
 </template>
 
 <script>
-import md5 from 'md5'
 import pick from 'lodash.pick'
 import { STable, Ellipsis } from '@/components'
-import { getFaultPhenomenonList, addFaultPhenomenon } from '@/api/faultPhenomenon'
+import { getFaultPhenomenonList, addFaultPhenomenon, modifyFaultPhenomenon, delFaultPhenomenon } from '@/api/faultPhenomenon'
 
 const state = {
   1: 'menu.user.manager.query.userState.item1',
@@ -104,7 +103,7 @@ const columns = [
     sorter: true,
     dataIndex: 'fault',
     slotName: 'menu.fault.phenomenon',
-    scopedSlots: { customRender: 'date', title: 'menu.fault.phenomenon' }
+    scopedSlots: { customRender: 'fault', title: 'menu.fault.phenomenon' }
   },
   {
     dataIndex: 'memo',
@@ -216,6 +215,15 @@ export default {
       })
     },
     handleDelete (record) {
+      delFaultPhenomenon(record).then(res => {
+        // 刷新表格
+        this.$refs.table.refresh()
+        this.$message.info(this.$t('menu.user.manager.new.successful'))
+        this.visible = false
+        this.confirmLoading = false
+        // 重置表单数据
+        this.form.resetFields()
+      })
     },
     handleDisableUser (record) {
     },
@@ -225,11 +233,15 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
             if (values.id && values.id.length > 0) {
-                if (values.password) {
-                    values.password = md5(values.password)
-                }
-
-                // menu.user.manager.new.modifySuccessful
+              modifyFaultPhenomenon(values).then(res => {
+                  // 刷新表格
+                  this.$refs.table.refresh()
+                  this.$message.info(this.$t('menu.user.manager.new.modifySuccessful'))
+                  this.visible = false
+                  this.confirmLoading = false
+                  // 重置表单数据
+                  this.form.resetFields()
+              })
             } else {
                 addFaultPhenomenon(values).then(res => {
                     // 刷新表格
