@@ -205,7 +205,6 @@ export default {
                 that.form.setFieldsValue(pick(JSON.parse(item.JSON), that.stepActuatorFields))
             } else if (that.showSlaveForm && item.DataNum === 4) {
                 const tmpSlaveData = JSON.parse(item.JSON)
-                console.log(tmpSlaveData, ',,,,,,,,,,,,,,,,,,,,,,,,,,,')
                 that.slaveOtherTargets = tmpSlaveData.other_slave_target
                 that.otherSlaveTarget = that.slaveOtherTargets
                 that.selectAreaTarget = tmpSlaveData.other_slave_select_area

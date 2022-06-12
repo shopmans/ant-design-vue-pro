@@ -2196,7 +2196,7 @@ export function getStepBaseFields () {
   'requirst_done_date', 'project_serial', 'serial', 'valve_serial', 'content', 'receipt_number',
   'purchased_part_list', 'control_model', 'process_medium', 'factory_branch', 'base_device', 'batch_number',
   'spec_app', 'stepbase_workerdone_date', 'stepbase_total_minute', 'application_local', 'worker_temp', 'pre_valve_pressure', 'pressure_after_valve',
-  'responsible1', 'responsible2', 'responsible3']
+  'responsible1', 'responsible2', 'responsible3', 'fault_phenomenon', 'maintenance_content']
 }
 
 export function getStepPartsFields () {

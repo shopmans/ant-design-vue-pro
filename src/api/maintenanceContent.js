@@ -4,7 +4,8 @@ const maintenanceContentApi = {
     maintenanceContentList: '/maintenance-content-list',
     addMaintenanceContent: '/new-maintenance-content',
     modifyMaintenanceContent: '/modify-maintenance-content',
-    delMaintenanceContent: '/del-maintenance-content'
+    delMaintenanceContent: '/del-maintenance-content',
+    getMaintenanceContentNames: '/maintenance-content-names'
 }
 
 export function getMaintenanceContentList (parameter) {
@@ -34,6 +35,14 @@ export function modifyMaintenanceContent (parameter) {
 export function delMaintenanceContent (parameter) {
     return request({
         url: maintenanceContentApi.delMaintenanceContent,
+        method: 'post',
+        data: parameter
+    })
+}
+
+export function getMaintenanceContentNames (parameter) {
+    return request({
+        url: maintenanceContentApi.getMaintenanceContentNames,
         method: 'post',
         data: parameter
     })

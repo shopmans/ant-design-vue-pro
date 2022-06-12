@@ -4,7 +4,8 @@ const faultPhenomenonApi = {
     faultPhenomenonList: '/fault-phenomenon-list',
     addfaultPhenomenon: '/new-fault-phenomenon',
     modifyfaultPhenomenon: '/modify-fault-phenomenon',
-    delfaultPhenomenon: '/del-fault-phenomenon'
+    delfaultPhenomenon: '/del-fault-phenomenon',
+    getFaultPhenomenonNames: 'fault-phenomenon-names'
 }
 
 export function getFaultPhenomenonList (parameter) {
@@ -34,6 +35,14 @@ export function modifyFaultPhenomenon (parameter) {
 export function delFaultPhenomenon (parameter) {
     return request({
         url: faultPhenomenonApi.delfaultPhenomenon,
+        method: 'post',
+        data: parameter
+    })
+}
+
+export function getFaultPhenomenonNames (parameter) {
+    return request({
+        url: faultPhenomenonApi.getFaultPhenomenonNames,
         method: 'post',
         data: parameter
     })

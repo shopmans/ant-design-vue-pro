@@ -376,9 +376,23 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <a-row>
-        <a-col :span="24">
-          <a-col>
+      <a-row :gutter="16">
+        <a-col :span="6">
+          <a-form-item
+            label="故障现象">
+            <a-select
+              v-decorator="[
+                'fault_phenomenon',
+                {rules: [{ message: ''}]}
+              ]"
+              :allowClear="true"
+            >
+              <a-select-option v-for="d in faultPhenomenonNames" :key="d">
+                {{ d }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+          <!-- <a-col>
             <a-form-item
               label="故障现象及工作内容">
               <a-textarea
@@ -388,7 +402,34 @@
                   {rules: []}
                 ]" />
             </a-form-item>
-          </a-col>
+          </a-col> -->
+        </a-col>
+        <a-col :span="6">
+          <a-form-item
+            label="工作内容">
+            <a-select
+              v-decorator="[
+                'maintenance_content',
+                {rules: [{ message: ''}]}
+              ]"
+              :allowClear="true"
+            >
+              <a-select-option v-for="d in maintenanceContentNames" :key="d">
+                {{ d }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+          <!-- <a-col>
+            <a-form-item
+              label="故障现象及工作内容">
+              <a-textarea
+                rows="6"
+                v-decorator="[
+                  'content',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+          </a-col> -->
         </a-col>
       </a-row>
       <!-- 行2 -->
@@ -557,6 +598,9 @@ import { getUserList } from '@/api/user'
 import moment from 'moment'
 import XLSX from 'xlsx'
 import { querySparePartsBySerial } from '@/api/spareParts'
+import { getMaintenanceContentNames } from '@/api/maintenanceContent'
+import { getFaultPhenomenonNames } from '@/api/faultPhenomenon'
+
 import pdfView from '@/components/PdfView'
 import editSelect from '@/components/EditSelect'
 
@@ -589,7 +633,9 @@ export default {
         selectProjectItem: null,
         currentStep: '',
         flowID: '',
-        repairManList: []
+        repairManList: [],
+        faultPhenomenonNames: [],
+        maintenanceContentNames: []
       }
     },
     mounted () {
@@ -649,6 +695,14 @@ export default {
       getUserList({ pageSize: 99999999, pageNo: 1, position: '2' }).then(e => {
         this.repairManList = e.result.data
       })
+      // 获取故障现象
+      getFaultPhenomenonNames().then(e => {
+        this.faultPhenomenonNames = e
+      })
+      // 获取维修内容
+      getMaintenanceContentNames().then(e => {
+        this.maintenanceContentNames = e
+      })
     },
     methods: {
       moment,
@@ -658,6 +712,8 @@ export default {
       getValveStdTestPressedList,
       getUserList,
       getProcessMediumList,
+      getMaintenanceContentNames,
+      getFaultPhenomenonNames,
       repairSelectChange (value) {
           this.$emit('repairSelectChange', value)
       },

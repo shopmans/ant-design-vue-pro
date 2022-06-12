@@ -21,7 +21,7 @@ const locale = {
   'menu.report': '报告',
   'menu.review': '预览',
 
-  'app.version': 'v1.0.18',
+  'app.version': 'v1.0.19',
   'app.flow.repair.start': '新建工单',
   'app.flow.repair.query': '工单管理',
   'app.flow.repair.receipt': '收货',
