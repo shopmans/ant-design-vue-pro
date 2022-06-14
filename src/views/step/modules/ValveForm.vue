@@ -1,6 +1,32 @@
 <template>
   <div>
     <a-card :headStyle="{fontWeight:'bold'}" :bodyStyle="{padding:'30px 30px'}">
+      <a-row class="form-row" :gutter="16">
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀门出厂日期">
+            <a-date-picker
+              style="width:100%;"
+              valueFormat="YYYY-MM-DDTHH:mm:ssZ"
+              v-decorator="[
+                'valve_manufacture_date',
+                {rules: []}
+              ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀门投运日期">
+            <a-date-picker
+              style="width:100%;"
+              valueFormat="YYYY-MM-DDTHH:mm:ssZ"
+              v-decorator="[
+                'valve_production_date',
+                {rules: []}
+              ]" />
+          </a-form-item>
+        </a-col>
+      </a-row>
       <a-divider>阀门信息</a-divider>
       <!-- 行1 -->
       <a-row class="form-row" :gutter="16">

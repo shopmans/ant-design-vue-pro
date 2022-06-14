@@ -1354,7 +1354,7 @@ export function getValveTypeUnit (val) {
     case '7':
       return 'Angle UNBalanced'
     default:
-      return ''
+      return val
   }
 }
 
@@ -2168,7 +2168,7 @@ export function getStepValveFields () {
   'valve_flow_input', 'valve_leak_test_medium', 'valve_leak_test_std_pressed', 'valve_leak_test_std_pressed_unit', 'valve_test_std',
   'valve_connect_model', 'valve_core_ball_bettlefly', 'valve_cage_retaining_ring', 'valve_set_ring', 'valve_village_bearing',
   'valve_spacer', 'valve_stem_axis', 'valve_serial_switch', 'valve_set_ring_switch', 'valve_village_bearing_switch',
-  'valve_core_ball_bettlefly_switch', 'valve_cage_retaining_ring_switch']
+  'valve_core_ball_bettlefly_switch', 'valve_cage_retaining_ring_switch', 'valve_manufacture_date', 'valve_production_date']
 }
 
 export function getStepActuatorFields () {
@@ -2177,7 +2177,7 @@ export function getStepActuatorFields () {
   'actu_cover_bolt_material', 'actu_cover_bolt_size', 'actu_use_mode', 'actu_model', 'actu_spring_set_pressure_unit',
   'actu_cover_bolt_tool_unit', 'actu_cover_bolt_tool_item', 'actu_cover_bolt_torque_unit', 'actu_cover_bolt_size_unit',
   'actu_size_unit', 'actu_air_pressed', 'actu_air_pressed_unit', 'actu_install_bracket', 'actu_install_directore', 'actu_handwheel',
-'actu_install_travel', 'actu_install_travel_unit']
+'actu_install_travel', 'actu_install_travel_unit', 'actu_manufacture_date', 'actu_production_date']
 }
 
 export function getStepSlaveFields () {

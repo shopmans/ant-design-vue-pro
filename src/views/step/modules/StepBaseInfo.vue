@@ -34,10 +34,10 @@
               <a-descriptions-item label="完成日期">{{ baseInfo.stepbase_workerdone_date ? moment(baseInfo.stepbase_workerdone_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
             </a-descriptions>
             <a-row>
-              <a-col :span="24">
-                故障现象及工作内容
-                <a-textarea :rows="5" :value="baseInfo.content" :disabled="true"></a-textarea>
-              </a-col>
+              <a-descriptions title="">
+                <a-descriptions-item label="故障现象">{{ baseInfo.fault_phenomenon }}</a-descriptions-item>
+                <a-descriptions-item label="工作内容">{{ baseInfo.maintenance_content }}</a-descriptions-item>
+              </a-descriptions>
             </a-row>
             <a-divider style="margin-bottom: 32px">已购买备件清单</a-divider>
             <a-table
@@ -63,6 +63,9 @@
       <a-tab-pane key="2" tab="阀门信息" v-if="showValveForm" :forceRender="true">
         <a-card :bordered="false">
           <a-descriptions title="阀门信息">
+            <a-descriptions-item label="阀门出厂日期">{{ valveInfo.valve_manufacture_date ? moment(valveInfo.valve_manufacture_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
+            <a-descriptions-item label="阀门投运日期">{{ valveInfo.valve_production_date ? moment(valveInfo.valve_production_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
+            <a-descriptions-item label=""></a-descriptions-item>
             <a-descriptions-item label="阀类型">{{ getValveTypeUnit(valveInfo.valve_type) }}</a-descriptions-item>
             <a-descriptions-item label="阀门品牌">{{ valveInfo.valve_manufacturer }}</a-descriptions-item>
             <a-descriptions-item label="阀门序列号">{{ valveInfo.valve_serial }}</a-descriptions-item>
@@ -127,6 +130,9 @@
       <a-tab-pane key="3" tab="执行机构信息" v-if="showActuatorForm" :forceRender="true">
         <a-card :bordered="false">
           <a-descriptions title="执行机构信息">
+            <a-descriptions-item label="执行机构出厂日期">{{ ActuatorInfo.actu_manufacture_date ? moment(ActuatorInfo.actu_manufacture_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
+            <a-descriptions-item label="执行机构投用日期">{{ ActuatorInfo.actu_production_date ? moment(ActuatorInfo.actu_production_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
+            <a-descriptions-item label=""></a-descriptions-item>
             <a-descriptions-item label="执行机构品牌">{{ ActuatorInfo.actu_manufacturer }}</a-descriptions-item>
             <a-descriptions-item label="类型">{{ getActuTypeUnit(ActuatorInfo.actu_type) }}</a-descriptions-item>
             <a-descriptions-item label="作用方式">{{ getActuUseModeUnit(ActuatorInfo.actu_use_mode) }}</a-descriptions-item>
