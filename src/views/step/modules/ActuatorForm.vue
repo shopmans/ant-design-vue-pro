@@ -28,6 +28,7 @@
         </a-col>
       </a-row>
       <!-- 行1 -->
+      <a-divider orientation="left">1</a-divider>
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
@@ -88,14 +89,25 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="序列号">
-            <a-input-search v-decorator="[ 'actuator_serial', {rules: [{ message: '请输入序列号', whitespace: true}]} ]" @search="copySerialFromValve">
-              <a-button slot="enterButton">
-                复制阀门序列号
-              </a-button>
-            </a-input-search>
+            label="驱动源">
+            <editSelect :typeData="getPowerSource()" v-decorator="[ 'actu_power_source', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
+              :allowClear="true"
+              v-decorator="[
+                'actu_use_mode',
+                {rules: [{ message: '请选择作用方式'}]}
+              ]" >
+              <a-select-option value="1">正作用</a-select-option>
+              <a-select-option value="2">反作用</a-select-option>
+              <a-select-option value="3">双作用</a-select-option>
+              <a-select-option value="4">分程正作用</a-select-option>
+              <a-select-option value="5">分程反作用</a-select-option>
+            </a-select> -->
           </a-form-item>
         </a-col>
+      </a-row>
+      <a-divider orientation="left">2</a-divider>
+      <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="型号">
@@ -115,19 +127,47 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="动作方式">
-            <editSelect :typeData="getActuActionMode()" v-decorator="[ 'actu_action_mode', {rules: [{ message: ''}]} ]" />
-            <!-- <a-select
+            label="序列号">
+            <a-input-search v-decorator="[ 'actuator_serial', {rules: [{ message: '请输入序列号', whitespace: true}]} ]" @search="copySerialFromValve">
+              <a-button slot="enterButton">
+                复制阀门序列号
+              </a-button>
+            </a-input-search>
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-divider orientation="left">3</a-divider>
+      <a-row class="form-row" :gutter="16">
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="行程">
+            <a-input
               v-decorator="[
-                'actu_action_mode',
-                {rules: [{ message: '请选择动作方式'}]}
-              ]"
-              :allowClear="true" >
-              <a-select-option value="1">PDTC</a-select-option>
-              <a-select-option value="2">PDTO</a-select-option>
-              <a-select-option value="3">CWTC</a-select-option>
-              <a-select-option value="4">CCWTC</a-select-option>
-            </a-select> -->
+                'actu_install_travel',
+                {rules: [{ message: '请输入行程'}]}
+              ]">
+              <a-select v-decorator="[ 'actu_install_travel_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
+                <a-select-option value="1">inch</a-select-option>
+                <a-select-option value="2">mm</a-select-option>
+                <a-select-option value="3">°</a-select-option>
+              </a-select>
+            </a-input>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="气源压力">
+            <a-input
+              v-decorator="[
+                'actu_air_pressed',
+                {rules: [{ message: '请输入气源压力'}]}
+              ]">
+              <a-select v-decorator="[ 'actu_air_pressed_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
+                <a-select-option v-for="item in StdTestPressed" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-input>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -156,6 +196,15 @@
                 </a-select-option>
               </a-select>
             </a-input>
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-divider orientation="left">4</a-divider>
+      <a-row class="form-row" :gutter="16">
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="动作方式">
+            <editSelect :typeData="getActuActionMode()" v-decorator="[ 'actu_action_mode', {rules: [{ message: ''}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -198,60 +247,30 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="膜盖/缸盖螺栓工具">
-            <a-row :gutter="0">
-              <a-col :span="8">
-                <a-input
-                  v-decorator="[
-                    'actu_cover_bolt_tool',
-                    {rules: [{ message: '请输入膜盖/缸盖螺栓工具'}]}
-                  ]"></a-input>
-              </a-col>
-              <a-col :span="8">
-                <a-select
-                  v-decorator="[
-                    'actu_cover_bolt_tool_unit',
-                    {rules: [{ message: '请选择单位'}]}
-                  ]"
-                  :allowClear="true">
-                  <a-select-option value="1">inch</a-select-option>
-                  <a-select-option value="2">mm</a-select-option>
-                </a-select>
-              </a-col>
-              <a-col :span="8">
-                <a-select
-                  v-decorator="[
-                    'actu_cover_bolt_tool_item',
-                    {rules: [{ message: '请选择安装位置'}]}
-                  ]"
-                  :allowClear="true" >
-                  <a-select-option value="1">呆扳手</a-select-option>
-                  <a-select-option value="2">内六角</a-select-option>
-                  <a-select-option value="3">套筒</a-select-option>
-                </a-select>
-              </a-col>
-            </a-row>
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="膜盖/缸盖螺栓扭矩标准值">
-            <a-input
+            label="手轮">
+            <editSelect :typeData="getActuHandwheel2()" v-decorator="[ 'actu_handwheel', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
               v-decorator="[
-                'actu_cover_bolt_torque',
-                {rules: [{ message: '请输入阀盖螺栓扭矩标准值'}]}
-              ]">
-              <a-select v-decorator="[ 'actu_cover_bolt_torque_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
-                <a-select-option value="1">
-                  N.m
-                </a-select-option>
-                <a-select-option value="2">
-                  Lbf.ft
-                </a-select-option>
-              </a-select>
-            </a-input>
+                'actu_handwheel',
+                {rules: [{ message: ''}]}
+              ]"
+              :allowClear="true" >
+              <a-select-option value="1">顶装</a-select-option>
+              <a-select-option value="2">侧装</a-select-option>
+              <a-select-option value="3">1076</a-select-option>
+              <a-select-option value="4">1077</a-select-option>
+              <a-select-option value="5">1078</a-select-option>
+              <a-select-option value="6">Integral</a-select-option>
+              <a-select-option value="7">Side Mount</a-select-option>
+              <a-select-option value="8">Top Mount</a-select-option>
+              <a-select-option value="9">None</a-select-option>
+              <a-select-option value="10">Other</a-select-option>
+            </a-select> -->
           </a-form-item>
         </a-col>
+      </a-row>
+      <a-divider orientation="left">5</a-divider>
+      <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="膜盖/缸盖螺栓材质">
@@ -289,18 +308,58 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="气源压力">
+            label="膜盖/缸盖螺栓扭矩标准值">
             <a-input
               v-decorator="[
-                'actu_air_pressed',
-                {rules: [{ message: '请输入气源压力'}]}
+                'actu_cover_bolt_torque',
+                {rules: [{ message: '请输入阀盖螺栓扭矩标准值'}]}
               ]">
-              <a-select v-decorator="[ 'actu_air_pressed_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
-                <a-select-option v-for="item in StdTestPressed" :value="item" :key="item">
-                  {{ item }}
+              <a-select v-decorator="[ 'actu_cover_bolt_torque_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
+                <a-select-option value="1">
+                  N.m
+                </a-select-option>
+                <a-select-option value="2">
+                  Lbf.ft
                 </a-select-option>
               </a-select>
             </a-input>
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="膜盖/缸盖螺栓工具">
+            <a-row :gutter="0">
+              <a-col :span="8">
+                <a-input
+                  v-decorator="[
+                    'actu_cover_bolt_tool',
+                    {rules: [{ message: '请输入膜盖/缸盖螺栓工具'}]}
+                  ]"></a-input>
+              </a-col>
+              <a-col :span="8">
+                <a-select
+                  v-decorator="[
+                    'actu_cover_bolt_tool_unit',
+                    {rules: [{ message: '请选择单位'}]}
+                  ]"
+                  :allowClear="true">
+                  <a-select-option value="1">inch</a-select-option>
+                  <a-select-option value="2">mm</a-select-option>
+                </a-select>
+              </a-col>
+              <a-col :span="8">
+                <a-select
+                  v-decorator="[
+                    'actu_cover_bolt_tool_item',
+                    {rules: [{ message: '请选择安装位置'}]}
+                  ]"
+                  :allowClear="true" >
+                  <a-select-option value="1">呆扳手</a-select-option>
+                  <a-select-option value="2">内六角</a-select-option>
+                  <a-select-option value="3">套筒</a-select-option>
+                </a-select>
+              </a-col>
+            </a-row>
           </a-form-item>
         </a-col>
         <!-- <a-col :lg="6" :md="12" :sm="24">
@@ -331,45 +390,6 @@
             </a-select>
           </a-form-item>
         </a-col> -->
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="手轮">
-            <editSelect :typeData="getActuHandwheel2()" v-decorator="[ 'actu_handwheel', {rules: [{ message: ''}]} ]" />
-            <!-- <a-select
-              v-decorator="[
-                'actu_handwheel',
-                {rules: [{ message: ''}]}
-              ]"
-              :allowClear="true" >
-              <a-select-option value="1">顶装</a-select-option>
-              <a-select-option value="2">侧装</a-select-option>
-              <a-select-option value="3">1076</a-select-option>
-              <a-select-option value="4">1077</a-select-option>
-              <a-select-option value="5">1078</a-select-option>
-              <a-select-option value="6">Integral</a-select-option>
-              <a-select-option value="7">Side Mount</a-select-option>
-              <a-select-option value="8">Top Mount</a-select-option>
-              <a-select-option value="9">None</a-select-option>
-              <a-select-option value="10">Other</a-select-option>
-            </a-select> -->
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="行程">
-            <a-input
-              v-decorator="[
-                'actu_install_travel',
-                {rules: [{ message: '请输入行程'}]}
-              ]">
-              <a-select v-decorator="[ 'actu_install_travel_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
-                <a-select-option value="1">inch</a-select-option>
-                <a-select-option value="2">mm</a-select-option>
-                <a-select-option value="3">°</a-select-option>
-              </a-select>
-            </a-input>
-          </a-form-item>
-        </a-col>
       </a-row>
       <div><br><br></div>
     </a-card>
@@ -378,7 +398,7 @@
 
 <script>
 import { getValvaBanner, getValveStdTestPressedList, getActuType, getActuUseMode, getActuActionMode, getActuFailure, getActuInstallPoint,
-getActuCoverBoltMaterial, getActuHandwheel2 } from '@/api/step'
+getActuCoverBoltMaterial, getActuHandwheel2, getPowerSource } from '@/api/step'
 import editSelect from '@/components/EditSelect'
 
 export default {
@@ -399,6 +419,7 @@ export default {
     getActuInstallPoint,
     getActuCoverBoltMaterial,
     getActuHandwheel2,
+    getPowerSource,
     selectActuBannerInputChange (value) {
       this.$emit('selectActuInputChange', { actu_manufacturer: value })
     },

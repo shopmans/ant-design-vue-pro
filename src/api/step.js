@@ -2177,7 +2177,7 @@ export function getStepActuatorFields () {
   'actu_cover_bolt_material', 'actu_cover_bolt_size', 'actu_use_mode', 'actu_model', 'actu_spring_set_pressure_unit',
   'actu_cover_bolt_tool_unit', 'actu_cover_bolt_tool_item', 'actu_cover_bolt_torque_unit', 'actu_cover_bolt_size_unit',
   'actu_size_unit', 'actu_air_pressed', 'actu_air_pressed_unit', 'actu_install_bracket', 'actu_install_directore', 'actu_handwheel',
-'actu_install_travel', 'actu_install_travel_unit', 'actu_manufacture_date', 'actu_production_date']
+'actu_install_travel', 'actu_install_travel_unit', 'actu_manufacture_date', 'actu_production_date', 'actu_power_source']
 }
 
 export function getStepSlaveFields () {
@@ -2271,12 +2271,12 @@ export function getValveTestStd () {
 
 // 执行机类型
 export function getActuType () {
-  return ['旋转式-弹簧薄膜', '旋转式-气缸', '旋转式-齿轮齿条', '旋转式-拨叉', '直行程-弹簧薄膜', '直行程-气缸', '其它']
+  return ['直行程', '旋转式-气缸', '旋转-曲柄滑块式', '旋转-齿轮齿条式', '旋转-拨叉式', '多回转', 'Other']
 }
 
 // 作用方式
 export function getActuUseMode () {
-  return ['正作用', '反作用', '双作用', '分程正作用', '分程反作用']
+  return ['单作用', '双作用不带弹簧', '双作用带弹簧']
 }
 
 // 动作方式
@@ -2299,9 +2299,9 @@ export function getActuCoverBoltMaterial () {
   return ['SST(不锈钢)', 'B7(碳钢)', 'B8(碳钢)']
 }
 
-// 膜盖/缸盖螺栓材质
+// 手轮
 export function getActuHandwheel2 () {
-  return ['顶装', '侧装', '1076', '1077', '1078', 'Integral', 'Side Mount', 'Top Mount', 'None', 'Other']
+  return ['Top Mount', 'Side Mount', 'Integral', 'Hydraulic', '1076', '1077', '1078', 'None', 'Other']
 }
 
 // 定位器等级
@@ -2322,6 +2322,11 @@ export function getSlaveInputSignalScope () {
 // 保位/切换阀动作
 export function getSlaveRetainingValveActive () {
   return ['故障开', '故障关', '故障保位']
+}
+
+// 驱动源
+export function getPowerSource () {
+  return ['气动', '电动', '液动', '电液', '气液']
 }
 
 export function cccccccccccccc () {
