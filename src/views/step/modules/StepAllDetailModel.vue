@@ -9,7 +9,7 @@
       @cancel="cancel"
     >
       <template slot="footer">
-        <a-button key="edit" @click="editBaseStep">
+        <a-button key="edit" @click="editBaseStep" v-if="state !== 4">
           编辑工单基本信息
         </a-button>
         <a-button key="back" @click="cancel">
@@ -124,6 +124,7 @@ export default {
     },
     data () {
         return {
+          state: 0,
           visible: false,
           loading: false,
           current_step: '(start)',
@@ -151,15 +152,16 @@ export default {
           this.current_step = activeKey
         }).catch(e => { this.loading = false })
       },
-      showSetpDetailData (flowID, currentStep) {
-        if (!flowID || !currentStep) {
+      showSetpDetailData (flow, currentStep) {
+        if (!flow || !currentStep) {
           return
         }
         const that = this
-        this.flow_id = flowID
+        this.state = flow.state
+        this.flow_id = flow.id
         this.current_step = '(start)' // currentStep
         this.visible = true
-        getFlowStepLog({ FlowID: flowID }).then(e => {
+        getFlowStepLog({ FlowID: flow.id }).then(e => {
           if (e.FlowStepLogs.length > 0) {
             that.stepGlideList.length = 0
             e.FlowStepLogs.forEach(e => {

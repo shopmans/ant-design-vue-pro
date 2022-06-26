@@ -66,9 +66,9 @@
             <a-descriptions-item label="阀门出厂日期">{{ valveInfo.valve_manufacture_date ? moment(valveInfo.valve_manufacture_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
             <a-descriptions-item label="阀门投运日期">{{ valveInfo.valve_production_date ? moment(valveInfo.valve_production_date).format("YYYY-MM-DD") : "" }}</a-descriptions-item>
             <a-descriptions-item label=""></a-descriptions-item>
-            <a-descriptions-item label="阀类型">{{ getValveTypeUnit(valveInfo.valve_type) }}</a-descriptions-item>
+            <a-descriptions-item label="阀门类型">{{ getValveTypeUnit(valveInfo.valve_type) }}</a-descriptions-item>
             <a-descriptions-item label="阀门品牌">{{ valveInfo.valve_manufacturer }}</a-descriptions-item>
-            <a-descriptions-item label="阀门序列号">{{ valveInfo.valve_serial }}</a-descriptions-item>
+            <a-descriptions-item label="阀门序列号/批次号">{{ valveInfo.valve_serial }}</a-descriptions-item>
             <a-descriptions-item label="阀门型号">{{ valveInfo.valve_model }}</a-descriptions-item>
             <a-descriptions-item label="阀门尺寸">{{ valveInfo.valve_size + " " + getValveSizeUnit(valveInfo.valve_size_unit) }}</a-descriptions-item>
             <a-descriptions-item label="阀门材质">{{ getValveMaterialUnit(valveInfo.valve_material) }}</a-descriptions-item>

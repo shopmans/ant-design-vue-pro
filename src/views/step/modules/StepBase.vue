@@ -67,8 +67,9 @@
           <a-row>
             <a-col :span="18">
               <a-form-item
-                label="阀门序列号">
-                <a-select
+                label="阀门序列号/批次号">
+                <a-input v-decorator="[ 'valve_serial', {rules: [{ message: '', whitespace: true}]} ]" />
+                <!-- <a-select
                   ref="valveSelect"
                   show-search
                   :default-active-first-option="false"
@@ -77,19 +78,20 @@
                   :not-found-content="null"
                   @search="handleValveSearch"
                   @change="selectValveSerialChange"
-                  v-decorator="[ 'valve_serial', {rules: [{ message: '请输入阀门序列号'}]} ]"
+                  v-decorator="[ 'valve_serial', {rules: [{ message: '请输入阀门序列号/批次号'}]} ]"
                   v-if="showValveSerialValue"
                 >
                   <a-select-option v-for="d in valveSerialData" :key="d.value">
                     {{ d.text }}
                   </a-select-option>
-                </a-select>
-                <a-input v-if="!showValveSerialValue" v-decorator="[ 'valve_serial', {rules: [{ message: '请输入阀门序列号' }]} ]" @change="inputValveSerialChange"></a-input>
+                </a-select> -->
+                <!-- <a-input v-if="!showValveSerialValue" v-decorator="[ 'valve_serial', {rules: [{ message: '请输入阀门序列号' }]} ]" @change="inputValveSerialChange"></a-input> -->
               </a-form-item>
             </a-col>
             <a-col :span="6">
               <a-form-item>
-                <a-switch :checked="switchChecked" v-decorator="[ 'valve_serial_switch', {rules: [{ required: false }]} ]" style="margin-top:45px;margin-left:5px;" @change="valveSerialInputSwitch"></a-switch>
+                <!-- <a-switch :checked="switchChecked" v-decorator="[ 'valve_serial_switch', {rules: [{ required: false }]} ]" style="margin-top:45px;margin-left:5px;" @change="valveSerialInputSwitch"></a-switch> -->
+                <a-button style="margin-top:44px;margin-left:5px;" @click="readValveSerial">读取</a-button>
               </a-form-item>
             </a-col>
           </a-row>
@@ -586,12 +588,14 @@
       <div><br><br></div>
     </a-card>
     <pdfView ref="pdf"></pdfView>
+    <stepBaseReadInstallbase ref="selectInstallbase" @selectInstallbase="selectInstallbase"></stepBaseReadInstallbase>
   </div>
 </template>
 
 <script>
 import { fetch } from '@/utils/inputSearch'
 import DispatchUser from '@/views/step/modules/DispatchUser'
+import stepBaseReadInstallbase from '@/views/step/modules/StepBaseReadInstallbase'
 import { getColumnsPurchased, getWorkSerialSerial, getProcessMediumList, BaseFillerColumns, BaseFillerColumnNames, newBaseFillerColumns, getValveStdTestPressedList } from '@/api/step'
 import { getProjectList } from '@/api/project'
 import { getUserList } from '@/api/user'
@@ -609,7 +613,8 @@ export default {
       XLSX,
       pdfView,
       DispatchUser,
-      editSelect
+      editSelect,
+      stepBaseReadInstallbase
     },
     data () {
       return {
@@ -941,10 +946,20 @@ export default {
       selectValveSerialChange (value) {
         const that = this
         querySparePartsBySerial({ serial: value }).then(e => {
-          e.valve_model = e.model
-          e.valve_serial = e.serial
           that.$emit('selectValveSerialChange', e)
           this.$store.commit('VALVE_SERIAL', value)
+        })
+      },
+      // 从数据库读取installbase数据
+      readValveSerial () {
+        this.$refs.selectInstallbase.visible = true
+      },
+      // 选择installbase
+      selectInstallbase (data) {
+        const that = this
+        querySparePartsBySerial({ id: data }).then(e => {
+          that.$emit('selectValveSerialChange', e)
+          this.$store.commit('VALVE_SERIAL', e.valve_serial)
         })
       },
       inputValveSerialChange (e) {

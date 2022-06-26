@@ -140,6 +140,7 @@ const locale = {
   'menu.workOrder.workOrderList.query.processStatus.item1': 'Not performed',
   'menu.workOrder.workOrderList.query.processStatus.item2': 'Processing',
   'menu.workOrder.workOrderList.query.processStatus.item3': 'Done',
+  'menu.workOrder.workOrderList.query.processStatus.item4': 'Close',
   'menu.workOrder.repair.workOrderList.action.dispatch': 'Dispatch',
   'menu.workOrder.repair.workOrderList.action.execution': 'Execution',
   'menu.workOrder.repair.workOrderList.title.workordernumber': 'Work Order',
@@ -249,6 +250,7 @@ const locale = {
   'menu.spare_parts.valve.add': 'Add Spare Parts',
   'menu.spare_parts.valve.query': 'Query Spare Parts',
   'menu.spare_parts.valve.import': 'Import Spare Parts',
+  'menu.close': 'Close',
 
   'menu.permission': 'Permission',
   'menu.permission.rolegroup': 'Role Group',

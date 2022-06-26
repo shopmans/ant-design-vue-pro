@@ -17,7 +17,7 @@
             <template v-else>
               <div style="font-weight:bold;font-size:24px;color:blank;">序列号:{{ serial }}</div>
             </template>
-            <div style="font-weight:bold;font-size:24px;color:blank;">阀体型号:{{ valveModel }}</div>
+            <div style="font-weight:bold;font-size:24px;color:blank;">阀门型号:{{ valveModel }}</div>
             <div style="font-weight:bold;font-size:24px;color:blank;">阀体尺寸:{{ valveSize }}</div>
             <div style="font-weight:bold;font-size:24px;color:blank;">执行机构型号:{{ actuModel }}</div>
             <div style="font-weight:bold;font-size:24px;color:blank;">执行机构尺寸:{{ actuSize }}</div>

@@ -10,29 +10,77 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
-            <a-col :md="6" :sm="24">
+            <a-col :md="4" :sm="24">
               <a-form-item :label="$t('menu.workOrder.workOrderList.query.date')">
                 <a-date-picker v-model="queryParam.date" style="width: 100%" />
               </a-form-item>
             </a-col>
-            <a-col :md="6" :sm="24">
+            <a-col :md="4" :sm="24">
               <a-form-item :label="$t('menu.workOrder.repair.workOrderList.title.workordernumber')">
                 <a-input v-model="queryParam.work_order" placeholder=""/>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item :label="$t('menu.workOrder.workOrderList.query.processStatus')">
-                <a-select v-model="queryParam.state" default-value="0">
-                  <a-select-option value="1">{{ $t('menu.workOrder.workOrderList.query.processStatus.item1') }}</a-select-option>
-                  <a-select-option value="2">{{ $t('menu.workOrder.workOrderList.query.processStatus.item2') }}</a-select-option>
-                  <a-select-option value="3">{{ $t('menu.workOrder.workOrderList.query.processStatus.item3') }}</a-select-option>
+            <a-col :md="4" :sm="24">
+              <a-form-item :label="$t('menu.customer.new.finallyUser')">
+                <a-input v-model="queryParam.finally_user" placeholder=""/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="4" :sm="24">
+              <a-form-item :label="$t('menu.customer.sales')">
+                <a-input v-model="queryParam.sales_name" placeholder=""/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="4" :sm="24">
+              <a-form-item :label="$t('menu.project.detail.repairShop')">
+                <a-select v-model="queryParam.repair_plan" default-value="0">
+                  <a-select-option value="1">{{ $t('menu.project.detail.repairShop.item1') }}</a-select-option>
+                  <a-select-option value="2">{{ $t('menu.project.detail.repairShop.item2') }}</a-select-option>
+                  <a-select-option value="3">{{ $t('menu.project.detail.repairShop.item3') }}</a-select-option>
+                  <a-select-option value="4">{{ $t('menu.project.detail.repairShop.item4') }}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :sm="24">
-              <span class="table-page-search-submitButtons" >
-                <a-button type="primary" @click="startQuery">{{ $t('menu.project.view.query.query') }}</a-button>
-                <a-button style="margin-left: 8px" @click="resetQuery">{{ $t('menu.project.view.query.reset') }}</a-button>
+            <template v-if="advanced">
+              <a-col :md="4" :sm="24">
+                <a-form-item :label="$t('menu.spare_parts.valve.serial2')">
+                  <a-input v-model="queryParam.work_serial" placeholder=""/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="4" :sm="24">
+                <a-form-item :label="$t('menu.spare_parts.valve.tag')">
+                  <a-input v-model="queryParam.tag" placeholder=""/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="4" :sm="24">
+                <a-form-item :label="$t('menu.workOrder.repair.workOrderList.title.currentFlow')">
+                  <a-select v-model="queryParam.current_step_text" default-value="0">
+                    <a-select-option v-for="(item,index) in getCurrentStepMap2()" :value="item.value" :key="index">{{ $t(item.text) }}</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :md="4" :sm="24">
+                <a-form-item :label="$t('menu.workOrder.workOrderList.query.processStatus')">
+                  <a-select v-model="queryParam.state" default-value="0">
+                    <a-select-option value="1">{{ $t('menu.workOrder.workOrderList.query.processStatus.item1') }}</a-select-option>
+                    <a-select-option value="2">{{ $t('menu.workOrder.workOrderList.query.processStatus.item2') }}</a-select-option>
+                    <a-select-option value="3">{{ $t('menu.workOrder.workOrderList.query.processStatus.item3') }}</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :md="4" :sm="24">
+                <a-form-item :label="$t('menu.step.exec.man')">
+                  <a-input v-model="queryParam.user_name" placeholder=""/>
+                </a-form-item>
+              </a-col>
+            </template>
+            <a-col :md="!advanced && 4 || 8" :sm="24">
+              <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
+                <a-button type="primary" @click="startQuery">{{ this.$t('menu.project.view.query.query') }}</a-button>
+                <a-button style="margin-left: 8px" @click="resetQuery">{{ this.$t('menu.project.view.query.reset') }}</a-button>
+                <a @click="toggleAdvanced" style="margin-left: 8px">
+                  {{ advanced ? this.$t('menu.project.view.query.collapse') : this.$t('menu.project.view.action.more') }}
+                  <a-icon :type="advanced ? 'up' : 'down'"/>
+                </a>
               </span>
             </a-col>
           </a-row>
@@ -59,36 +107,47 @@
         <span slot="state" slot-scope="text">
           <a-badge :status="text | statusTypeFilter" :text="$t(statusMap[text].text)" />
         </span>
+        <span slot="repair_plan" slot-scope="text">
+          {{ text | formatRepairPlan }}
+        </span>
         <span slot="current_step" slot-scope="text">
           {{ $t(currentStepMap[text].text) }}
         </span>
         <span slot="action" slot-scope="text, record">
-          <template>
+          <template v-if="record.state === 4">
             <a @click="handleDescrption(record)">{{ $t('menu.project.view.action.detail') }}</a>
-            <a-divider type="vertical" />
-            <!-- <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</span>
+          </template>
+          <template v-else>
+            <template>
+              <a @click="handleDescrption(record)">{{ $t('menu.project.view.action.detail') }}</a>
+              <a-divider type="vertical" />
+              <!-- <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</span>
             <a v-else @click="handleDispatchUser(record)">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</a>
             <a-divider type="vertical" /> -->
-            <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.execution') }}</span>
-            <a v-else @click="handleEdit(record)">{{ $t('menu.workOrder.repair.workOrderList.action.execution') }}</a>
+              <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.execution') }}</span>
+              <a v-else @click="handleEdit(record)">{{ $t('menu.workOrder.repair.workOrderList.action.execution') }}</a>
+            </template>
+            <a-divider type="vertical" />
+            <a-dropdown>
+              <a class="ant-dropdown-link">
+                {{ $t('menu.project.view.action.more') }} <a-icon type="down" />
+              </a>
+              <a-menu slot="overlay">
+                <a-menu-item>
+                  <a @click="adjustFlow(record)">{{ $t('menu.workOrder.workOrderList.flow') }}</a>
+                </a-menu-item>
+                <a-menu-item>
+                  <a @click="report(record)">{{ $t('menu.project.view.action.report') }}</a>
+                </a-menu-item>
+                <a-menu-item >
+                  <a @click="printStep(record)">{{ $t('menu.project.view.action.print') }}</a>
+                </a-menu-item>
+                <a-menu-item >
+                  <a @click="colseStep(record)">{{ $t('menu.close') }}</a>
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
           </template>
-          <a-divider type="vertical" />
-          <a-dropdown>
-            <a class="ant-dropdown-link">
-              {{ $t('menu.project.view.action.more') }} <a-icon type="down" />
-            </a>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a @click="adjustFlow(record)">{{ $t('menu.workOrder.workOrderList.flow') }}</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="report(record)">{{ $t('menu.project.view.action.report') }}</a>
-              </a-menu-item>
-              <a-menu-item >
-                <a @click="printStep(record)">{{ $t('menu.project.view.action.print') }}</a>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
         </span>
         <template v-for="(item, index) in columns" :slot="item.slotName">
           <span :key="index">{{ $t(item.slotName) }}</span>
@@ -111,11 +170,19 @@
         <span slot="state" slot-scope="text">
           <a-badge :status="text | statusTypeFilter" :text="$t(statusMap[text].text)" />
         </span>
+        <span slot="repair_plan" slot-scope="text">
+          {{ text | formatRepairPlan }}
+        </span>
         <span slot="current_step" slot-scope="text">
           {{ $t(currentStepMap[text].text) }}
         </span>
         <span slot="action" slot-scope="text, record">
-          <a @click="deleteStep(record)">{{ $t('menu.project.view.action.delete') }}</a>
+          <template v-if="record.state === 4">
+            <a @click="handleDescrption(record)">{{ $t('menu.project.view.action.detail') }}</a>
+          </template>
+          <template v-else>
+            <a @click="deleteStep(record)">{{ $t('menu.project.view.action.delete') }}</a>
+          </template>
         </span>
         <template v-for="(item, index) in columns" :slot="item.slotName">
           <span :key="index">{{ $t(item.slotName) }}</span>
@@ -137,6 +204,9 @@
         </span>
         <span slot="state" slot-scope="text">
           <a-badge :status="text | statusTypeFilter" :text="$t(statusMap[text].text)" />
+        </span>
+        <span slot="repair_plan" slot-scope="text">
+          {{ text | formatRepairPlan }}
         </span>
         <span slot="current_step" slot-scope="text">
           {{ $t(currentStepMap[text].text) }}
@@ -168,8 +238,16 @@
         <span slot="current_step" slot-scope="text">
           {{ $t(currentStepMap[text].text) }}
         </span>
+        <span slot="repair_plan" slot-scope="text">
+          {{ text | formatRepairPlan }}
+        </span>
         <span slot="action" slot-scope="text, record">
-          <a @click="report(record)">{{ $t('menu.project.view.action.report') }}</a>
+          <template v-if="record.state === 4">
+            <a @click="handleDescrption(record)">{{ $t('menu.project.view.action.detail') }}</a>
+          </template>
+          <template v-else>
+            <a @click="report(record)">{{ $t('menu.project.view.action.report') }}</a>
+          </template>
         </span>
         <template v-for="(item, index) in columns" :slot="item.slotName">
           <span :key="index">{{ $t(item.slotName) }}</span>
@@ -221,6 +299,25 @@
     >
       <qrcode ref="qrcode" />
     </a-modal>
+    <!-- 打印对话框 -->
+    <a-modal
+      :title="$t('menu.project.view.action.print')"
+      :width="680"
+      :visible="visiblePrint"
+      :destroyOnClose="true"
+      :maskClosable="false"
+      @ok="printOk"
+      @cancel="printCancel"
+    >
+      <a-radio-group v-model="printSelectValue">
+        <a-radio :value="1">
+          二维码标签
+        </a-radio>
+        <a-radio :value="2">
+          维修流程跟踪记录表
+        </a-radio>
+      </a-radio-group>
+    </a-modal>
     <!-- 报告 -->
     <report ref="reportModel" />
   </div>
@@ -229,7 +326,8 @@
 <script>
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
-import { getStepList, stepEdit, deleteStep, queryStepData, queryStepDataOnlyread, getCurrentStepMap, getFlowStepLog, changeFlow } from '@/api/step'
+import { getvalveRepairProcessReport } from '@/api/report'
+import { getStepList, stepEdit, deleteStep, queryStepData, getCurrentStepMap, queryStepDataOnlyread, getFlowStepLog, changeFlow, getCurrentStepMap2, stepClose } from '@/api/step'
 import StepForm from './start/StepForm'
 import DispatchUserDialog from '../modules/DispatchUserModel'
 import stepAllDetailModel from '../modules/StepAllDetailModel'
@@ -241,13 +339,33 @@ const columns = [
     slotName: 'menu.project.view.table.column.date',
     dataIndex: 'date',
     sorter: true,
-    width: '200px',
+    width: '120px',
     scopedSlots: { customRender: 'date', title: 'menu.project.view.table.column.date' }
   },
   {
     dataIndex: 'work_order',
     slotName: 'menu.workOrder.repair.workOrderList.title.workordernumber',
     scopedSlots: { customRender: 'work_order', title: 'menu.workOrder.repair.workOrderList.title.workordernumber' }
+  },
+  {
+    dataIndex: 'finally_user',
+    slotName: 'menu.customer.new.finallyUser',
+    scopedSlots: { customRender: 'finally_user', title: 'menu.customer.new.finallyUser' }
+  },
+  {
+    dataIndex: 'sales_name',
+    slotName: 'menu.customer.sales',
+    scopedSlots: { customRender: 'sales_name', title: 'menu.customer.sales' }
+  },
+  {
+    dataIndex: 'repair_plan',
+    slotName: 'menu.project.detail.repairShop',
+    scopedSlots: { customRender: 'repair_plan', title: 'menu.project.detail.repairShop' }
+  },
+  {
+    dataIndex: 'tag',
+    slotName: 'menu.spare_parts.valve.tag',
+    scopedSlots: { customRender: 'tag', title: 'menu.spare_parts.valve.tag' }
   },
   {
     dataIndex: 'work_serial',
@@ -260,15 +378,15 @@ const columns = [
     scopedSlots: { customRender: 'current_step', title: 'menu.workOrder.repair.workOrderList.title.currentFlow' }
   },
   {
-    dataIndex: 'user_names',
-    slotName: 'menu.workOrder.repair.workOrderList.title.operator',
-    scopedSlots: { customRender: 'user_names', title: 'menu.workOrder.repair.workOrderList.title.operator' }
-  },
-  {
     dataIndex: 'state',
     slotName: 'menu.workOrder.workOrderList.query.processStatus',
     sorter: true,
     scopedSlots: { customRender: 'state', title: 'menu.workOrder.workOrderList.query.processStatus' }
+  },
+  {
+    dataIndex: 'user_names',
+    slotName: 'menu.step.exec.man',
+    scopedSlots: { customRender: 'user_names', title: 'menu.step.exec.man' }
   },
   {
     dataIndex: 'action',
@@ -289,6 +407,10 @@ const statusMap = {
   3: {
     status: 'success',
     text: 'menu.workOrder.workOrderList.query.processStatus.item3'
+  },
+  4: {
+    status: 'success',
+    text: 'menu.workOrder.workOrderList.query.processStatus.item4'
   }
 }
 
@@ -307,6 +429,8 @@ export default {
   data () {
     this.columns = columns
     return {
+      // 高级搜索 展开/关闭
+      advanced: false,
       // 派员model
       visible: false,
       flowID: '',
@@ -320,6 +444,7 @@ export default {
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
         return getStepList(requestParameters).then(res => {
+          console.log(res.result)
           return res.result
         })
       },
@@ -352,12 +477,15 @@ export default {
       selectFlowdefault: '',
       selectValue: '',
       visibleQrcode: false,
+      visiblePrint: false,
       visibleReport: false,
       reportRecord: {},
       optDelete: false,
       optOpen: false,
       optReport: false,
-      optExport: false
+      optExport: false,
+      printSelectValue: '',
+      printerSelectRecord: {}
     }
   },
   mounted () {
@@ -398,10 +526,22 @@ export default {
       return currentStepMap[val].text
     },
     formatDate (val) {
-      return moment(val).zone('+08:00').format('YYYY-MM-DD HH:mm:ss')
+      return moment(val).zone('+08:00').format('YYYY-MM-DD')
     },
     dispatchUserFilter (record) {
       return record.current_step === 'Assessment'
+    },
+    formatRepairPlan (val) {
+      switch (val) {
+      case '1':
+          return '成都车间'
+      case '2':
+          return '榆林车间'
+      case '3':
+        return '用户现场'
+      case '4':
+        return '在线维修'
+      }
     }
   },
   computed: {
@@ -421,6 +561,7 @@ export default {
     }
   },
   methods: {
+    getCurrentStepMap2,
     // 派员cancal
     handleCancel () {
       this.visible = false
@@ -478,9 +619,59 @@ export default {
       this.$refs.reportModel.showModel(record)
     },
     printStep (record) {
-      queryStepDataOnlyread({ id: record.id, current_step: 'print' }).then(res => {
-        this.$store.commit('SET_STEP_EDIT_DATA', res.result)
-        this.visibleQrcode = true
+      this.printerSelectRecord = record
+      this.visiblePrint = true
+    },
+    // 打印对话框选择
+    printOk () {
+      if (this.printSelectValue !== 1 && this.printSelectValue !== 2) {
+        this.$message.info('打印操作未做出选择')
+        return
+      }
+      if (this.printSelectValue === 1) {
+        this.visiblePrint = false
+        queryStepDataOnlyread({ id: this.printerSelectRecord.id, current_step: 'print' }).then(res => {
+          this.$store.commit('SET_STEP_EDIT_DATA', res.result)
+          this.visibleQrcode = true
+        })
+      }
+      if (this.printSelectValue === 2) {
+        getvalveRepairProcessReport(this.printerSelectRecord).then(res => {
+                const content = res
+                const blob = new Blob([content])
+                const fileName = 'SinoValveRepairProcessReport_' + moment(new Date()).format('YYYY_MM_DD_HH_mm_ss') + '.xlsx'
+                if ('download' in document.createElement('a')) { // 非IE下载
+                    const elink = document.createElement('a')
+                    elink.download = fileName
+                    elink.style.display = 'none'
+                    elink.href = URL.createObjectURL(blob)
+                    document.body.appendChild(elink)
+                    elink.click()
+                    URL.revokeObjectURL(elink.href) // 释放URL 对象
+                    document.body.removeChild(elink)
+                } else { // IE10+下载
+                    navigator.msSaveBlob(blob, fileName)
+                }
+                this.$message.info('报告生成完毕')
+            })
+      }
+    },
+    printCancel () { this.visiblePrint = false },
+    // 关闭工单
+    colseStep (record) {
+      const letThis = this
+      this.$confirm({
+        title: '关闭',
+        content: '确定要关闭工单？',
+        okText: '确认',
+        cancelText: '取消',
+        onOk () {
+          stepClose(record).then(res => {
+              // 刷新表格
+              letThis.$refs.table.refresh()
+              letThis.$message.info('关闭成功')
+          })
+        }
       })
     },
     qrcodeCancel () {
@@ -513,6 +704,9 @@ export default {
     selectFlowChange (val) {
       this.selectValue = val
     },
+    toggleAdvanced () {
+      this.advanced = !this.advanced
+    },
     handleDescrption (record) {
       this.$store.commit('SET_UPLOAD_MD5', [])
       this.$store.commit('SET_STEP_EDIT_DATA', {})
@@ -520,7 +714,7 @@ export default {
         queryStepData({ id: record.id, current_step: '(start)' }).then(res => {
           this.$store.commit('SET_STEP_EDIT_DATA', res.result)
           this.stepDetailvisible = true
-          this.$refs.stepDetailModel.showSetpDetailData(record.id, '(start)')
+          this.$refs.stepDetailModel.showSetpDetailData(record, '(start)')
         })
       } else {
         queryStepData(record).then(res => {

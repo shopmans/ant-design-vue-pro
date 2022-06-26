@@ -124,7 +124,7 @@
             </a-col>
             <!-- 阀门序列号 -->
             <a-col :span="6">
-              <a-form-item label="阀门序列号">
+              <a-form-item label="阀门序列号/批次号">
                 <a-input v-decorator="['valve_serial', { rules: [{}] }]" />
               </a-form-item>
             </a-col>
@@ -382,6 +382,7 @@ import moment from 'moment'
 import pick from 'lodash.pick'
 import { STable } from '@/components'
 import { sparePartsList, deleteSparePart, modifySpareParts, addSpareParts, importPartsList } from '@/api/spareParts'
+import { getInstallbaseCloumes, getInstallbaseFields } from '@/api/step'
 import XLSX from 'xlsx'
 import importValveData from './ImportValveData'
 
@@ -395,232 +396,7 @@ const position = {
   2: 'menu.user.manager.new.maintenanceEngineer'
 }
 
-const columns = [
-//   { // date
-//     sorter: true,
-//     dataIndex: 'Date',
-//     slotName: 'menu.project.view.table.column.date',
-//     scopedSlots: { customRender: 'Date', title: 'menu.project.view.table.column.date' },
-//     width: 200
-//   },
-  { // 客户名称
-    dataIndex: 'customer_name',
-    slotName: 'menu.project.view.query.customerName',
-    scopedSlots: { customRender: 'customer_name', title: 'menu.project.view.query.customerName' },
-    width: 400
-  },
-  { // 生产部/分厂
-    dataIndex: 'factroy',
-    slotName: 'menu.customer.installbase.factory',
-    scopedSlots: { customRender: 'factroy', title: 'menu.customer.installbase.factory' },
-    width: 150
-  },
-  { // 装置
-    dataIndex: 'device',
-    slotName: 'menu.spare_parts.valve.device',
-    scopedSlots: { customRender: 'device', title: 'menu.spare_parts.valve.device' },
-    width: 300
-  },
-  { // 位号
-    sorter: true,
-    dataIndex: 'tag',
-    slotName: 'menu.spare_parts.valve.tag',
-    scopedSlots: { customRender: 'tag', title: 'menu.spare_parts.valve.tag' },
-    width: 200
-  },
-  { // 品牌
-    dataIndex: 'valve_brand',
-    slotName: 'menu.customer.installbase.brand',
-    scopedSlots: { customRender: 'valve_brand', title: 'menu.customer.installbase.brand' },
-    width: 150
-  },
-  { // 阀门种类
-    dataIndex: 'valve_class',
-    slotName: '阀门种类',
-    scopedSlots: { customRender: 'valve_class', title: '阀门种类' },
-    width: 150
-  },
-  { // 阀类型
-    dataIndex: 'valve_type',
-    slotName: '阀类型',
-    scopedSlots: { customRender: 'valve_type', title: '阀类型' },
-    width: 150
-  },
-  { // 阀门序列号
-    sorter: true,
-    dataIndex: 'valve_serial',
-    slotName: '阀门序列号',
-    scopedSlots: { customRender: 'valve_serial', title: '阀门序列号' },
-    width: 150
-  },
-  { // 阀门型号
-    dataIndex: 'valve_model',
-    slotName: '阀门型号',
-    scopedSlots: { customRender: 'valve_model', title: '阀门型号' },
-    width: 150
-  },
-  { // 阀门尺寸
-    sorter: true,
-    dataIndex: 'valve_size',
-    slotName: 'menu.spare_parts.valve.size',
-    scopedSlots: { customRender: 'valve_size', title: 'menu.spare_parts.valve.size' },
-    width: 150
-  },
-  { // 执行机构品牌
-    dataIndex: 'actuator_brand',
-    slotName: '执行机构品牌',
-    scopedSlots: { customRender: 'actuator_brand', title: '执行机构品牌' },
-    width: 150
-  },
-  { // 执行机构型号
-    dataIndex: 'actuator_model',
-    slotName: '执行机构品牌',
-    scopedSlots: { customRender: 'actuator_model', title: '执行机构型号' },
-    width: 150
-  },
-  { // 执行机构尺寸
-    dataIndex: 'actuator_size',
-    slotName: '执行机构尺寸',
-    scopedSlots: { customRender: 'actuator_size', title: '执行机构尺寸' },
-    width: 150
-  },
-  { // 执行机构序列号
-    dataIndex: 'actuator_serial',
-    slotName: '执行机构序列号',
-    scopedSlots: { customRender: 'actuator_serial', title: '执行机构序列号' },
-    width: 150
-  },
-  { // 压力等级
-    dataIndex: 'pressure_level',
-    slotName: '压力等级',
-    scopedSlots: { customRender: 'pressure_level', title: '压力等级' },
-    width: 150
-  },
-  { // 连接类型
-    dataIndex: 'connection_type',
-    slotName: '连接类型',
-    scopedSlots: { customRender: 'connection_type', title: '连接类型' },
-    width: 150
-  },
-  { // 阀体材质
-    dataIndex: 'valve_material',
-    slotName: '阀体材质',
-    scopedSlots: { customRender: 'valve_material', title: '阀体材质' },
-    width: 150
-  },
-  { // 阀杆材质
-    dataIndex: 'valve_stem_material',
-    slotName: '阀杆材质',
-    scopedSlots: { customRender: 'valve_stem_material', title: '阀杆材质' },
-    width: 200
-  },
-  { // 阀芯材质
-    dataIndex: 'valve_core_material',
-    slotName: '阀芯材质',
-    scopedSlots: { customRender: 'valve_core_material', title: '阀芯材质' },
-    width: 200
-  },
-  { // 阀座材质
-    dataIndex: 'valve_seat_material',
-    slotName: '阀座材质',
-    scopedSlots: { customRender: 'valve_seat_material', title: '阀座材质' },
-    width: 200
-  },
-  { // 阀笼材质
-    dataIndex: 'cage_material',
-    slotName: '阀笼材质',
-    scopedSlots: { customRender: 'cage_material', title: '阀笼材质' },
-    width: 200
-  },
-  { // 流量特性
-    dataIndex: 'flow_char',
-    slotName: '流量特性',
-    scopedSlots: { customRender: 'flow_char', title: '流量特性' },
-    width: 200
-  },
-  { // 泄漏等级
-    dataIndex: 'leak_level',
-    slotName: '泄漏等级',
-    scopedSlots: { customRender: 'leak_level', title: '泄漏等级' },
-    width: 200
-  },
-  { // 填料类型
-    dataIndex: 'packing_type',
-    slotName: '填料类型',
-    scopedSlots: { customRender: 'packing_type', title: '填料类型' },
-    width: 200
-  },
-  { // 行程
-    dataIndex: 'travel',
-    slotName: '行程',
-    scopedSlots: { customRender: 'travel', title: '行程' },
-    width: 200
-  },
-  { // benchset
-    dataIndex: 'benchset',
-    slotName: 'Benchset',
-    scopedSlots: { customRender: 'benchset', title: 'Benchset' },
-    width: 200
-  },
-  { // 定位器
-    dataIndex: 'locator',
-    slotName: '定位器',
-    scopedSlots: { customRender: 'locator', title: '定位器' },
-    width: 200
-  },
-  { // 其它附件
-    dataIndex: 'other_accessory',
-    slotName: '其它附件',
-    scopedSlots: { customRender: 'other_accessory', title: '其它附件' },
-    width: 300
-  },
-  { // 介质
-    dataIndex: 'medium',
-    slotName: '介质',
-    scopedSlots: { customRender: 'medium', title: '介质' },
-    width: 200
-  },
-  { // 工作温度
-    dataIndex: 'work_temp',
-    slotName: '工作温度',
-    scopedSlots: { customRender: 'work_temp', title: '工作温度' },
-    width: 200
-  },
-  { // 阀前压力P1
-    dataIndex: 'pressure_p1',
-    slotName: '阀前压力P1',
-    scopedSlots: { customRender: 'pressure_p1', title: '阀前压力P1' },
-    width: 200
-  },
-  { // 阀前压力P2
-    dataIndex: 'pressure_p2',
-    slotName: '阀前压力P2',
-    scopedSlots: { customRender: 'pressure_p2', title: '阀前压力P2' },
-    width: 200
-  },
-  { // 重要程度
-    dataIndex: 'importance',
-    slotName: '重要程度',
-    scopedSlots: { customRender: 'importance', title: '重要程度' },
-    width: 200
-  },
-  { // 阀门订单号
-    dataIndex: 'valve_order',
-    slotName: '阀门订单号',
-    scopedSlots: { customRender: 'valve_order', title: '阀门订单号' },
-    width: 200
-  },
-  { // 备注
-    dataIndex: 'memo',
-    slotName: '备注',
-    scopedSlots: { customRender: 'memo', title: '备注' }
-  },
-  {
-    dataIndex: 'action',
-    slotName: 'menu.project.view.table.column.action',
-    scopedSlots: { customRender: 'action', title: 'menu.project.view.table.column.action' }
-  }
-]
+const columns = getInstallbaseCloumes()
 
 export default {
   name: 'TableList',
@@ -644,7 +420,6 @@ export default {
         const requestParameters = Object.assign({}, parameter, this.queryParam)
 
         return sparePartsList(requestParameters).then(res => {
-          console.log(res.result)
           return res.result
         })
       },
@@ -704,6 +479,7 @@ export default {
     }
   },
   methods: {
+    getInstallbaseFields,
     handleAdd () {
       this.form.resetFields()
       this.addOrModify = true
@@ -719,11 +495,7 @@ export default {
       this.visible = true
       this.userModelTitle = this.$t('menu.user.manager.modify')
 
-      const fields = ['ID', 'customer_id', 'customer_name', 'factroy', 'device', 'tag', 'valve_brand', 'valve_class', 'valve_type', 'valve_serial',
-      'valve_model', 'valve_size', 'actuator_brand', 'actuator_model', 'actuator_size', 'actuator_serial', 'pressure_level',
-      'connection_type', 'valve_material', 'valve_stem_material', 'valve_core_material', 'valve_seat_material', 'cage_material',
-      'flow_char', 'leak_level', 'packing_type', 'travel', 'benchset', 'locator', 'other_accessory', 'medium', 'work_temp',
-      'pressure_p1', 'pressure_p2', 'importance', 'valve_order', 'memo']
+      const fields = getInstallbaseFields()
 
       fields.forEach(v => this.form.getFieldDecorator(v))
       this.$nextTick(() => {

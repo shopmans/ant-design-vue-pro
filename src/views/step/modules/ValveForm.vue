@@ -32,7 +32,7 @@
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="阀类型">
+            label="阀门类型">
             <editSelect :typeData="getValveTypeList()" v-decorator="[ 'valve_type', {rules: [{ message: ''}]} ]" />
             <!-- <a-input-group compact>
               <a-input
@@ -50,57 +50,7 @@
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="阀门品牌">
-            <editSelect @change="selectInputChange" :typeData="getValvaBanner()" v-decorator="[ 'valve_manufacturer', {rules: [{ message: ''}]} ]" />
-            <!-- <a-input-group compact>
-              <a-input
-                v-decorator="[
-                  'valve_manufacturer',
-                  {initialValue: 'FISHER', rules: [{ message: '请输入阀门品牌'}]}
-                ]"
-                style="width: 65%" />
-              <a-select style="width: 35%" @change="selectInputChange" :allowClear="true">
-                <a-select-option v-for="item in ValveBannerList" :value="item" :key="item">
-                  {{ item }}
-                </a-select-option>
-              </a-select>
-            </a-input-group> -->
-          </a-form-item>
-        </a-col>
-        <!-- <a-col :lg="6" :md="12" :sm="24">
-          <a-row>
-             <a-col :span="18">
-              <a-form-item
-                label="阀门序列号">
-                <a-select
-                  ref="valveSelect"
-                  show-search
-                  :default-active-first-option="false"
-                  :show-arrow="false"
-                  :filter-option="false"
-                  :not-found-content="null"
-                  @search="handleValveSearch"
-                  @change="selectValveSerialChange"
-                  v-decorator="[ 'valve_serial', {rules: [{ required: true, message: '请输入阀门序列号'}]} ]"
-                  v-if="showSerialValue"
-                >
-                  <a-select-option v-for="d in valveSerialData" :key="d.value">
-                    {{ d.text }}
-                  </a-select-option>
-                </a-select>
-                <a-input v-if="!showSerialValue" v-decorator="[ 'valve_serial', {rules: [{ required: true, message: '请输入阀门序列号' }]} ]" ></a-input>
-              </a-form-item>
-            </a-col> -->
-        <!-- <a-col :span="6">
-              <a-form-item>
-                <a-switch :checked="switchChecked" v-decorator="[ 'valve_serial_switch', {rules: [{ required: false }]} ]" style="margin-top:45px;margin-left:5px;" @change="valveSerialInputSwitch"></a-switch>
-              </a-form-item>
-            </a-col>
-          </a-row>
-        </a-col> -->
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="阀体型号">
+          <a-form-item label="阀门型号">
             <a-input
               v-decorator="[
                 'valve_model',
@@ -108,41 +58,8 @@
               ]" />
           </a-form-item>
         </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="阀门尺寸">
-            <a-input
-              v-decorator="[
-                'valve_size',
-                {rules: [{ message: '请输入阀门尺寸'}]}
-              ]">
-              <a-select v-decorator="[ 'valve_size_unit', {initialValue: '1', rules: [{ message: '请选择阀尺寸单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
-                <a-select-option value="1">
-                  inch
-                </a-select-option>
-                <a-select-option value="2">
-                  mm
-                </a-select-option>
-              </a-select>
-            </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="阀门材质">
-            <editSelect :typeData="getValveMaterial()" v-decorator="[ 'valve_material', {rules: [{ message: ''}]} ]" />
-            <!-- <a-input
-              v-decorator="[
-                'valve_material',
-                {rules: [{ message: '请输入阀门尺寸'}]}
-              ]"
-              style="width: 65%">
-            </a-input>
-            <a-select style="width: 35%" @change="selectValveMaterialChange" :allowClear="true">
-              <a-select-option v-for="item in ValveMaterial" :value="item" :key="item">
-                {{ item }}
-              </a-select-option>
-            </a-select> -->
-          </a-form-item>
-        </a-col>
+      </a-row>
+      <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀门压力等级">
@@ -164,60 +81,27 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="阀门流向">
-            <editSelect :typeData="getValveFlowList()" v-decorator="[ 'valve_flow', {rules: [{ message: ''}]} ]" />
-            <!-- <a-input-group compact>
-              <a-input
-                v-decorator="[
-                  'valve_flow',
-                  {rules: [{}]}
-                ]"
-                style="width: 65%" />
-              <a-select default-value="" style="width: 35%" @change="selectValvaFlowInputChange" :allowClear="true">
-                <a-select-option v-for="item in ValveFlowList" :value="item" :key="item">
-                  {{ item }}
-                </a-select-option>
-              </a-select>
-            </a-input-group> -->
-            <!-- <template v-if="valueTypeValue == '99'">
-              <a-input
-                v-decorator="[
-                  'not_user'
-                ]" />
-            </template>
-            <template v-else>
-              <template v-if="valueTypeValue != '5'">
-                <a-select
-                  v-decorator="[
-                    'valve_flow',
-                    {rules: [{ message: '请选择阀门流向'}]}
-                  ]">
-                  <a-select-option v-for="(item, index) in selectArray" :value="selectArrayKey[index]" :key="selectArrayKey[index]" >{{ item }}</a-select-option>
-                </a-select>
-              </template>
-              <template v-else>
-                <a-input
-                  v-decorator="[
-                    'valve_flow_input',
-                    {rules: [{ message: '请选择阀门流向'}]}
-                  ]" />
-              </template>
-            </template> -->
+            label="连接方式">
+            <editSelect :typeData="getValveConnectModel()" v-decorator="[ 'valve_connect_model', {rules: [{ message: ''}]} ]" />
+            <!-- <a-select
+              v-decorator="[
+                'valve_connect_model',
+                {rules: [{ message: '请选择连接方式'}]}
+              ]"
+              :allowClear="true" >
+              <a-select-option value="1">RF</a-select-option>
+              <a-select-option value="2">RTJ</a-select-option>
+              <a-select-option value="3">对夹</a-select-option>
+              <a-select-option value="4">焊接</a-select-option>
+              <a-select-option value="5">螺纹</a-select-option>
+              <a-select-option value="6">其它</a-select-option>
+            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="Push down to">
-            <editSelect :typeData="['Open', 'Close']" v-decorator="[ 'valve_push_done', {rules: [{ message: ''}]} ]" />
-            <!-- <a-select
-              v-decorator="[
-                'valve_push_done',
-                {rules: [{ message: '请选择向下压'}]}
-              ]"
-              :allowClear="true" >
-              <a-select-option value="1">Open</a-select-option>
-              <a-select-option value="2">Close</a-select-option>
-            </a-select> -->
+            label="阀门流向">
+            <editSelect :typeData="getValveFlowList()" v-decorator="[ 'valve_flow', {rules: [{ message: ''}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -242,6 +126,30 @@
             </a-input>
           </a-form-item>
         </a-col>
+      </a-row>
+      <a-row class="form-row" :gutter="16">
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀门口径">
+            <a-input
+              v-decorator="[
+                'valve_caliber',
+                {rules: [{ message: '请输入口径'}]}
+              ]">
+              <a-select v-decorator="[ 'valve_caliber_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
+                <a-select-option value="1">
+                  inch
+                </a-select-option>
+                <a-select-option value="2">
+                  mm
+                </a-select-option>
+                <a-select-option value="3">
+                  N/A
+                </a-select-option>
+              </a-select>
+            </a-input>
+          </a-form-item>
+        </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item label="阀门Cv值">
             <a-input
@@ -255,34 +163,6 @@
           <a-form-item
             label="阀内件特性">
             <editSelect :typeData="getValveTrimChar()" v-decorator="[ 'valve_flow_char', {rules: [{ message: ''}]} ]" />
-            <!-- <a-select
-              v-decorator="[
-                'valve_flow_char',
-                {rules: [{ message: '请选择阀内件特性'}]}
-              ]"
-              :allowClear="true" >
-              <a-select-option value="1">线性</a-select-option>
-              <a-select-option value="3">快开</a-select-option>
-              <a-select-option value="2">等百分比</a-select-option>
-              <a-select-option value="4">修正等百分比</a-select-option>
-              <a-select-option value="5">定制</a-select-option>
-              <a-select-option value="6">修正线性</a-select-option>
-              <a-select-option value="7">Anti-Cav</a-select-option>
-              <a-select-option value="8">Cavitrol III</a-select-option>
-              <a-select-option value="9">Cavitrol IV</a-select-option>
-              <a-select-option value="10">M-Flat</a-select-option>
-              <a-select-option value="11">M-Flow</a-select-option>
-              <a-select-option value="12">M-Flute</a-select-option>
-              <a-select-option value="13">M-Form</a-select-option>
-              <a-select-option value="14">Micro Notch</a-select-option>
-              <a-select-option value="15">Noise Atten</a-select-option>
-              <a-select-option value="16">Notchflo</a-select-option>
-              <a-select-option value="17">Whisper I</a-select-option>
-              <a-select-option value="18">Whisper III</a-select-option>
-              <a-select-option value="19">Whisperflo</a-select-option>
-              <a-select-option value="20">N/A</a-select-option>
-              <a-select-option value="21">Other</a-select-option>
-            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -304,47 +184,53 @@
             </a-input>
           </a-form-item>
         </a-col>
+      </a-row>
+      <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="口径">
-            <a-input
-              v-decorator="[
-                'valve_caliber',
-                {rules: [{ message: '请输入口径'}]}
-              ]">
-              <a-select v-decorator="[ 'valve_caliber_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
-                <a-select-option value="1">
-                  inch
-                </a-select-option>
-                <a-select-option value="2">
-                  mm
-                </a-select-option>
-                <a-select-option value="3">
-                  N/A
-                </a-select-option>
-              </a-select>
-            </a-input>
+          <a-form-item label="阀体材质">
+            <editSelect :typeData="getValveMaterial()" v-decorator="[ 'valve_material', {rules: [{ message: ''}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="连接方式">
-            <editSelect :typeData="getValveConnectModel()" v-decorator="[ 'valve_connect_model', {rules: [{ message: ''}]} ]" />
-            <!-- <a-select
-              v-decorator="[
-                'valve_connect_model',
-                {rules: [{ message: '请选择连接方式'}]}
-              ]"
-              :allowClear="true" >
-              <a-select-option value="1">RF</a-select-option>
-              <a-select-option value="2">RTJ</a-select-option>
-              <a-select-option value="3">对夹</a-select-option>
-              <a-select-option value="4">焊接</a-select-option>
-              <a-select-option value="5">螺纹</a-select-option>
-              <a-select-option value="6">其它</a-select-option>
-            </a-select> -->
+            label="阀芯/阀球/蝶板材质">
+            <editSelect :typeData="getValveCoreBallBettlefly()" v-decorator="[ 'valve_core_ball_bettlefly', {rules: [{ message: ''}]} ]" />
           </a-form-item>
         </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀座环/蝶阀密封圈材质">
+            <editSelect :typeData="getValveSetRing()" v-decorator="[ 'valve_set_ring', {rules: [{ message: ''}]} ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀笼/保持环材质">
+            <editSelect :typeData="getValveCageRetainingRing()" v-decorator="[ 'valve_cage_retaining_ring', {rules: [{ message: ''}]} ]" />
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row class="form-row" :gutter="16">
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="阀杆/阀轴材质">
+            <editSelect :typeData="getValveStemAxis()" v-decorator="[ 'valve_stem_axis', {rules: [{ message: ''}]} ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="衬套/轴承材质">
+            <editSelect :typeData="getValveVillageBearing()" v-decorator="[ 'valve_village_bearing', {rules: [{ message: ''}]} ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item
+            label="垫片材质">
+            <editSelect :typeData="getValveSpacerData()" v-decorator="[ 'valve_spacer', {rules: [{ message: ''}]} ]" />
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="法兰螺栓工具">
@@ -386,118 +272,36 @@
             </a-input>
           </a-form-item>
         </a-col>
+      </a-row>
+      <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="阀芯/阀球/蝶板材质">
-            <editSelect :typeData="getValveCoreBallBettlefly()" v-decorator="[ 'valve_core_ball_bettlefly', {rules: [{ message: ''}]} ]" />
-            <!-- <a-input-group compact>
-              <a-input
-                v-decorator="[
-                  'valve_core_ball_bettlefly',
-                  {rules: [{}]}
-                ]"
-                style="width: 50%" />
-              <a-select default-value="" style="width: 50%" @change="selectValveCoreBallBettleflyChange" :allowClear="true">
-                <a-select-option v-for="item in ValveCoreBallBettlefly" :value="item" :key="item">
-                  {{ item }}
+            label="阀门品牌">
+            <editSelect @change="selectInputChange" :typeData="getValvaBanner()" v-decorator="[ 'valve_manufacturer', {rules: [{ message: ''}]} ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item label="阀门尺寸">
+            <a-input
+              v-decorator="[
+                'valve_size',
+                {rules: [{ message: '请输入阀门尺寸'}]}
+              ]">
+              <a-select v-decorator="[ 'valve_size_unit', {initialValue: '1', rules: [{ message: '请选择阀尺寸单位'}]}]" slot="addonAfter" style="width: 80px" :allowClear="true">
+                <a-select-option value="1">
+                  inch
+                </a-select-option>
+                <a-select-option value="2">
+                  mm
                 </a-select-option>
               </a-select>
-            </a-input-group> -->
+            </a-input>
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="阀杆/阀轴材质">
-            <editSelect :typeData="getValveStemAxis()" v-decorator="[ 'valve_stem_axis', {rules: [{ message: ''}]} ]" />
-            <!-- <a-input-group compact>
-              <a-input
-                v-decorator="[
-                  'valve_stem_axis',
-                  {rules: [{}]}
-                ]"
-                style="width: 60%" />
-              <a-select default-value="" style="width: 40%" @change="selectValveStemAxisChange" :allowClear="true">
-                <a-select-option v-for="item in ValveStemAxis" :value="item" :key="item">
-                  {{ item }}
-                </a-select-option>
-              </a-select>
-            </a-input-group> -->
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="阀笼/保持环材质">
-            <editSelect :typeData="getValveCageRetainingRing()" v-decorator="[ 'valve_cage_retaining_ring', {rules: [{ message: ''}]} ]" />
-            <!-- <a-input-group compact>
-              <a-input
-                v-decorator="[
-                  'valve_cage_retaining_ring',
-                  {rules: [{}]}
-                ]"
-                style="width: 50%" />
-              <a-select default-value="" style="width: 50%" @change="selectValveCageRetainingRingChange" :allowClear="true">
-                <a-select-option v-for="item in ValveCageRetainingRing" :value="item" :key="item">
-                  {{ item }}
-                </a-select-option>
-              </a-select>
-            </a-input-group> -->
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="阀座环/蝶阀密封圈材质">
-            <editSelect :typeData="getValveSetRing()" v-decorator="[ 'valve_set_ring', {rules: [{ message: ''}]} ]" />
-            <!-- <a-input-group compact>
-              <a-input
-                v-decorator="[
-                  'valve_set_ring',
-                  {rules: [{}]}
-                ]"
-                style="width: 50%" />
-              <a-select default-value="" style="width: 50%" @change="selectValveSetRingChange" :allowClear="true">
-                <a-select-option v-for="item in ValveSetRing" :value="item" :key="item">
-                  {{ item }}
-                </a-select-option>
-              </a-select>
-            </a-input-group> -->
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="村套/轴承材质">
-            <editSelect :typeData="getValveVillageBearing()" v-decorator="[ 'valve_village_bearing', {rules: [{ message: ''}]} ]" />
-            <!-- <a-input-group compact>
-              <a-input
-                v-decorator="[
-                  'valve_village_bearing',
-                  {rules: [{}]}
-                ]"
-                style="width: 50%" />
-              <a-select default-value="" style="width: 50%" @change="selectValveVillageBearingChange" :allowClear="true">
-                <a-select-option v-for="item in ValveVillageBearing" :value="item" :key="item">
-                  {{ item }}
-                </a-select-option>
-              </a-select>
-            </a-input-group> -->
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item
-            label="垫片材质">
-            <editSelect :typeData="getValveSpacerData()" v-decorator="[ 'valve_spacer', {rules: [{ message: ''}]} ]" />
-            <!-- <a-input-group compact>
-              <a-input
-                v-decorator="[
-                  'valve_spacer',
-                  {rules: [{}]}
-                ]"
-                style="width: 50%" />
-              <a-select default-value="" style="width: 50%" @change="selectValveSpacerChange" :allowClear="true">
-                <a-select-option v-for="item in ValveSpacer" :value="item" :key="item">
-                  {{ item }}
-                </a-select-option>
-              </a-select>
-            </a-input-group> -->
+            label="Push down to">
+            <editSelect :typeData="['Open', 'Close']" v-decorator="[ 'valve_push_done', {rules: [{ message: ''}]} ]" />
           </a-form-item>
         </a-col>
       </a-row>

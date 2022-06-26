@@ -10,7 +10,7 @@
                 width: '300px',
                 height: '350px',
               }"
-              :data-source="SelectArea"
+              :data-source="SelectAreaSource"
               :filter-option="selectAreaFilterOption"
               :target-keys="selectAreaTargets"
               :render="item => item.title"
@@ -360,6 +360,108 @@
             </a-form-item>
           </a-col>
         </a-row>
+        <template v-if="part6_1">
+          <a-divider>气动放大器</a-divider>
+          <a-row :gutter="16">
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="气动放大器品牌">
+                <a-input v-decorator="[ 'slave_air_big_brand', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="气动放大器型号">
+                <a-input v-decorator="[ 'slave_air_big_model', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </template>
+        <template v-if="part6_2">
+          <a-divider>快排</a-divider>
+          <a-row :gutter="16">
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="快排品牌">
+                <a-input v-decorator="[ 'slave_quick_out_brand', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="快排型号">
+                <a-input v-decorator="[ 'slave_quick_out_model', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </template>
+        <template v-if="part6_3">
+          <a-divider>减压阀</a-divider>
+          <a-row :gutter="16">
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="减压阀品牌">
+                <a-input v-decorator="[ 'slave_reducing_valve_brand', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="减压阀型号">
+                <a-input v-decorator="[ 'slave_reducing_valve_model', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </template>
+        <template v-if="part6_4">
+          <a-divider>过滤器</a-divider>
+          <a-row :gutter="16">
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="过滤器品牌">
+                <a-input v-decorator="[ 'slave_filter_brand', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="过滤器型号">
+                <a-input v-decorator="[ 'slave_filter_model', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </template>
+        <template v-if="part6_5">
+          <a-divider>电气转换器</a-divider>
+          <a-row :gutter="16">
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="电气转换器品牌">
+                <a-input v-decorator="[ 'slave_electrical_converter_brand', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="电气转换器型号">
+                <a-input v-decorator="[ 'slave_electrical_converter_model', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </template>
+        <template v-if="part6_6">
+          <a-divider>位置变送器</a-divider>
+          <a-row :gutter="16">
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="位置变送器品牌">
+                <a-input v-decorator="[ 'slave_position_transmitter_brand', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="12" :sm="24">
+              <a-form-item
+                label="位置变送器型号">
+                <a-input v-decorator="[ 'slave_position_transmitter_model', {initialValue: '', rules: [{ message: '', whitespace: true}]} ]" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </template>
         <div><br><br></div>
       </template>
     </a-card>
@@ -395,10 +497,16 @@ export default {
     })
   },
   watch: {
-    targets (val) {
+    targets (val) { // 其它附件 加载数据时用
       this.targetKeys = val
+      this.part6_1 = this.targetKeys.indexOf('1') >= 0
+      this.part6_2 = this.targetKeys.indexOf('2') >= 0
+      this.part6_3 = this.targetKeys.indexOf('3') >= 0
+      this.part6_4 = this.targetKeys.indexOf('4') >= 0
+      this.part6_5 = this.targetKeys.indexOf('5') >= 0
+      this.part6_6 = this.targetKeys.indexOf('6') >= 0
     },
-    selectArea (val) {
+    selectArea (val) { // 附件 加载数据时用
       this.allPart = true
       this.selectAreaTargets = val
       if (this.selectAreaTargets.length <= 0) {
@@ -411,6 +519,27 @@ export default {
       this.part4 = this.selectAreaTargets.indexOf('4') >= 0
       this.part5 = this.selectAreaTargets.indexOf('5') >= 0
       this.part6 = this.selectAreaTargets.indexOf('6') >= 0
+    },
+    selectAreaTargets (val) { // 附件, 选择数据项用
+      this.allPart = true
+      if (this.selectAreaTargets.length <= 0) {
+        this.allPart = false
+        return
+      }
+      this.part1 = this.selectAreaTargets.indexOf('1') >= 0
+      this.part2 = this.selectAreaTargets.indexOf('2') >= 0
+      this.part3 = this.selectAreaTargets.indexOf('3') >= 0
+      this.part4 = this.selectAreaTargets.indexOf('4') >= 0
+      this.part5 = this.selectAreaTargets.indexOf('5') >= 0
+      this.part6 = this.selectAreaTargets.indexOf('6') >= 0
+    },
+    targetKeys (val) { // 其它附件,选择数据项用
+      this.part6_1 = this.targetKeys.indexOf('1') >= 0
+      this.part6_2 = this.targetKeys.indexOf('2') >= 0
+      this.part6_3 = this.targetKeys.indexOf('3') >= 0
+      this.part6_4 = this.targetKeys.indexOf('4') >= 0
+      this.part6_5 = this.targetKeys.indexOf('5') >= 0
+      this.part6_6 = this.targetKeys.indexOf('6') >= 0
     }
   },
   data () {
@@ -419,15 +548,21 @@ export default {
       SlaveBannerList: getValvaBanner(),
       OtherSlaveData: getOtherSlaveData(),
       targetKeys: [],
-      SelectArea: getOtherSlaveSelectArea(),
+      SelectAreaSource: getOtherSlaveSelectArea(),
       selectAreaTargets: [],
-      part1: true,
-      part2: true,
-      part3: true,
-      part4: true,
-      part5: true,
-      part6: true,
-      allPart: true
+      part1: false,
+      part2: false,
+      part3: false,
+      part4: false,
+      part5: false,
+      part6: false,
+      allPart: false,
+      part6_1: false,
+      part6_2: false,
+      part6_3: false,
+      part6_4: false,
+      part6_5: false,
+      part6_6: false
     }
   },
   methods: {
