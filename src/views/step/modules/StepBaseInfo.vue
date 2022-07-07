@@ -72,7 +72,7 @@
             <a-descriptions-item label="阀门型号">{{ valveInfo.valve_model }}</a-descriptions-item>
             <a-descriptions-item label="阀门尺寸">{{ valveInfo.valve_size + " " + getValveSizeUnit(valveInfo.valve_size_unit) }}</a-descriptions-item>
             <a-descriptions-item label="阀门材质">{{ getValveMaterialUnit(valveInfo.valve_material) }}</a-descriptions-item>
-            <a-descriptions-item label="阀门压力等级">{{ valveInfo.valve_pressure_level }}</a-descriptions-item>
+            <a-descriptions-item label="压力等级">{{ valveInfo.valve_pressure_level }}</a-descriptions-item>
             <a-descriptions-item label="阀门流向">{{ valveInfo.valve_flow }}</a-descriptions-item>
             <a-descriptions-item label="Push down to">{{ getValvePushDoneUnit(valveInfo.valve_push_done) }}</a-descriptions-item>
             <a-descriptions-item label="阀门行程">{{ getValveSizeUnitText(valveInfo.valve_travel, valveInfo.valve_travel_unit) }}</a-descriptions-item>

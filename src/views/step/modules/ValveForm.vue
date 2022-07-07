@@ -62,7 +62,7 @@
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="阀门压力等级">
+            label="压力等级">
             <editSelect :typeData="getValvePressureList()" v-decorator="[ 'valve_pressure_level', {rules: [{ message: ''}]} ]" />
             <!-- <a-input-group compact>
               <a-input

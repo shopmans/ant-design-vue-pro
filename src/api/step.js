@@ -971,7 +971,7 @@ export function getActuSpringSetPressureUnit (val) {
     case '5':
     return 'KG'
     default:
-      return ''
+      return 'val'
   }
 }
 
@@ -2288,7 +2288,7 @@ export function getStepBaseFields () {
   'requirst_done_date', 'project_serial', 'serial', 'valve_serial', 'content', 'receipt_number',
   'purchased_part_list', 'control_model', 'process_medium', 'factory_branch', 'base_device', 'batch_number',
   'spec_app', 'stepbase_workerdone_date', 'stepbase_total_minute', 'application_local', 'worker_temp', 'pre_valve_pressure', 'pressure_after_valve',
-  'responsible1', 'responsible2', 'responsible3', 'fault_phenomenon', 'maintenance_content']
+  'responsible1', 'responsible2', 'responsible3', 'fault_phenomenon', 'maintenance_content', 'pre_valve_pressure_unit', 'pressure_after_valve_unit']
 }
 
 export function getStepPartsFields () {
@@ -2323,7 +2323,7 @@ export function getValveFillInputList () {
 
 // 标准测试压力
 export function getValveStdTestPressedList () {
-  return ['Psig', 'Bar', 'MPa', 'Kg/cm2', 'KPa']
+  return ['Psig', 'Bar', 'MPa', 'KPa', 'Kg/cm2']
 }
 
 // 返厂部件
@@ -2365,7 +2365,7 @@ export function getValveTestStd () {
 
 // 执行机类型
 export function getActuType () {
-  return ['直行程', '旋转式-气缸', '旋转-曲柄滑块式', '旋转-齿轮齿条式', '旋转-拨叉式', '多回转', 'Other']
+  return ['直行程', '旋转-曲柄滑块式', '旋转-齿轮齿条式', '旋转-拨叉式', '多回转', 'Other']
 }
 
 // 作用方式
@@ -2662,6 +2662,11 @@ export function getInstallbaseFields () {
   'pressure_p1', 'pressure_p2', 'importance', 'valve_order', 'memo']
 }
 
+// 应用位置
+export function getApplicationLocal () {
+  return ['氧阀', '放空阀', '防喘振阀', 'PDS阀', '三偏心', '锁渣阀']
+}
+
 export function cccccccccccccc () {
   return ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
 }
@@ -2753,7 +2758,7 @@ export function getProcessMediumList () {
 
 // 阀类型
 export function getValveTypeList () {
-  return ['Globe Balanced', 'Globe Unbalanced', 'Butterfly', 'Ball', 'Angle Balanced', 'Angle Unbalanced', 'Others']
+  return ['Globe Balanced', 'Globe Unbalanced', 'Angle Balanced', 'Angle Unbalanced', 'Butterfly', 'Ball', 'Gate', 'Globe', 'Check', 'Other']
 }
 
 // 其它附件根据选择显示不同区域

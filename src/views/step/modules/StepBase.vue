@@ -65,7 +65,7 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-row>
-            <a-col :span="18">
+            <a-col :span="16">
               <a-form-item
                 label="阀门序列号/批次号">
                 <a-input v-decorator="[ 'valve_serial', {rules: [{ message: '', whitespace: true}]} ]" />
@@ -91,17 +91,17 @@
             <a-col :span="6">
               <a-form-item>
                 <!-- <a-switch :checked="switchChecked" v-decorator="[ 'valve_serial_switch', {rules: [{ required: false }]} ]" style="margin-top:45px;margin-left:5px;" @change="valveSerialInputSwitch"></a-switch> -->
-                <a-button style="margin-top:44px;margin-left:5px;" @click="readValveSerial">读取</a-button>
+                <a-button style="margin-top:44px;margin-left:5px;" @click="readValveSerial">从数据库读取</a-button>
               </a-form-item>
             </a-col>
           </a-row>
         </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
+        <!-- <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="批次号">
             <a-input v-decorator="[ 'batch_number', {rules: [{ message: '', whitespace: true}]} ]" />
           </a-form-item>
-        </a-col>
+        </a-col> -->
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="设备类型">
@@ -123,26 +123,14 @@
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="应用位置">
-            <editSelect :typeData="['调节阀', '开关阀', 'Ggc', '仪表', '调压器']" v-decorator="[ 'application_local', {rules: [{ message: ''}]} ]" />
+            <a-input v-decorator="[ 'application_local', {rules: [{ message: '', whitespace: true}]} ]" />
+            <!-- <editSelect :typeData="getApplicationLocal()" v-decorator="[ 'application_local', {rules: [{ message: ''}]} ]" /> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="特殊应用">
-            <a-select
-              @change="repairSelectChange"
-              v-decorator="[
-                'spec_app',
-                {initialValue: '', rules: []}
-              ]"
-              :allowClear="true" >
-              <a-select-option value="1">氧阀</a-select-option>
-              <a-select-option value="2">放空阀</a-select-option>
-              <a-select-option value="3">防喘振阀</a-select-option>
-              <a-select-option value="4">PDS阀</a-select-option>
-              <a-select-option value="5">三偏心</a-select-option>
-              <a-select-option value="6">锁渣阀</a-select-option>
-            </a-select>
+            <editSelect :typeData="getApplicationLocal()" v-decorator="[ 'spec_app', {rules: [{ message: ''}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -165,20 +153,42 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="工作温度">
+            label="工作温度（℃）">
             <a-input v-decorator="[ 'worker_temp', {rules: [{whitespace: true}]} ]" />
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀前压力P1">
-            <editSelect :typeData="getValveStdTestPressedList()" v-decorator="[ 'pre_valve_pressure', {rules: [{ message: ''}]} ]" />
+            <a-input
+              v-decorator="[
+                'pre_valve_pressure',
+                {rules: [{ message: '请输入阀门行程'}]}
+              ]">
+              <a-select v-decorator="[ 'pre_valve_pressure_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 100px" :allowClear="true">
+                <a-select-option v-for="(d,index) in getValveStdTestPressedList()" :key="d" :value="getValveString(index)">
+                  {{ d }}
+                </a-select-option>
+              </a-select>
+            </a-input>
+            <!-- <editSelect :typeData="getValveStdTestPressedList()" v-decorator="[ 'pre_valve_pressure', {rules: [{ message: ''}]} ]" /> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="阀后压力P2">
-            <editSelect :typeData="getValveStdTestPressedList()" v-decorator="[ 'pressure_after_valve', {rules: [{ message: ''}]} ]" />
+            <a-input
+              v-decorator="[
+                'pressure_after_valve',
+                {rules: [{ message: '请输入阀门行程'}]}
+              ]">
+              <a-select v-decorator="[ 'pressure_after_valve_unit', {initialValue: '1', rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 100px" :allowClear="true">
+                <a-select-option v-for="(d,index) in getValveStdTestPressedList()" :key="d" :value="getValveString(index)">
+                  {{ d }}
+                </a-select-option>
+              </a-select>
+            </a-input>
+            <!-- <editSelect :typeData="getValveStdTestPressedList()" v-decorator="[ 'pressure_after_valve', {rules: [{ message: ''}]} ]" /> -->
           </a-form-item>
         </a-col>
       </a-row>
@@ -315,21 +325,6 @@
       <a-row :gutter="16">
         <a-divider orientation="left">5</a-divider>
         <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="工时(min)">
-            <a-input-number
-              style="width:100%;"
-              v-decorator="[
-                'stepbase_total_minute',
-                {rules: []}
-              ]" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="完成日期">
-            <a-date-picker valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['stepbase_workerdone_date', {}]" style="width: 100%" />
-          </a-form-item>
-        </a-col>
-        <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
             label="责任人1">
             <a-select
@@ -379,7 +374,25 @@
         </a-col>
       </a-row>
       <a-row :gutter="16">
+        <a-divider orientation="left">6</a-divider>
+        <a-col :lg="6" :md="12" :sm="24">
+          <a-form-item label="工时(min)">
+            <a-input-number
+              style="width:100%;"
+              v-decorator="[
+                'stepbase_total_minute',
+                {rules: []}
+              ]" />
+          </a-form-item>
+        </a-col>
         <a-col :span="6">
+          <a-form-item label="完成日期">
+            <a-date-picker valueFormat="YYYY-MM-DDTHH:mm:ssZ" v-decorator="['stepbase_workerdone_date', {}]" style="width: 100%" />
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row :gutter="16">
+        <a-col :span="12">
           <a-form-item
             label="故障现象">
             <a-select
@@ -394,6 +407,15 @@
               </a-select-option>
             </a-select>
           </a-form-item>
+          <Transfer
+            :data-source="transferData"
+            :titles="['故障现象', '故障现象']"
+            :target-keys="faultPhenomenonTargetKeys"
+            :selected-keys="faultPhenomenonSelectedKeys"
+            :render="item => item.title"
+            @change="handleFaultPhenomenonChange"
+            @selectChange="handleFaultPhenomenonSelectChange"
+          />
           <!-- <a-col>
             <a-form-item
               label="故障现象及工作内容">
@@ -596,7 +618,7 @@
 import { fetch } from '@/utils/inputSearch'
 import DispatchUser from '@/views/step/modules/DispatchUser'
 import stepBaseReadInstallbase from '@/views/step/modules/StepBaseReadInstallbase'
-import { getColumnsPurchased, getWorkSerialSerial, getProcessMediumList, BaseFillerColumns, BaseFillerColumnNames, newBaseFillerColumns, getValveStdTestPressedList } from '@/api/step'
+import { getColumnsPurchased, getWorkSerialSerial, getProcessMediumList, getApplicationLocal, BaseFillerColumns, BaseFillerColumnNames, newBaseFillerColumns, getValveStdTestPressedList } from '@/api/step'
 import { getProjectList } from '@/api/project'
 import { getUserList } from '@/api/user'
 import moment from 'moment'
@@ -604,7 +626,7 @@ import XLSX from 'xlsx'
 import { querySparePartsBySerial } from '@/api/spareParts'
 import { getMaintenanceContentNames } from '@/api/maintenanceContent'
 import { getFaultPhenomenonNames } from '@/api/faultPhenomenon'
-
+import { Transfer } from 'ant-design-vue'
 import pdfView from '@/components/PdfView'
 import editSelect from '@/components/EditSelect'
 
@@ -614,6 +636,7 @@ export default {
       pdfView,
       DispatchUser,
       editSelect,
+      Transfer,
       stepBaseReadInstallbase
     },
     data () {
@@ -640,7 +663,10 @@ export default {
         flowID: '',
         repairManList: [],
         faultPhenomenonNames: [],
-        maintenanceContentNames: []
+        maintenanceContentNames: [],
+        transferData: [],
+        faultPhenomenonTargetKeys: [],
+        faultPhenomenonSelectedKeys: []
       }
     },
     mounted () {
@@ -708,6 +734,18 @@ export default {
       getMaintenanceContentNames().then(e => {
         this.maintenanceContentNames = e
       })
+      // 故障现像
+      this.transferData.push({
+        key: '1',
+        title: 'sssss',
+        isShow: true
+      },
+      {
+        key: '2',
+        title: '3333',
+        isShow: false
+      }
+      )
     },
     methods: {
       moment,
@@ -719,6 +757,13 @@ export default {
       getProcessMediumList,
       getMaintenanceContentNames,
       getFaultPhenomenonNames,
+      getApplicationLocal,
+      handleFaultPhenomenonChange (nextTargetKeys, direction, moveKeys) {
+        this.faultPhenomenonTargetKeys = nextTargetKeys
+      },
+      handleFaultPhenomenonSelectChange (sourceSelectedKeys, targetSelectedKeys) {
+        this.faultPhenomenonSelectedKeys = [...sourceSelectedKeys, ...targetSelectedKeys]
+      },
       repairSelectChange (value) {
           this.$emit('repairSelectChange', value)
       },
@@ -1076,6 +1121,9 @@ export default {
       },
       selectProcessMediumChange (value) {
         this.$emit('selectInputChange', { process_medium: value })
+      },
+      getValveString (data) {
+        return '' + data + 1
       }
     }
 }

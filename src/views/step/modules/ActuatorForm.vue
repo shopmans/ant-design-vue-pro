@@ -28,7 +28,6 @@
         </a-col>
       </a-row>
       <!-- 行1 -->
-      <a-divider orientation="left">1</a-divider>
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
@@ -106,7 +105,6 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <a-divider orientation="left">2</a-divider>
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
@@ -127,7 +125,7 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="序列号">
+            label="序列号/批次号">
             <a-input-search v-decorator="[ 'actuator_serial', {rules: [{ message: '请输入序列号', whitespace: true}]} ]" @search="copySerialFromValve">
               <a-button slot="enterButton">
                 复制阀门序列号
@@ -136,7 +134,6 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <a-divider orientation="left">3</a-divider>
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
@@ -172,34 +169,21 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="弹簧设置压力">
+            label="弹簧设置范围">
             <a-input
               v-decorator="[
                 'actu_spring_set_pressure',
-                {rules: [{ message: '请输入弹簧设置压力'}]}
+                {rules: [{ message: '请输入弹簧设置范围'}]}
               ]">
               <a-select v-decorator="[ 'actu_spring_set_pressure_unit', {rules: [{ message: '请选择单位'}]}]" slot="addonAfter" style="width: 100px" :allowClear="true">
-                <a-select-option value="1">
-                  Psig
-                </a-select-option>
-                <a-select-option value="2">
-                  Bar
-                </a-select-option>
-                <a-select-option value="3">
-                  Kg/cm2
-                </a-select-option>
-                <a-select-option value="4">
-                  KPa
-                </a-select-option>
-                <a-select-option value="5">
-                  KG
+                <a-select-option v-for="item in StdTestPressed" :value="item" :key="item">
+                  {{ item }}
                 </a-select-option>
               </a-select>
             </a-input>
           </a-form-item>
         </a-col>
       </a-row>
-      <a-divider orientation="left">4</a-divider>
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
@@ -209,18 +193,8 @@
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
-            label="故障失效">
+            label="故障失效位置">
             <editSelect :typeData="getActuFailure()" v-decorator="[ 'actu_failure', {rules: [{ message: ''}]} ]" />
-            <!-- <a-select
-              v-decorator="[
-                'actu_failure',
-                {rules: [{ message: '请选择故障失效'}]}
-              ]"
-              :allowClear="true" >
-              <a-select-option value="1">Open</a-select-option>
-              <a-select-option value="2">Close</a-select-option>
-              <a-select-option value="3">Lock</a-select-option>
-            </a-select> -->
           </a-form-item>
         </a-col>
         <a-col :lg="6" :md="12" :sm="24">
@@ -269,7 +243,6 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <a-divider orientation="left">5</a-divider>
       <a-row class="form-row" :gutter="16">
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item
