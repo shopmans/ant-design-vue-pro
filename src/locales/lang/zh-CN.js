@@ -21,7 +21,7 @@ const locale = {
   'menu.report': '报告',
   'menu.review': '预览',
 
-  'app.version': 'v1.0.23',
+  'app.version': 'v1.0.24',
   'app.flow.repair.start': '新建工单',
   'app.flow.repair.query': '工单管理',
   'app.flow.repair.receipt': '收货',
@@ -275,7 +275,7 @@ const locale = {
 
   'menu.repair.repairbefore.image.title': '维修前图片',
   'menu.repair.repairafter.image.title': '维修后图片',
-
+  'menu.view': '查看',
   'menu.permission': '权限',
   'menu.permission.rolegroup': '用户组',
   'menu.permission.member': '成员',

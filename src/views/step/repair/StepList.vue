@@ -92,6 +92,7 @@
       </div> -->
 
       <!-- ////////////////////////////////////////////////////// 打开工单 -->
+      <!-- :scroll="{ x: 2500 }" -->
       <s-table
         ref="table"
         size="default"
@@ -115,11 +116,13 @@
         </span>
         <span slot="action" slot-scope="text, record">
           <template v-if="record.state === 4">
-            <a @click="handleDescrption(record)">{{ $t('menu.project.view.action.detail') }}</a>
+            <a @click="handleDescrption(record)">{{ $t('menu.view') }}</a>
           </template>
           <template v-else>
             <template>
-              <a @click="handleDescrption(record)">{{ $t('menu.project.view.action.detail') }}</a>
+              <a @click="handleDescrption(record)">{{ $t('menu.view') }}</a>
+              <a-divider type="vertical" />
+              <span>{{ $t('menu.user.manager.action.edit') }}</span>
               <a-divider type="vertical" />
               <!-- <span v-if="record.current_step==='(end)'">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</span>
             <a v-else @click="handleDispatchUser(record)">{{ $t('menu.workOrder.repair.workOrderList.action.dispatch') }}</a>
@@ -128,7 +131,10 @@
               <a v-else @click="handleEdit(record)">{{ $t('menu.workOrder.repair.workOrderList.action.execution') }}</a>
             </template>
             <a-divider type="vertical" />
-            <a-dropdown>
+            <a @click="printStep(record)">{{ $t('menu.project.view.action.print') }}</a>
+            <a-divider type="vertical" />
+            <a @click="colseStep(record)">{{ $t('menu.close') }}</a>
+            <!-- <a-dropdown>
               <a class="ant-dropdown-link">
                 {{ $t('menu.project.view.action.more') }} <a-icon type="down" />
               </a>
@@ -146,7 +152,7 @@
                   <a @click="colseStep(record)">{{ $t('menu.close') }}</a>
                 </a-menu-item>
               </a-menu>
-            </a-dropdown>
+            </a-dropdown> -->
           </template>
         </span>
         <template v-for="(item, index) in columns" :slot="item.slotName">
@@ -390,6 +396,7 @@ const columns = [
   },
   {
     dataIndex: 'action',
+    fixed: 'right',
     slotName: 'menu.project.view.table.column.action',
     scopedSlots: { customRender: 'action', title: 'menu.project.view.table.column.action' }
   }

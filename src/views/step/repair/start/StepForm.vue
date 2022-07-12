@@ -3,7 +3,15 @@
     <a-form @submit="handleSubmit" :form="form" class="form">
       <a-tabs default-active-key="1">
         <a-tab-pane key="1" tab="工单基本信息">
-          <StepBase ref="baseInfo" @selectValveSerialChange="getValveContentByInputSearch($event, getValveContentByInputSearch)" @repairSelectChange="repairSelectChange($event,repairSelectChange)" @projectSelectChange="projectSelectChange($event,projectSelectChange)" @selectInputChange="selectInputChangeEvent($event, selectInputChangeEvent)" />
+          <StepBase
+            ref="baseInfo"
+            @selectFaultPhenomenonChange="selectFaultPhenomenonChange"
+            @selectMaintenanceContentChange="selectMaintenanceContentChange"
+            @selectValveSerialChange="getValveContentByInputSearch($event, getValveContentByInputSearch)"
+            @repairSelectChange="repairSelectChange($event,repairSelectChange)"
+            @projectSelectChange="projectSelectChange($event,projectSelectChange)"
+            @selectInputChange="selectInputChangeEvent($event, selectInputChangeEvent)"
+          />
         </a-tab-pane>
         <a-tab-pane key="2" tab="阀门信息" v-if="showValveForm" :forceRender="true">
           <ValveForm v-if="showValveForm" @selectInputChange="selectInputChangeEvent($event, selectInputChangeEvent)" />
@@ -132,7 +140,26 @@ export default {
     }
   },
   methods: {
-
+    selectFaultPhenomenonChange (data) {
+      if (data && data.length >= 0) {
+        var tmpStr = data[0]
+        for (var i = 1; i < data.length; i++) {
+          tmpStr = tmpStr + '✜' + data[i]
+        }
+        this.form.getFieldDecorator('fault_phenomenon')
+        this.form.setFieldsValue({ fault_phenomenon: tmpStr })
+      }
+    },
+    selectMaintenanceContentChange (data) {
+      if (data && data.length >= 0) {
+        var tmpStr = data[0]
+        for (var i = 1; i < data.length; i++) {
+          tmpStr = tmpStr + '✜' + data[i]
+        }
+        this.form.getFieldDecorator('maintenance_content')
+        this.form.setFieldsValue({ maintenance_content: tmpStr })
+      }
+    },
     // handler
     nextStep () {
       setTimeout(() => {

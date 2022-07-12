@@ -397,7 +397,6 @@ export default {
       this.$emit('selectActuInputChange', { actu_manufacturer: value })
     },
     copySerialFromValve () {
-      console.log(this.$store.state.user.valveSerial)
       this.$emit('selectActuInputChange', { actuator_serial: this.$store.state.user.valveSerial })
     }
   }

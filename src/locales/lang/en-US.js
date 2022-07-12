@@ -51,7 +51,7 @@ const locale = {
   'app.login.welcome': 'Welcome',
   'app.login.welcome.back': 'Welcome Back',
   'app.login.welcome.goodMorning': 'Good Morning',
-
+  'menu.view': 'View',
   'menu.project': 'Project',
   'menu.project.new': 'New Maintenance Project',
   'menu.project.new.valveNumber': 'Number of valves',

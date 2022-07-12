@@ -68,7 +68,7 @@
             <a-col :span="16">
               <a-form-item
                 label="阀门序列号/批次号">
-                <a-input v-decorator="[ 'valve_serial', {rules: [{ message: '', whitespace: true}]} ]" />
+                <a-input @change="valveSerialChange" v-decorator="[ 'valve_serial', {rules: [{ message: '', whitespace: true}]} ]" />
                 <!-- <a-select
                   ref="valveSelect"
                   show-search
@@ -373,8 +373,8 @@
           </a-form-item>
         </a-col>
       </a-row>
+      <a-divider orientation="left">6</a-divider>
       <a-row :gutter="16">
-        <a-divider orientation="left">6</a-divider>
         <a-col :lg="6" :md="12" :sm="24">
           <a-form-item label="工时(min)">
             <a-input-number
@@ -391,9 +391,31 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <a-row :gutter="16">
+      <a-divider orientation="left">7</a-divider>
+      <!-- 故障现象 -->
+      <a-row :gutter="16" type="flex" justify="center">
+        <a-col :span="4">
+        </a-col>
+        <a-col :span="10">
+          <a-row>
+            <a-col :span="14">
+              <a-input v-model="newFaultPhenomenon"></a-input>
+            </a-col>
+            <a-col :span="4">
+              <a-button @click="addFaultPhenomenon" style="margin-left:16px;">新增故障</a-button>
+            </a-col>
+            <a-col :span="4">
+              <a-button @click="delNewFaultPhenomenon" style="margin-left:16px;">删除新增故障</a-button>
+            </a-col>
+          </a-row>
+        </a-col>
+        <a-col :span="6">
+        </a-col>
+      </a-row>
+      <br>
+      <a-row :gutter="16" type="flex" justify="center">
         <a-col :span="12">
-          <a-form-item
+          <!-- <a-form-item
             label="故障现象">
             <a-select
               v-decorator="[
@@ -406,15 +428,77 @@
                 {{ d }}
               </a-select-option>
             </a-select>
-          </a-form-item>
+          </a-form-item> -->
           <Transfer
-            :data-source="transferData"
-            :titles="['故障现象', '故障现象']"
+            :list-style="{
+              width: '300px',
+              height: '350px',
+            }"
+            :data-source="faultPhenomenonData"
+            :titles="['故障现象', '']"
             :target-keys="faultPhenomenonTargetKeys"
             :selected-keys="faultPhenomenonSelectedKeys"
             :render="item => item.title"
             @change="handleFaultPhenomenonChange"
             @selectChange="handleFaultPhenomenonSelectChange"
+          />
+          <a-form-item>
+            <a-input hidden v-decorator="['fault_phenomenon', {rules: []}]"></a-input>
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <!-- 工作内容 -->
+      <br><br><br><br>
+      <a-row type="flex" justify="center">
+        <a-col :span="4">
+        </a-col>
+        <a-col :span="10">
+          <a-row>
+            <a-row>
+              <a-col :span="14">
+                <a-input v-model="newMaintenanceContent"></a-input>
+              </a-col>
+              <a-col :span="5">
+                <a-button @click="addMaintenanceContent" style="margin-left:16px;">新增工作内容</a-button>
+              </a-col>
+              <a-col :span="5">
+                <a-button @click="delNewMaintenanceContent" style="margin-left:16px;">删除新增工作内容</a-button>
+              </a-col>
+            </a-row>
+          </a-row>
+        </a-col>
+        <a-col :span="6">
+        </a-col>
+      </a-row>
+      <br>
+      <a-row :gutter="16" type="flex" justify="center">
+        <a-col :span="12">
+          <!-- <a-form-item
+            label="故障现象">
+            <a-select
+              v-decorator="[
+                'fault_phenomenon',
+                {rules: [{ message: ''}]}
+              ]"
+              :allowClear="true"
+            >
+              <a-select-option v-for="d in faultPhenomenonNames" :key="d">
+                {{ d }}
+              </a-select-option>
+            </a-select>
+          </a-form-item> -->
+          <Transfer
+            :list-style="{
+              width: '300px',
+              height: '350px',
+            }"
+            :data-source="maintenanceContentData"
+            :titles="['工作内容', '']"
+            :target-keys="maintenanceContentTargetKeys"
+            :selected-keys="maintenanceContentSelectedKeys"
+            :render="item => item.title"
+            @change="handleMaintenanceContentChange"
+            @selectChange="handleMaintenanceContentSelectChange"
           />
           <!-- <a-col>
             <a-form-item
@@ -427,33 +511,9 @@
                 ]" />
             </a-form-item>
           </a-col> -->
-        </a-col>
-        <a-col :span="6">
-          <a-form-item
-            label="工作内容">
-            <a-select
-              v-decorator="[
-                'maintenance_content',
-                {rules: [{ message: ''}]}
-              ]"
-              :allowClear="true"
-            >
-              <a-select-option v-for="d in maintenanceContentNames" :key="d">
-                {{ d }}
-              </a-select-option>
-            </a-select>
+          <a-form-item>
+            <a-input hidden v-decorator="['maintenance_content', {rules: []}]"></a-input>
           </a-form-item>
-          <!-- <a-col>
-            <a-form-item
-              label="故障现象及工作内容">
-              <a-textarea
-                rows="6"
-                v-decorator="[
-                  'content',
-                  {rules: []}
-                ]" />
-            </a-form-item>
-          </a-col> -->
         </a-col>
       </a-row>
       <!-- 行2 -->
@@ -664,9 +724,15 @@ export default {
         repairManList: [],
         faultPhenomenonNames: [],
         maintenanceContentNames: [],
-        transferData: [],
+        faultPhenomenonData: [],
+        newFaultPhenomenon: '',
         faultPhenomenonTargetKeys: [],
-        faultPhenomenonSelectedKeys: []
+        faultPhenomenonSelectedKeys: [],
+        customer_fault_phenomenon: '',
+        maintenanceContentTargetKeys: [],
+        maintenanceContentSelectedKeys: [],
+        newMaintenanceContent: '',
+        maintenanceContentData: []
       }
     },
     mounted () {
@@ -681,7 +747,18 @@ export default {
         if (baseInfo.base_filler_data) {
           this.baseFillerSource = baseInfo.base_filler_data
         }
-
+        // 故障现象
+        if (baseInfo.fault_phenomenon) {
+          baseInfo.fault_phenomenon.split('✜').forEach(e => {
+            this.faultPhenomenonTargetKeys.push(e)
+          })
+        }
+        // 工作内容
+        if (baseInfo.maintenance_content) {
+          baseInfo.maintenance_content.split('✜').forEach(e => {
+            this.maintenanceContentTargetKeys.push(e)
+          })
+        }
         // 禁用工程序号选择
         this.showSerialValue = false
         // 准备将上传文件信息保存至state
@@ -728,24 +805,54 @@ export default {
       })
       // 获取故障现象
       getFaultPhenomenonNames().then(e => {
-        this.faultPhenomenonNames = e
+        e.forEach(item => {
+          this.faultPhenomenonData.push({
+            key: item,
+            title: item
+          })
+        })
+        // 加载新增加故障单元
+        this.faultPhenomenonTargetKeys.forEach(e => {
+          var find = false
+          this.faultPhenomenonData.forEach(item => {
+            if (item.key === e) {
+              find = true
+            }
+          })
+          if (!find) {
+            this.faultPhenomenonData.push({
+              key: e,
+              title: e,
+              isNew: true
+            })
+          }
+        })
       })
       // 获取维修内容
       getMaintenanceContentNames().then(e => {
-        this.maintenanceContentNames = e
+        e.forEach(item => {
+          this.maintenanceContentData.push({
+            key: item,
+            title: item
+          })
+        })
+        // 加载新增加工作内容
+        this.maintenanceContentTargetKeys.forEach(e => {
+          var find = false
+          this.maintenanceContentData.forEach(item => {
+            if (item.key === e) {
+              find = true
+            }
+          })
+          if (!find) {
+            this.maintenanceContentData.push({
+              key: e,
+              title: e,
+              isNew: true
+            })
+          }
+        })
       })
-      // 故障现像
-      this.transferData.push({
-        key: '1',
-        title: 'sssss',
-        isShow: true
-      },
-      {
-        key: '2',
-        title: '3333',
-        isShow: false
-      }
-      )
     },
     methods: {
       moment,
@@ -758,11 +865,109 @@ export default {
       getMaintenanceContentNames,
       getFaultPhenomenonNames,
       getApplicationLocal,
+      // 故障现象
       handleFaultPhenomenonChange (nextTargetKeys, direction, moveKeys) {
         this.faultPhenomenonTargetKeys = nextTargetKeys
+        this.$emit('selectFaultPhenomenonChange', this.faultPhenomenonTargetKeys)
       },
       handleFaultPhenomenonSelectChange (sourceSelectedKeys, targetSelectedKeys) {
         this.faultPhenomenonSelectedKeys = [...sourceSelectedKeys, ...targetSelectedKeys]
+      },
+      addFaultPhenomenon () {
+        var find = false
+        if (this.newFaultPhenomenon.length <= 0) { return }
+
+        this.faultPhenomenonData.forEach(e => {
+          if (e.key === this.newFaultPhenomenon) {
+            find = true
+          }
+        })
+        if (find) { return }
+
+        this.faultPhenomenonData.push({
+          key: this.newFaultPhenomenon,
+          title: this.newFaultPhenomenon,
+          isNew: true
+        })
+        this.faultPhenomenonTargetKeys.push(this.newFaultPhenomenon)
+        this.$emit('selectFaultPhenomenonChange', this.faultPhenomenonTargetKeys)
+      },
+      delNewFaultPhenomenon () {
+        var delKeys = []
+        this.faultPhenomenonSelectedKeys.forEach(e => {
+          for (var i = 0; i < this.faultPhenomenonData.length; i++) {
+            if (this.faultPhenomenonData[i].isNew && e === this.faultPhenomenonData[i].key) {
+              this.faultPhenomenonData.splice(i, 1)
+              delKeys.push(e)
+              break
+            }
+          }
+        })
+        delKeys.forEach(e => {
+          for (var i = 0; i < this.faultPhenomenonSelectedKeys.length; i++) {
+            if (this.faultPhenomenonSelectedKeys[i] === e) {
+              this.faultPhenomenonSelectedKeys.splice(i, 1)
+            }
+          }
+          for (var k = 0; k < this.faultPhenomenonTargetKeys.length; k++) {
+            if (this.faultPhenomenonTargetKeys[k] === e) {
+              this.faultPhenomenonTargetKeys.splice(k, 1)
+            }
+          }
+        })
+        this.$emit('selectFaultPhenomenonChange', this.faultPhenomenonTargetKeys)
+      },
+      // 工作内容
+      handleMaintenanceContentChange (nextTargetKeys, direction, moveKeys) {
+        this.maintenanceContentTargetKeys = nextTargetKeys
+        this.$emit('selectMaintenanceContentChange', this.maintenanceContentTargetKeys)
+      },
+      handleMaintenanceContentSelectChange (sourceSelectedKeys, targetSelectedKeys) {
+        this.maintenanceContentSelectedKeys = [...sourceSelectedKeys, ...targetSelectedKeys]
+      },
+      addMaintenanceContent () {
+        var find = false
+        if (this.newMaintenanceContent.length <= 0) { return }
+
+        this.maintenanceContentData.forEach(e => {
+          if (e.key === this.newMaintenanceContent) {
+            find = true
+          }
+        })
+        if (find) { return }
+
+        this.maintenanceContentData.push({
+          key: this.newMaintenanceContent,
+          title: this.newMaintenanceContent,
+          isNew: true
+        })
+        this.maintenanceContentTargetKeys.push(this.newMaintenanceContent)
+        this.$emit('selectMaintenanceContentChange', this.maintenanceContentTargetKeys)
+      },
+      delNewMaintenanceContent () {
+        var delKeys = []
+        this.maintenanceContentSelectedKeys.forEach(e => {
+          for (var i = 0; i < this.maintenanceContentData.length; i++) {
+            if (this.maintenanceContentData[i].isNew && e === this.maintenanceContentData[i].key) {
+              this.maintenanceContentData.splice(i, 1)
+              delKeys.push(e)
+              break
+            }
+          }
+        })
+        delKeys.forEach(e => {
+          for (var i = 0; i < this.maintenanceContentSelectedKeys.length; i++) {
+            if (this.maintenanceContentSelectedKeys[i] === e) {
+              this.maintenanceContentSelectedKeys.splice(i, 1)
+            }
+          }
+          for (var k = 0; k < this.maintenanceContentTargetKeys.length; k++) {
+            if (this.maintenanceContentTargetKeys[k] === e) {
+              this.maintenanceContentTargetKeys.splice(k, 1)
+            }
+          }
+        })
+        this.$emit('selectMaintenanceContentChange', this.maintenanceContentTargetKeys)
       },
       repairSelectChange (value) {
           this.$emit('repairSelectChange', value)
@@ -994,6 +1199,9 @@ export default {
           that.$emit('selectValveSerialChange', e)
           this.$store.commit('VALVE_SERIAL', value)
         })
+      },
+      valveSerialChange (value) {
+        this.$store.commit('VALVE_SERIAL', value.target.value)
       },
       // 从数据库读取installbase数据
       readValveSerial () {

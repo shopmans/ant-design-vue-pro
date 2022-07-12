@@ -27,51 +27,60 @@
       <!-- 行1 -->
       <template>
         <a-divider>定位器</a-divider>
+        <a-row class="form-row" :gutter="16">
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item
+              label="定位器出厂日期">
+              <a-date-picker
+                style="width:100%;"
+                valueFormat="YYYY-MM-DDTHH:mm:ssZ"
+                v-decorator="[
+                  'slave_locator_manufacture_date',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-form-item
+              label="定位器投用日期">
+              <a-date-picker
+                style="width:100%;"
+                valueFormat="YYYY-MM-DDTHH:mm:ssZ"
+                v-decorator="[
+                  'slave_locator_production_date',
+                  {rules: []}
+                ]" />
+            </a-form-item>
+          </a-col>
+        </a-row>
         <a-row :gutter="16">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item
               label="定位器品牌">
               <editSelect :typeData="getValvaBanner()" v-decorator="[ 'slave_locator_brand', {rules: [{ message: ''}]} ]" />
-              <!-- <a-input-group compact>
-                <a-input
-                  v-decorator="[
-                    'slave_locator_brand',
-                    {initialValue: 'FISHER', rules: [{ message: '请输入阀门品牌'}]}
-                  ]"
-                  style="width: 65%" />
-                <a-select style="width: 35%" @change="selectSalveBannerInputChange" :allowClear="true">
-                  <a-select-option v-for="item in SlaveBannerList" :value="item" :key="item">
-                    {{ item }}
-                  </a-select-option>
-                </a-select>
-              </a-input-group> -->
-            </a-form-item>
-          </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item
-              label="定位器序列号">
-              <a-input v-decorator="[ 'slave_locator_serial', {rules: [{ message: '请输入定位器序列号', whitespace: true}]} ]" />
             </a-form-item>
           </a-col>
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item
               label="定位器型号">
               <editSelect :typeData="getSalveLocaModList()" v-decorator="[ 'slave_locator_model', {rules: [{ message: ''}]} ]" />
-              <!-- <a-input-group compact>
-                <a-input
-                  v-decorator="[
-                    'slave_locator_model',
-                    {initialValue: 'DVC6200' , rules: [{ message: '请输入阀门品牌'}]}
-                  ]"
-                  style="width: 65%" />
-                <a-select default-value="DVC6200" style="width: 35%" @change="selectSalveLocaModInputChange" :allowClear="true">
-                  <a-select-option v-for="item in SalveLocaModList" :value="item" :key="item">
-                    {{ item }}
-                  </a-select-option>
-                </a-select>
-              </a-input-group> -->
             </a-form-item>
           </a-col>
+          <a-col :lg="6" :md="12" :sm="24">
+            <a-row gutter="0" type="flex" align="middle">
+              <a-col :span="16">
+                <a-form-item
+                  label="定位器序列号">
+                  <a-input v-decorator="[ 'slave_locator_serial', {rules: [{ message: '请输入定位器序列号', whitespace: true}]} ]" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="5">
+                <a-button style="margin-top:12px;" @click="slaveLocatorCopyValvaSerial">复制阀门序列号</a-button>
+              </a-col>
+            </a-row>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item
               label="定位器等级">
@@ -134,11 +143,12 @@
               <a-select
                 v-decorator="[
                   'slave_standard_output',
-                  {initialValue: '2', rules: [{ message: '请输入标准输出'}]}
+                  {rules: [{ message: '请输入标准输出'}]}
                 ]"
                 :allowClear="true" >
-                <a-select-option value="1">100-75-50-25-0</a-select-option>
-                <a-select-option value="2">0-25-50-75-100</a-select-option>
+                <a-select-option v-for="item in getSlaveStandardOutput()" :value="item" :key="item">
+                  {{ item }}
+                </a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -471,7 +481,7 @@
 <script>
 import { Transfer } from 'ant-design-vue'
 import { getValvaBanner, getSalveLocaModList, getOtherSlaveData, getOtherSlaveSelectArea, getSlaveLocatorLeval, getSlaveLocatorActionmode,
-getSlaveInputSignalScope, getSlaveRetainingValveActive } from '@/api/step'
+getSlaveInputSignalScope, getSlaveRetainingValveActive, getSlaveStandardOutput } from '@/api/step'
 import editSelect from '@/components/EditSelect'
 
 export default {
@@ -572,6 +582,7 @@ export default {
     getSlaveLocatorActionmode,
     getSlaveInputSignalScope,
     getSlaveRetainingValveActive,
+    getSlaveStandardOutput,
     selectSalveBannerInputChange (value) {
       this.$emit('selectSlaveInputChange', { slave_locator_brand: value })
     },
@@ -597,6 +608,9 @@ export default {
       this.$emit('selectAreaOtherSlaveChange', { selectAreaTargets: targetKeys })
     },
     selectAreaHandleSearch (dir, value) {
+    },
+    slaveLocatorCopyValvaSerial () {
+      this.$emit('slaveLocatorCopyValvaSerial', { slave_locator_serial: this.$store.state.user.valveSerial })
     }
   }
 }

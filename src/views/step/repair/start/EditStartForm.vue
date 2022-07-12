@@ -3,7 +3,15 @@
     <a-form @submit="handleSubmit" :form="form" class="form">
       <a-tabs default-active-key="1">
         <a-tab-pane key="1" tab="工单基本信息" :forceRender="true">
-          <StepBase ref="baseInfo" @selectValveSerialChange="getValveContentByInputSearch($event, getValveContentByInputSearch)" @repairSelectChange="repairSelectChange($event,repairSelectChange)" @projectSelectChange="projectSelectChange($event,projectSelectChange)" @selectInputChange="selectInputChangeEvent($event, selectInputChangeEvent)" />
+          <StepBase
+            ref="baseInfo"
+            @selectFaultPhenomenonChange="selectFaultPhenomenonChange"
+            @selectMaintenanceContentChange="selectMaintenanceContentChange"
+            @selectValveSerialChange="getValveContentByInputSearch($event, getValveContentByInputSearch)"
+            @repairSelectChange="repairSelectChange($event,repairSelectChange)"
+            @projectSelectChange="projectSelectChange($event,projectSelectChange)"
+            @selectInputChange="selectInputChangeEvent($event, selectInputChangeEvent)"
+          />
         </a-tab-pane>
         <a-tab-pane key="2" tab="阀门信息" v-if="showValveForm" :forceRender="true">
           <ValveForm v-if="showValveForm" ref="valveForm" @selectInputChange="selectInputChangeEvent($event, selectInputChangeEvent)" />
@@ -18,7 +26,8 @@
             :selectArea="selectAreaTargetProp"
             @selectSlaveInputChange="selectSlaveInputChangeEvent($event, selectSlaveInputChangeEvent)"
             @selectOtherSlaveChange="selectOtherSlaveChangeEvent($event, selectOtherSlaveChangeEvent)"
-            @selectAreaOtherSlaveChange="selectAreaOtherSlaveChangeEvent($event, selectAreaOtherSlaveChangeEvent)" />
+            @selectAreaOtherSlaveChange="selectAreaOtherSlaveChangeEvent($event, selectAreaOtherSlaveChangeEvent)"
+            @slaveLocatorCopyValvaSerial="slaveLocatorCopyValvaSerial"/>
         </a-tab-pane>
         <a-tab-pane key="5" tab="零部件信息" v-if="showPartsForm" :forceRender="true">
           <ValveParts v-if="showPartsForm" />
@@ -160,63 +169,83 @@ export default {
     })
     var that = this
     setTimeout(function () {
-        dataList.forEach(item => {
-            if (item.DataNum === 1) {
-              const tmpBaseInfo = JSON.parse(item.JSON)
-              tmpBaseInfo.project_serial = that.projectData.serial
-              that.$refs.baseInfo.$emit('baseHasEdit', tmpBaseInfo)
-              that.form.setFieldsValue(pick(tmpBaseInfo, that.stepBaseFields))
-              that.$store.commit('VALVE_SERIAL', tmpBaseInfo.valve_serial)
-            } else if (that.showValveForm && item.DataNum === 2) {
-                const valvaData = JSON.parse(item.JSON)
-                that.form.setFieldsValue(pick(valvaData, that.stepValveFields))
+      dataList.forEach(item => {
+        if (item.DataNum === 1) {
+          const tmpBaseInfo = JSON.parse(item.JSON)
+          tmpBaseInfo.project_serial = that.projectData.serial
+          that.$refs.baseInfo.$emit('baseHasEdit', tmpBaseInfo)
+          that.form.setFieldsValue(pick(tmpBaseInfo, that.stepBaseFields))
+          that.$store.commit('VALVE_SERIAL', tmpBaseInfo.valve_serial)
+        } else if (that.showValveForm && item.DataNum === 2) {
+            const valvaData = JSON.parse(item.JSON)
+            that.form.setFieldsValue(pick(valvaData, that.stepValveFields))
 
-                // 根据阀类型决定流向字段内容
-                const valveType = that.form.getFieldsValue(['valve_type'])
-                switch (valveType.valve_type) {
-                  case '1':
-                  case '2': { // 选择的  GLOBE balanced    GLOBE unbalanced
-                    that.$refs.valveForm.selectArray = that.$refs.valveForm.globeValveTypeSelect
-                    that.$refs.valveForm.selectArrayKey = that.$refs.valveForm.globeValveTypeSelectKey
-                    that.$refs.valveForm.valueTypeValue = '1'
-                    break
-                  }
-                  case '3': {
-                    that.$refs.valveForm.selectArray = that.$refs.valveForm.butterflyValveTypeSelect
-                    that.$refs.valveForm.selectArrayKey = that.$refs.valveForm.butterflyValveTypeSelectKey
-                    that.$refs.valveForm.valueTypeValue = '1'
-                    break
-                  }
-                  case '4': {
-                    that.$refs.valveForm.selectArray = that.$refs.valveForm.BallValveTypeSelect
-                    that.$refs.valveForm.selectArrayKey = that.$refs.valveForm.BallValveTypeSelectKey
-                    that.$refs.valveForm.valueTypeValue = '1'
-                    break
-                  }
-                  case '5': {
-                    that.$refs.valveForm.valueTypeValue = '5'
-                    that.form.setFieldsValue({ valve_flow_input: that.form.getFieldsValue(['valve_flow_input']).valve_flow_input })
-                  }
-                }
-
-                // 还原阀门序号 还原阀门输入选择开关
-                that.$refs.valveForm.addValveSelectData(valvaData.valve_serial, valvaData.valve_serial, valvaData.valve_serial_switch)
-            } else if (that.showActuatorForm && item.DataNum === 3) {
-                that.form.setFieldsValue(pick(JSON.parse(item.JSON), that.stepActuatorFields))
-            } else if (that.showSlaveForm && item.DataNum === 4) {
-                const tmpSlaveData = JSON.parse(item.JSON)
-                that.slaveOtherTargets = tmpSlaveData.other_slave_target
-                that.otherSlaveTarget = that.slaveOtherTargets
-                that.selectAreaTarget = tmpSlaveData.other_slave_select_area
-                that.selectAreaTargetProp = that.selectAreaTarget
-                that.form.setFieldsValue(pick(tmpSlaveData, that.stepSlaveFields))
-            } else if (that.showPartsForm && item.DataNum === 5) {
-                that.form.setFieldsValue(pick(JSON.parse(item.JSON), that.stepPartsFields))
+            // 根据阀类型决定流向字段内容
+            const valveType = that.form.getFieldsValue(['valve_type'])
+            switch (valveType.valve_type) {
+              case '1':
+              case '2': { // 选择的  GLOBE balanced    GLOBE unbalanced
+                that.$refs.valveForm.selectArray = that.$refs.valveForm.globeValveTypeSelect
+                that.$refs.valveForm.selectArrayKey = that.$refs.valveForm.globeValveTypeSelectKey
+                that.$refs.valveForm.valueTypeValue = '1'
+                break
+              }
+              case '3': {
+                that.$refs.valveForm.selectArray = that.$refs.valveForm.butterflyValveTypeSelect
+                that.$refs.valveForm.selectArrayKey = that.$refs.valveForm.butterflyValveTypeSelectKey
+                that.$refs.valveForm.valueTypeValue = '1'
+                break
+              }
+              case '4': {
+                that.$refs.valveForm.selectArray = that.$refs.valveForm.BallValveTypeSelect
+                that.$refs.valveForm.selectArrayKey = that.$refs.valveForm.BallValveTypeSelectKey
+                that.$refs.valveForm.valueTypeValue = '1'
+                break
+              }
+              case '5': {
+                that.$refs.valveForm.valueTypeValue = '5'
+                that.form.setFieldsValue({ valve_flow_input: that.form.getFieldsValue(['valve_flow_input']).valve_flow_input })
+              }
             }
-        })
+
+            // 还原阀门序号 还原阀门输入选择开关
+            that.$refs.valveForm.addValveSelectData(valvaData.valve_serial, valvaData.valve_serial, valvaData.valve_serial_switch)
+        } else if (that.showActuatorForm && item.DataNum === 3) {
+            that.form.setFieldsValue(pick(JSON.parse(item.JSON), that.stepActuatorFields))
+        } else if (that.showSlaveForm && item.DataNum === 4) {
+            const tmpSlaveData = JSON.parse(item.JSON)
+            that.slaveOtherTargets = tmpSlaveData.other_slave_target
+            that.otherSlaveTarget = that.slaveOtherTargets
+            that.selectAreaTarget = tmpSlaveData.other_slave_select_area
+            that.selectAreaTargetProp = that.selectAreaTarget
+            that.form.setFieldsValue(pick(tmpSlaveData, that.stepSlaveFields))
+        } else if (that.showPartsForm && item.DataNum === 5) {
+            that.form.setFieldsValue(pick(JSON.parse(item.JSON), that.stepPartsFields))
+        }
+      })
     }, 10)
   },
   methods: {
+    selectFaultPhenomenonChange (data) {
+      if (data && data.length >= 0) {
+        var tmpStr = data[0]
+        for (var i = 1; i < data.length; i++) {
+          tmpStr = tmpStr + '✜' + data[i]
+        }
+        this.form.getFieldDecorator('fault_phenomenon')
+        this.form.setFieldsValue({ fault_phenomenon: tmpStr })
+      }
+    },
+    selectMaintenanceContentChange (data) {
+      if (data && data.length >= 0) {
+        var tmpStr = data[0]
+        for (var i = 1; i < data.length; i++) {
+          tmpStr = tmpStr + '✜' + data[i]
+        }
+        this.form.getFieldDecorator('maintenance_content')
+        this.form.setFieldsValue({ maintenance_content: tmpStr })
+      }
+    },
     repairSelectChange (value) {
       switch (value) {
         // 阀门
@@ -319,6 +348,9 @@ export default {
     },
     selectActuInputChangeEvent (data) {
       this.form.setFieldsValue(pick(data, this.stepActuatorFields))
+    },
+    slaveLocatorCopyValvaSerial (data) {
+      this.form.setFieldsValue(pick(data, this.stepSlaveFields))
     },
     selectSlaveInputChangeEvent (data) {
       this.form.setFieldsValue(pick(data, this.stepSlaveFields))

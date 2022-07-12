@@ -1375,6 +1375,8 @@ export function getSlaveInputSignalScopeUnit (val) {
       return '3-9 Psi'
     case '5':
       return '3-15 Psi'
+    case '6':
+      return '0-100'
     default:
       return ''
   }
@@ -1505,15 +1507,11 @@ export function getSlaveElectValveActiveUnit (val) {
 export function getSlaveLocatorActionmodeUnit (val) {
   switch (val) {
     case '1':
-      return '正作用'
+      return '单作用正作用'
     case '2':
-      return '反作用'
+      return '单作用反作用'
     case '3':
       return '双作用'
-    case '4':
-      return '分程正作用'
-    case '5':
-      return '分程反作用'
     default:
       return ''
   }
@@ -2240,8 +2238,8 @@ export function takeAttachment (data, that) { // 附件
     data.slave_locator_model = selectValue[0]
     data.slave_retaining_valve_model = selectValue[1]
     data.slave_filter_valve_model = selectValue[2]
-    data.slave_locator_serial = data.valve_serial
   }
+  data.slave_locator_serial = data.valve_serial
 }
 
 export function getStepValveFields () {
@@ -2279,7 +2277,8 @@ export function getStepSlaveFields () {
   'slave_retaining_valve_brand', 'slave_retaining_valve_model', 'slave_retaining_valve_setpoint', 'slave_retaining_valve_setpoint_unit',
   'slave_retaining_valve_active', 'slave_air_big_brand', 'slave_air_big_model', 'slave_quick_out_brand', 'slave_quick_out_model',
   'slave_reducing_valve_brand', 'slave_reducing_valve_model', 'slave_filter_brand', 'slave_filter_model', 'slave_electrical_converter_brand',
-  'slave_electrical_converter_model', 'slave_position_transmitter_brand', 'slave_position_transmitter_model']
+  'slave_electrical_converter_model', 'slave_position_transmitter_brand', 'slave_position_transmitter_model', 'slave_locator_manufacture_date',
+  'slave_locator_production_date']
 }
 
 export function getStepBaseFields () {
@@ -2405,12 +2404,17 @@ export function getSlaveLocatorLeval () {
 
 // 定位器作用方式
 export function getSlaveLocatorActionmode () {
-  return ['正作用', '反作用', '双作用', '分程正作用', '分程反作用']
+  return ['单作用正作用', '单作用反作用', '双作用']
 }
 
 // 输入信号范围
 export function getSlaveInputSignalScope () {
-  return ['4-20mA', '4-12mA', '12-20mA', '3-9 Psi', '3-15 Psi']
+  return ['4-20mA', '4-12mA', '12-20mA', '3-9 Psi', '3-15 Psi', '0-100']
+}
+
+// 标准输出
+export function getSlaveStandardOutput () {
+  return ['100-75-50-25-0', '0-25-50-75-100', '100-0']
 }
 
 // 保位/切换阀动作
@@ -2712,7 +2716,7 @@ export function getValveStdTestInputList () {
 }
 
 export function getSalveLocaModList () {
-  return ['3570', '3580', '3582', '3582i', '3610', '3610J', '3610JP', '3611JP', '3620JP', '3621JP', '3622', '3661', '3710', '3720', 'DV2000', 'DVC6000F', 'DVC6010', 'DVC6020', 'DVC6030', 'DVC6200', 'DVC6200F', 'DVC6200P', 'Other']
+  return ['DVC6200', '3800SA\\DVC2000', 'DVC6205', 'DVC6200f', 'DVC6200P', 'DVC6010', 'DVC6020', 'DVC6030', '3582i', '3661', '3610JP', '3620JP', '3570', '3580', '3582', '3610', '3610J', '3611JP', '3621JP', '3622', '3710', '3720', 'DV2000', 'DVC6000F', 'DVC6200F', 'Other']
 }
 
 // 其它附件
